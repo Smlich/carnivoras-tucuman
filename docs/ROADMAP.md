@@ -102,7 +102,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 ## Semana 6 — Calidad, SEO y publicación
 
-- Ampliar las pruebas automatizadas de configuración/OAuth hacia rutas críticas del catálogo y pedido; completar la revisión de accesibilidad.
+- Ampliar las pruebas automatizadas del catálogo demo a consultas MongoDB y a las reglas de pedidos, una vez definidas; completar la revisión de accesibilidad.
 - Publicar en un hosting adecuado para frontend y backend.
 - Configurar dominio, HTTPS, Search Console, sitemap y medición de rendimiento.
 - Crear páginas indexables por producto con descripciones propias y datos estructurados únicamente cuando precio y disponibilidad sean reales.
@@ -112,9 +112,9 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado parcial de rendimiento:** el catálogo genera variantes adaptables de imágenes y conserva los originales; recorre la [lección de optimización de imágenes](LESSON_05_IMAGE_OPTIMIZATION.md) y completa la medición de red en DevTools.
 
-**Estado parcial de integración continua:** `.github/workflows/ci.yml` instala con `npm ci`, ejecuta `npm test` y construye el frontend en pull requests y cambios a `main`. La suite actual valida configuración y disponibilidad OAuth sin proveedores externos; ampliar pruebas a catálogo y pedido y completar la auditoría integral de accesibilidad siguen pendientes. Netlify publica automáticamente los cambios de `main`.
+**Estado parcial de integración continua:** `.github/workflows/ci.yml` instala con `npm ci`, ejecuta `npm test` y construye el frontend en pull requests y cambios a `main`. La suite cubre configuración, disponibilidad OAuth y lectura/filtros del catálogo en modo demo. Faltan pruebas de integración con MongoDB, el flujo de pedidos y la auditoría integral de accesibilidad. Netlify publica automáticamente los cambios de `main`.
 
-**Lección:** recorre [integración continua con GitHub Actions](LESSON_06_GITHUB_ACTIONS.md) y [las pruebas de configuración y OAuth](LESSON_11_API_CONFIGURATION_TESTS.md) para relacionar cada aserción y comando con CI.
+**Lección:** recorre [integración continua con GitHub Actions](LESSON_06_GITHUB_ACTIONS.md), [las pruebas de configuración y OAuth](LESSON_11_API_CONFIGURATION_TESTS.md) y [las pruebas del catálogo](LESSON_12_CATALOG_API_TESTS.md) para relacionar cada aserción y comando con CI.
 
 **Entrega:** versión de portafolio desplegada, instrucciones reproducibles, [plan mensual de contenidos](CONTENT_PLAN.md) adaptado a las redes oficiales y lista de mejoras priorizada.
 

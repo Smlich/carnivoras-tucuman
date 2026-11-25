@@ -35,7 +35,7 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 | Datos | MongoDB Atlas, Mongoose | Clúster Free conectado en AWS São Paulo; ocho productos sembrados; la API confirma `meta.source: mongodb`. |
 | Autenticación | Better Auth, Google y Facebook | Adaptador conectado a Atlas; faltan credenciales de proveedores y sesiones OAuth verificadas. |
 | Pedido | localStorage y enlace WhatsApp | Genera una consulta; no registra una orden ni procesa pagos. |
-| Calidad | documentación, ADR, plan de aprendizaje, Node test runner y CI en GitHub Actions | Suite automatizada local para reglas de configuración, perfil de Facebook y estado OAuth; CI ejecuta pruebas y build. Faltan las sesiones OAuth reales, pruebas de compra y auditoría integral. |
+| Calidad | documentación, ADR, plan de aprendizaje, Node test runner y CI en GitHub Actions | Suite automatizada para configuración, perfil de Facebook, estado OAuth y contratos de lectura del catálogo demo; CI ejecuta pruebas y build. Faltan integración de consultas MongoDB, sesiones OAuth reales, pruebas de compra y auditoría integral. |
 
 ### Vista previa pública
 
@@ -62,6 +62,7 @@ Adapta este guion con tus propias palabras después de recorrer [la lección del
 - Definir privacidad, condiciones de venta, dominio y alojamiento.
 - Comprobar que cada cambio en `main` genere un deploy exitoso en Netlify y documentar el historial reciente.
 - Añadir la cobertura automatizada prevista y un ciclo completo de pedido cuando se definan reglas de venta.
+- Extender las pruebas del catálogo demo a consultas MongoDB sin depender de un clúster externo.
 
 ## Enlaces internos
 

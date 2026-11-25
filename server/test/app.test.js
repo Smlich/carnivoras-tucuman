@@ -1,20 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createApp } from '../src/app.js';
+import { startTestServer } from './helpers/http.js';
 
 test('expone si OAuth está habilitado sin revelar configuración privada', async (context) => {
-  const server = createApp().listen(0, '127.0.0.1');
-  context.after(() => new Promise((resolve, reject) => {
-    server.close((error) => error ? reject(error) : resolve());
-  }));
-
-  await new Promise((resolve, reject) => {
-    server.once('listening', resolve);
-    server.once('error', reject);
-  });
-
-  const { port } = server.address();
-  const origin = `http://127.0.0.1:${port}`;
+  const origin = await startTestServer(createApp(), context);
   const statusResponse = await fetch(`${origin}/api/auth/status`);
   assert.equal(statusResponse.status, 200);
   assert.equal(statusResponse.headers.get('cache-control'), 'no-store');

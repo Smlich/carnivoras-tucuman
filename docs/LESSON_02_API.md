@@ -23,6 +23,8 @@ Entender el recorrido de una petición web desde React hasta Express y distingui
 
 La ruta `GET /api/auth/status` aplica el mismo principio de contrato explícito: informa si OAuth está activo y qué proveedores se habilitaron, pero nunca devuelve IDs ni secretos. Los tests de configuración y esta ruta están descritos en [la lección de pruebas](LESSON_11_API_CONFIGURATION_TESTS.md).
 
+El contrato del catálogo también se prueba en [la lección de pruebas del catálogo](LESSON_12_CATALOG_API_TESTS.md): filtros válidos, paginación, detalle y respuestas predecibles para parámetros inválidos o productos inexistentes.
+
 ## Práctica guiada
 
 1. Con npm run dev:all activo, abre GET /api/health y lee database y catalogMode.

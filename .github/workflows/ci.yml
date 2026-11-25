@@ -30,7 +30,7 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Run server configuration and auth readiness tests
+      - name: Run API contract and configuration tests
         run: npm test
 
       - name: Build the storefront
