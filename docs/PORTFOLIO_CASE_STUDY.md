@@ -1,6 +1,6 @@
 # Caso de estudio para portafolio
 
-> Borrador basado en el estado actual. La vista estática de Netlify se actualiza desde `main`. Google OAuth ya se verificó en desarrollo local; la aplicación MERN de producción no está desplegada y Facebook sigue pendiente.
+> Borrador basado en el estado actual. La vista estática de Netlify se actualiza desde `main`. Google OAuth ya se verificó en desarrollo local; la aplicación MERN de producción no está desplegada. Facebook queda diferido mientras Meta no complete la verificación por SMS.
 
 ## Carnívoras Tucumán — tienda web full stack en evolución
 

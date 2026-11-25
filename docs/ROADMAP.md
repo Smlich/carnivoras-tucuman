@@ -87,6 +87,8 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Actualización (25 de noviembre de 2026):** se creó el cliente web de Google `CarnivorasT`, se registró el callback `http://localhost:5173/api/auth/callback/google`, se guardaron las credenciales solo en `.env` y se completó un inicio de sesión real en `http://localhost:5173`. La app permanece en modo Testing. Facebook todavía no está configurado. Seguiremos usando opciones gratuitas y no habilitaremos servicios pagos para esta etapa.
 
+**Prioridad actual:** Facebook queda para una implementación futura porque Meta no envía el SMS de verificación necesario para continuar. No se bloqueará el avance de la tienda por ese trámite: primero se pulirá la experiencia pública, el catálogo, el pedido de consulta por WhatsApp y la guía de cuidados, sin incorporar alojamiento pago.
+
 **Lección:** recorre [OAuth, sesiones y secretos](LESSON_03_OAUTH_AND_SECRETS.md) antes de configurar proveedores reales. La lectura enseña el flujo sin necesitar compartir credenciales.
 
 **Práctica guiada:** sigue [la configuración de Google y Facebook](LESSON_07_OAUTH_PROVIDER_SETUP.md) para crear credenciales locales, registrar los callbacks exactos y probar las cuentas de desarrollo sin exponer secretos.
