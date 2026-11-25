@@ -61,7 +61,7 @@ Para regenerar variantes después de agregar o actualizar fotos autorizadas, eje
 
 ## Ruta de aprendizaje
 
-Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md), [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md), [la guía de cuidados indexable](docs/LESSON_08_INDEXABLE_CARE_GUIDE.md) y [el recorrido de Netlify a Hostinger](docs/LESSON_09_DEPLOYMENT_PATHS.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
+Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md), [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md), [la guía de cuidados indexable](docs/LESSON_08_INDEXABLE_CARE_GUIDE.md), [el recorrido de Netlify a Hostinger](docs/LESSON_09_DEPLOYMENT_PATHS.md) y [el sistema visual](docs/LESSON_10_VISUAL_SYSTEM.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
 
 ## Portafolio
 

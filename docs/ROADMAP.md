@@ -34,6 +34,17 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Aprendizaje:** diferenciar una vista previa estática de una aplicación MERN en producción y preparar variables por entorno.
 
+## Hito 0.3 — Sistema visual juvenil y legible
+
+**Estado:** primera versión implementada y documentada; compilación de producción verificada. La vista de Netlify todavía necesita actualizarse para revisar el resultado público.
+
+- Definir tokens de color y tipografía reutilizables.
+- Usar fuentes de personalidad en títulos y acentos cortos y una fuente legible en el catálogo y la guía.
+- Mantener las fotografías reales del vivero.
+- Unificar la guía de cuidados con la paleta y los encabezados de la tienda.
+
+**Aprendizaje:** seguir [la lección del sistema visual](LESSON_10_VISUAL_SYSTEM.md) y practicar el uso de variables CSS antes de añadir componentes nuevos.
+
 ## Semana 1 — Fundamentos y revisión del frontend
 
 - Recorrer cada componente y explicar el flujo de un pedido.

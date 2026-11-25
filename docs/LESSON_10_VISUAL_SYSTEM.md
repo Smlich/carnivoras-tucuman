@@ -1,0 +1,74 @@
+# Lección 10 — Un sistema visual moderno y coherente
+
+## Objetivo
+
+Aprender a dar personalidad a una página sin sacrificar legibilidad, y dejar las decisiones listas para reutilizar en otras páginas y proyectos.
+
+## La regla de marca
+
+La tienda usa fotos reales de las plantas del negocio. No reemplaces una planta por una ilustración, una foto de stock ni una imagen generada: la imagen del catálogo debe ayudar al cliente a entender qué va a recibir. El logo y las fotos se conservan como archivos fuente; CSS puede decidir cómo encuadrarlas en una tarjeta.
+
+La identidad visual mezcla verde botánico y fondos cálidos con una energía inspirada en anime y lettering. Las fuentes con más personalidad aparecen en títulos y acentos cortos; las descripciones, las preguntas frecuentes y los controles usan una fuente fácil de leer.
+
+## Paso 1: declarar los valores de la marca
+
+Abre `src/styles.css` y mira el bloque `:root`. Las variables CSS guardan colores y familias tipográficas una sola vez:
+
+```css
+:root {
+  --color-forest-deep: #142b21;
+  --color-forest: #214f38;
+  --color-lime: #d2f46a;
+  --color-orange: #ed5736;
+  --color-paper: #fbf9f0;
+  --sans: 'DM Sans', 'Segoe UI', sans-serif;
+  --heading: 'Bangers', Impact, sans-serif;
+  --marker: 'Permanent Marker', 'Comic Sans MS', cursive;
+}
+```
+
+`var(--color-lime)` reutiliza ese valor donde aparezca. Para cambiar el color del botón principal, filtros activos y números del carrito a la vez, actualiza el token en `:root`, no cada regla por separado.
+
+## Paso 2: asignar un trabajo a cada tipografía
+
+- **Bangers** da ritmo a `h1`, `h2`, precios y números breves.
+- **Permanent Marker** destaca solo palabras cortas dentro de un título y etiquetas breves.
+- **DM Sans** se encarga de párrafos, precios explicativos, botones, navegación, formularios y catálogo.
+
+Las fuentes se declaran como enlaces en los `<head>` de `index.html` y `cuidados.html`. La hoja de estilos puede empezar a cargar desde el HTML y las dos páginas usan los mismos nombres. Las listas separadas por comas en CSS sirven como respaldo si no se descarga la fuente principal.
+
+El selector compartido `h1, h2` define la voz de los titulares. `em` les permite cambiar de familia y color solo en la palabra marcada. Evita extender Bangers o Permanent Marker a párrafos: sus formas expresivas cansan cuando se repiten mucho.
+
+## Paso 3: reutilizar las decisiones en componentes y páginas
+
+Los botones primarios, los filtros seleccionados y las etiquetas de producto reutilizan lima; los detalles activos y algunas palabras destacadas reutilizan coral. El contraste oscuro sobre lima mantiene el texto del botón claro.
+
+`cuidados.html` carga la hoja común `src/styles.css` y después `src/care-page.css`. La primera contiene tokens y estilos compartidos; la segunda adapta la composición de la guía. De este modo se puede ajustar un color de marca en un sitio y mantenerlo sincronizado.
+
+## Paso 4: comprobar la implementación
+
+1. Ejecuta `npm run build` para pedirle a Vite que compile las dos páginas.
+2. Abre la tienda y `/cuidados.html` en escritorio y una pantalla angosta.
+3. Confirma que las palabras destacadas no se salen de los títulos, los párrafos siguen siendo cómodos de leer y los controles de teclado muestran el borde de foco.
+4. Si cambias una imagen, compara el resultado con el archivo original y conserva la foto real como fuente.
+
+En este entorno, la compilación se verificó con `node node_modules/vite/bin/vite.js build` porque el comando `npm` aún no está disponible en la terminal. La compilación de Vite es la comprobación de que el HTML, CSS y JavaScript se pueden preparar para producción; no reemplaza la revisión visual del navegador.
+
+## Práctica para repetir
+
+1. Cambia temporalmente `--color-lime` por otro color que conserve contraste con el texto oscuro.
+2. Busca los elementos que heredan el valor con `var(--color-lime)`.
+3. Restaura el color original y explica con tus palabras la diferencia entre un token y una regla CSS.
+4. En otro proyecto, define tokens propios antes de construir el primer botón y reutilízalos en la segunda página.
+
+## Repaso
+
+- ¿Por qué dejamos DM Sans para los párrafos aunque Bangers dé más personalidad?
+- ¿Qué ventaja tiene `var(--color-orange)` frente a repetir `#ed5736` en veinte selectores?
+- ¿Cómo confirmas que las fotos del catálogo siguen mostrando plantas reales?
+
+## Referencias
+
+- [MDN: Custom properties de CSS](https://developer.mozilla.org/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties)
+- [MDN: `font-family` y fuentes de reserva](https://developer.mozilla.org/docs/Web/CSS/font-family)
+- [Vite: construir para producción](https://vite.dev/guide/build)
