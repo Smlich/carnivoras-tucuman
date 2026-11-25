@@ -37,7 +37,7 @@ Abre `src/styles.css` y mira el bloque `:root`. Las variables CSS guardan colore
 
 Las fuentes se declaran como enlaces en los `<head>` de `index.html` y `cuidados.html`. La hoja de estilos puede empezar a cargar desde el HTML y las dos páginas usan los mismos nombres. Las listas separadas por comas en CSS sirven como respaldo si no se descarga la fuente principal.
 
-El selector compartido `h1, h2` define la voz de los titulares. `em` les permite cambiar de familia y color solo en la palabra marcada. Evita extender Bangers o Permanent Marker a párrafos: sus formas expresivas cansan cuando se repiten mucho.
+El selector compartido `h1, h2` define la voz de los titulares. `text-wrap: balance` distribuye sus líneas para reducir viudas y cortes desparejos; `em` cambia de familia y color solo en la frase marcada. Evita extender Bangers o Permanent Marker a párrafos: sus formas expresivas cansan cuando se repiten mucho.
 
 ## Paso 3: reutilizar las decisiones en componentes y páginas
 
