@@ -4,6 +4,8 @@ La integración continua ejecuta pruebas del servidor y compila el frontend; no 
 
 La primera ejecución de este repositorio terminó correctamente para Node 22, 24 y 26: [CI del commit f04fb7b](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45595845180). La corrida que verificó el ajuste responsive de `f7d385a` terminó correctamente: [CI del commit f7d385a](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45604158956). El build comprueba la instalación y compilación; no reemplaza pruebas de interfaz ni una revisión manual.
 
+La ejecución más reciente de `main`, en `bc4e869`, también terminó correctamente: [CI del ajuste de contraste del foco](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45620149326). Netlify recibió el CSS compilado de ese commit. La verificación manual de esa apariencia está en [la lección 13](LESSON_13_ACCESSIBLE_KEYBOARD_NAVIGATION.md).
+
 ## Objetivo
 
 Entender cómo GitHub obtiene el código, instala exactamente las dependencias bloqueadas y comprueba que el sitio todavía puede compilarse antes de integrar un cambio.

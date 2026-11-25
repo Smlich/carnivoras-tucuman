@@ -24,6 +24,8 @@ En la compilación de producción local, se abrió la portada y `/cuidados.html`
 
 Repetí la comprobación en cada página después de cambiar la cabecera o el orden del HTML. En la vista previa local también recorrí el carrito con Tab y Shift+Tab, lo cerré con Escape y comprobé que el foco vuelva a «Abrir pedido». Al eliminar el último producto, el foco llega a «Volver al catálogo». Esto comprueba estas interacciones concretas; no sustituye una auditoría WCAG completa ni las pruebas con lectores de pantalla.
 
+En una revisión posterior, recorrí la página con Tab hasta «Leer la guía de cuidados». El borde lima se vio con claridad sobre el fondo verde oscuro; la compilación publicada por Netlify contiene la misma regla CSS. El flujo CI de ese commit finalizó correctamente. Esta evidencia cubre el control y el fondo revisados, no todos los estados ni todas las combinaciones de contraste.
+
 ## Indicadores de foco y contraste
 
 Durante la revisión visual encontré que el borde de foco del menú de cuenta era demasiado tenue y que algunos textos secundarios no alcanzaban el contraste AA para texto normal. Centralicé esos tonos en `--color-muted` (`#5f7163`) y usé el naranja de marca para el foco de la cuenta y del campo de búsqueda. En la sección verde oscura el naranja solo alcanzaba 2.69:1, por eso los controles de esa sección usan un borde lima, con 7.54:1 de contraste.
