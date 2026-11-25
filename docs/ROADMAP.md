@@ -80,6 +80,8 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado parcial de integración continua:** `.github/workflows/ci.yml` está preparado para instalar con `npm ci` y construir el frontend en pull requests y cambios a `main`. Se activará al publicar el repositorio; las pruebas automatizadas siguen pendientes.
 
+**Lección:** recorre [integración continua con GitHub Actions](LESSON_06_GITHUB_ACTIONS.md) para relacionar el YAML del workflow con cada paso de compilación.
+
 **Entrega:** versión de portafolio desplegada, instrucciones reproducibles, [plan mensual de contenidos](CONTENT_PLAN.md) adaptado a las redes oficiales y lista de mejoras priorizada.
 
 ## Rutina de cada sesión
