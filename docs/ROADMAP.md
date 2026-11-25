@@ -39,7 +39,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 - Añadir operaciones de lectura y administración de productos.
 - Registrar pedidos con estado y fecha, sin guardar datos de pago sensibles.
 
-**Estado:** se eligió MongoDB Atlas; el modelo de producto, la carga inicial y la guía de conexión están preparados. Recorre la [lección práctica de Atlas](LESSON_04_MONGODB_ATLAS.md). **Pendiente:** crear el clúster y usuario de base de datos, agregar la URI de forma local, cargar el catálogo y comprobar persistencia; el modelo de pedidos se añadirá después de definir identidad y privacidad.
+**Estado parcial:** el proyecto Atlas y el clúster Free están conectados desde desarrollo; el seed cargó ocho productos y Express confirma `database: connected` y `meta.source: mongodb`. Recorre la [lección práctica de Atlas](LESSON_04_MONGODB_ATLAS.md). **Pendiente:** diseñar modelos de clientes y pedidos después de definir privacidad, y persistir pedidos solo cuando se acuerden las reglas de venta.
 
 ## Semana 4 — Cuentas con Google y Facebook
 
@@ -51,7 +51,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Entrega:** el cliente puede crear o recuperar su cuenta usando Google o Facebook.
 
-**Estado:** Better Auth, MongoDB y las rutas Express están integrados; el menú React aparece cuando hay configuración válida. **Pendiente:** conectar Atlas, crear las aplicaciones OAuth, guardar secretos localmente y completar un inicio de sesión real de cada proveedor.
+**Estado parcial:** Better Auth está integrado con Atlas y el menú React aparecerá al configurar al menos un proveedor. **Pendiente:** crear las aplicaciones OAuth, guardar IDs y secretos localmente y completar un inicio de sesión real de Google y otro de Facebook.
 
 **Lección:** recorre [OAuth, sesiones y secretos](LESSON_03_OAUTH_AND_SECRETS.md) antes de configurar proveedores reales. La lectura enseña el flujo sin necesitar compartir credenciales.
 

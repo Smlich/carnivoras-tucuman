@@ -10,7 +10,7 @@ El vivero vende plantas carnívoras con consultas directas por WhatsApp. Las pub
 
 ### La solución
 
-Una tienda en español para explorar productos, buscar por especie, filtrar categorías, preparar un pedido local y enviarlo como consulta a WhatsApp. El API Express sirve el catálogo y reporta si usa MongoDB o el modo de demostración. El acceso con Google y Facebook está preparado en el servidor; requiere conectar Atlas y verificar las dos aplicaciones OAuth antes de ofrecerlo a clientes.
+Una tienda en español para explorar productos, buscar por especie, filtrar categorías, preparar un pedido local y enviarlo como consulta a WhatsApp. El API Express sirve el catálogo desde Atlas en el entorno local y reporta si usa MongoDB o el modo de demostración. El acceso con Google y Facebook está preparado en el servidor; faltan las aplicaciones OAuth y probar sesiones reales antes de ofrecerlo a clientes.
 
 ### Decisiones de ingeniería
 
@@ -29,8 +29,8 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 | --- | --- | --- |
 | Interfaz | React, Vite, JSX y CSS | Funciona localmente; build de producción exitoso. |
 | API | Node.js, Express 5, Zod y Helmet | API de salud y catálogo responde en desarrollo. |
-| Datos | MongoDB Atlas, Mongoose | Esquema y seed listos; Atlas todavía no está conectado en este entorno. |
-| Autenticación | Better Auth, Google y Facebook | Integración preparada; sin credenciales reales ni sesión OAuth verificada. |
+| Datos | MongoDB Atlas, Mongoose | Clúster Free conectado en AWS São Paulo; ocho productos sembrados; la API confirma `meta.source: mongodb`. |
+| Autenticación | Better Auth, Google y Facebook | Adaptador conectado a Atlas; faltan credenciales de proveedores y sesiones OAuth verificadas. |
 | Pedido | localStorage y enlace WhatsApp | Genera una consulta; no registra una orden ni procesa pagos. |
 | Calidad | documentación, ADR, plan de aprendizaje y revisión manual | Build y flujos principales revisados; auditoría integral y pruebas automatizadas siguen en el cronograma. |
 
@@ -39,18 +39,17 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 1. Ejecuta `npm install` y `npm run dev:all` desde la raíz.
 2. Abre `http://localhost:5173`.
 3. Muestra búsqueda, filtros, fotos de catálogo, cambio de cantidades y consulta por WhatsApp. No envíes el mensaje durante una entrevista.
-4. Abre `/api/health` y explica que `database: not-configured` identifica el modo demo. Cuando Atlas esté conectado, verifica también `meta.source: mongodb` en `/api/products`.
+4. Abre `/api/health` y muestra `database: connected`; `/api/products` debe indicar `meta.source: mongodb`. En una instalación limpia sin URI, explica que desarrollo vuelve al modo demo.
 5. Explica que el menú de autenticación aparece solo al configurar proveedores y base de datos.
 
 ### Guion oral de 60 segundos
 
-> “Construí una tienda web para un vivero real de Tucumán. Empecé por un catálogo con fotos auténticas, búsqueda, filtros y un pedido que se consulta por WhatsApp porque el stock se confirma manualmente. Luego separé catálogo y presentación con una API Express y preparé Mongoose para persistir productos en Atlas. El servidor valida filtros, configura sus secretos desde el entorno y tiene Better Auth preparado para Google y Facebook. Hoy funciona localmente con catálogo de demostración; todavía estoy completando la conexión a Atlas y la validación OAuth. Elegí entregarlo por etapas para tener una experiencia útil desde el inicio y evitar anunciar pagos o disponibilidad que el negocio aún no confirma.”
+> “Construí una tienda web para un vivero real de Tucumán. Empecé por un catálogo con fotos auténticas, búsqueda, filtros y un pedido que se consulta por WhatsApp porque el stock se confirma manualmente. Separé la interfaz de una API Express y conecté Mongoose con Atlas; el endpoint de salud confirma la base y el catálogo devuelve ocho productos persistidos. El servidor valida filtros y mantiene los secretos fuera de React. Better Auth está preparado para Google y Facebook; el siguiente paso es configurar las aplicaciones OAuth y validar ambos inicios de sesión. Elegí entregarlo por etapas para tener una experiencia útil desde el inicio y evitar anunciar pagos o disponibilidad que el negocio aún no confirma.”
 
 Adapta este guion con tus propias palabras después de recorrer [la lección del pedido](LESSON_01_ORDER_FLOW.md), [la lección de la API](LESSON_02_API.md), [Atlas](LESSON_04_MONGODB_ATLAS.md) y [OAuth](LESSON_03_OAUTH_AND_SECRETS.md). No afirmes que implementaste personalmente una parte que todavía no puedas explicar.
 
 ### Próximas evidencias para completar el caso
 
-- Conectar Atlas y mostrar que `GET /api/products` entrega datos persistidos.
 - Probar inicios de sesión reales en Google y Facebook y documentar callbacks correctos.
 - Confirmar precios, stock, entrega y derechos de uso de las fotos con el negocio.
 - Definir privacidad, condiciones de venta, dominio y alojamiento.

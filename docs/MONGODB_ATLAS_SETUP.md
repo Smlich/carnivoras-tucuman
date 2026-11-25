@@ -2,6 +2,10 @@
 
 Esta guía conecta el API Express de Carnívoras Tucumán a una base remota. La URI contiene credenciales: guárdala solo en el archivo `.env` local, que Git ignora.
 
+## Estado del proyecto
+
+El entorno de desarrollo actual usa el proyecto Atlas **Carnivoras Tucuman** y el clúster Free **CarnivorasTucuman** en AWS `SA_EAST_1` (São Paulo). El API Express ya conecta a `carnivoras_tucuman`, el seed cargó ocho productos y `/api/health` confirma `database: connected`. La URI y la contraseña del usuario de aplicación permanecen en `.env`; los ejemplos de esta guía sirven para reconstruir la conexión en otro equipo.
+
 ## 1. Crear el clúster
 
 1. Crea una cuenta e inicia sesión en [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register).

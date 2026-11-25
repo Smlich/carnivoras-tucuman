@@ -28,12 +28,9 @@ También puedes usar `npm run dev` para trabajar solo en el frontend.
 
 ## MongoDB Atlas
 
-La API funciona sin base de datos en modo de demostración durante desarrollo y muestra claramente ese estado en `GET /api/health`. No persiste cambios en ese modo.
+En este entorno local, Express está conectado a un clúster Free de Atlas en São Paulo y el catálogo de ocho productos ya fue cargado. `GET /api/health` informa `database: connected` y `catalogMode: mongodb`; `GET /api/products` informa `meta.source: mongodb`. La URI vive únicamente en el `.env` local, ignorado por Git.
 
-1. Sigue [la guía de configuración de Atlas](docs/MONGODB_ATLAS_SETUP.md) para crear el clúster, un usuario de base de datos y limitar el acceso a tu IP.
-2. Copia `.env.example` a `.env` y pega localmente la URI de conexión en `MONGODB_URI`.
-3. Ejecuta `npm run seed:products` para crear o actualizar los productos de ejemplo en MongoDB.
-4. Ejecuta `npm run dev:all`; `GET /api/health` debe indicar que la base está conectada.
+En una instalación nueva o en otro equipo, sigue [la guía de Atlas](docs/MONGODB_ATLAS_SETUP.md), copia `.env.example` a `.env`, configura una URI privada y ejecuta `npm run seed:products`. Si `MONGODB_URI` falta durante desarrollo, la API usa el catálogo demo y lo indica en `/api/health`; no persiste datos en ese modo.
 
 En producción, el servidor no inicia sin `MONGODB_URI`. No incluyas el archivo `.env` ni secretos en Git ni los envíes por chat.
 

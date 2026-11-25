@@ -4,6 +4,8 @@
 
 Conectar Express a Atlas, explicar qué permite el acceso y comprobar que el catálogo que ves viene de MongoDB. La práctica usa datos de demostración del proyecto; no cargues productos reales hasta revisar precios y disponibilidad.
 
+**Resultado de esta práctica:** el entorno local ya está conectado al clúster Free `CarnivorasTucuman` en São Paulo. El seed creó ocho documentos y Express responde con `database: connected` y `meta.source: mongodb`. Repite los pasos de preparación solo para reconstruir el proyecto en otra máquina.
+
 ## Cuatro piezas distintas
 
 - **Proyecto y clúster Atlas:** el espacio administrado donde vive la base de datos.

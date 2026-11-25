@@ -36,6 +36,8 @@ Usa `.env.example` como plantilla y guarda estos valores solo en `.env`:
 - `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`.
 - `FACEBOOK_CLIENT_ID` y `FACEBOOK_CLIENT_SECRET`.
 
+`BETTER_AUTH_URL` debe coincidir exactamente con el origen desde el que abres Vite. El valor de ejemplo usa `http://localhost:5173`; si Vite informa otro puerto, actualiza también `BETTER_AUTH_URL`, agrega ese origen a `CORS_ORIGINS` y registra las URIs de retorno con el mismo host y puerto. El API recibe esas rutas mediante el proxy de Vite.
+
 Puedes generar el secreto desde PowerShell con Node.js:
 
 ```powershell
@@ -46,7 +48,7 @@ Pega el resultado directamente en el archivo local `.env`; no lo envíes por cha
 
 ## URIs de retorno
 
-Usa la misma dirección local que `BETTER_AUTH_URL`, incluida la ruta y sin agregar una barra final:
+Con el valor de ejemplo de `.env.example`, registra estas URIs locales. Si cambias el origen o el puerto, sustituye esa parte en ambas direcciones para que coincida con `BETTER_AUTH_URL`:
 
 ```text
 http://localhost:5173/api/auth/callback/google
@@ -62,7 +64,7 @@ Después de configurar Atlas, `.env` y al menos un proveedor:
 1. Reinicia `npm run dev:all`.
 2. Abre `http://127.0.0.1:4000/api/auth/status`.
 3. Comprueba que responda `enabled: true` y liste los proveedores con IDs y secretos configurados.
-4. Abre la web desde `http://localhost:5173` y usa el menú de cuenta.
+4. Abre la web desde el mismo origen configurado en `BETTER_AUTH_URL` y usa el menú de cuenta.
 5. Repite el inicio de sesión con Google y Facebook, y confirma que al volver hay una sesión activa.
 
 Si falta Atlas o la configuración OAuth, la API informa `enabled: false`; en desarrollo el resto de la tienda sigue funcionando. En producción, el servidor exige ambos proveedores para impedir un lanzamiento con el requisito social a medias.
