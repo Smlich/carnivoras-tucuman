@@ -57,7 +57,7 @@ Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSO
 
 ## Próximos hitos
 
-Lee `docs/ROADMAP.md`, `docs/API.md` y [la guía de autenticación](docs/AUTHENTICATION.md). Los botones de cuenta aparecen cuando Atlas y al menos un proveedor están configurados. El flujo está preparado, pero todavía no se ha conectado a credenciales reales ni verificado con cuentas de Google o Facebook. No hay escritura de pedidos en la API.
+Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTICATION.md) y el [plan de contenidos y SEO local](docs/CONTENT_PLAN.md). Los botones de cuenta aparecen cuando Atlas y al menos un proveedor están configurados. El flujo está preparado, pero todavía no se ha conectado a credenciales reales ni verificado con cuentas de Google o Facebook. No hay escritura de pedidos en la API.
 
 ## Datos que faltan antes del lanzamiento
 

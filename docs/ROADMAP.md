@@ -74,7 +74,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 - Crear páginas indexables por producto con descripciones propias y datos estructurados únicamente cuando precio y disponibilidad sean reales.
 - Vincular las redes oficiales y crear un calendario de contenido útil sobre especies y cuidados.
 
-**Entrega:** versión de portafolio desplegada, instrucciones reproducibles y lista de mejoras priorizada.
+**Entrega:** versión de portafolio desplegada, instrucciones reproducibles, [plan mensual de contenidos](CONTENT_PLAN.md) adaptado a las redes oficiales y lista de mejoras priorizada.
 
 ## Rutina de cada sesión
 
