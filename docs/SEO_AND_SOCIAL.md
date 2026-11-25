@@ -5,6 +5,9 @@ La meta es que las personas encuentren el vivero cuando buscan plantas carnívor
 ## Base ya incluida
 
 - Título y descripción en español para la tienda.
+- URL canónica de cada página, metadatos Open Graph y tarjetas de X con texto alternativo para las fotografías reales.
+- `robots.txt` permite el rastreo público y apunta al sitemap XML de la vista actual de Netlify; el sitemap enumera la tienda y la guía de cuidados.
+- Marcado `GardenStore` con teléfono de WhatsApp, área de servicio en Tucumán y perfil de Instagram.
 - Secciones enlazables para catálogo y contacto, más la página propia `/cuidados.html`.
 - La guía de cuidados tiene HTML semántico, título y descripción propios y metadatos Open Graph para compartir.
 - Texto real del negocio y de sus especies, evitando contenido genérico.
@@ -15,14 +18,12 @@ La meta es que las personas encuentren el vivero cuando buscan plantas carnívor
 
 ## Antes de publicar
 
-- Cambiar `og:url` y `og:image` al dominio final, añadir canonical y repetirlo cuando se elija el dominio definitivo; los metadatos actuales apuntan a la vista previa de Netlify.
-- Añadir `/cuidados.html` al sitemap con la URL pública absoluta una vez elegido el dominio.
+- Al elegir el dominio final, reemplazar la URL de Netlify en canonical, Open Graph, Twitter, JSON-LD, `robots.txt` y `sitemap.xml`.
 - Crear páginas por especie o producto cuando los datos se confirmen.
 - Mantener precio, disponibilidad, tamaño, envío y promociones sincronizados con el catálogo real.
 - Publicar una política de privacidad, términos de venta y condiciones de entrega.
 - Enviar un sitemap a Search Console una vez publicado el dominio.
 - Confirmar que `@canivoras_tucuman` siga siendo la cuenta oficial y vincular Facebook si el negocio abre o confirma esa cuenta.
-- Cambiar los metadatos de la vista previa por URLs absolutas del dominio final y agregar canonical/sitemap al decidir el dominio.
 
 ## Contenido para redes
 
