@@ -5,15 +5,17 @@ La meta es que las personas encuentren el vivero cuando buscan plantas carnívor
 ## Base ya incluida
 
 - Título y descripción en español para la tienda.
-- Secciones enlazables para catálogo, cuidados y contacto.
+- Secciones enlazables para catálogo y contacto, más la página propia `/cuidados.html`.
+- La guía de cuidados tiene HTML semántico, título y descripción propios y metadatos Open Graph para compartir.
 - Texto real del negocio y de sus especies, evitando contenido genérico.
 - Fotos del catálogo real, conservadas con sus textos originales.
 - Página responsive y enlace de contacto directo.
-- Consejos iniciales de agua, luz, sustrato y reposo con enlaces a guías de la International Carnivorous Plant Society y del U.S. Botanic Garden.
+- Consejos iniciales de agua, luz, sustrato y reposo con enlaces a guías de la International Carnivorous Plant Society y del U.S. Botanic Garden. La guía advierte cuándo una recomendación solo aplica a una especie determinada.
 
 ## Antes de publicar
 
 - Definir el dominio, actualizar la imagen social a una URL absoluta y añadir canonical.
+- Añadir `/cuidados.html` al sitemap con la URL pública absoluta una vez elegido el dominio.
 - Crear páginas por especie o producto cuando los datos se confirmen.
 - Mantener precio, disponibilidad, tamaño, envío y promociones sincronizados con el catálogo real.
 - Publicar una política de privacidad, términos de venta y condiciones de entrega.

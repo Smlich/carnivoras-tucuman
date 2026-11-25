@@ -1,5 +1,7 @@
 # Lección 6 — Integración continua con GitHub Actions
 
+La integración continua comprueba que el código compila; no publica la web. El despliegue por etapas se estudia aparte en [la lección 09](LESSON_09_DEPLOYMENT_PATHS.md).
+
 ## Objetivo
 
 Entender cómo GitHub obtiene el código, instala exactamente las dependencias bloqueadas y comprueba que el sitio todavía puede compilarse antes de integrar un cambio.

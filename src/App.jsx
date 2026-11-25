@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import AnnouncementBar from './components/AnnouncementBar';
+import PreviewBanner from './components/PreviewBanner';
 import CareSection from './components/CareSection';
 import CartDrawer from './components/CartDrawer';
 import ContactSection from './components/ContactSection';
@@ -26,6 +27,7 @@ export default function App() {
     <>
       <a className="skip-link" href="#contenido">Saltar al contenido</a>
       <AnnouncementBar />
+      <PreviewBanner />
       <SiteHeader itemCount={cart.count} onOpenCart={() => setIsCartOpen(true)} />
       <main id="contenido">
         <HeroSection />

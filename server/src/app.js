@@ -1,11 +1,15 @@
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ZodError } from 'zod';
 import { toNodeHandler } from 'better-auth/node';
 import { env } from './config/env.js';
 import { healthRouter } from './routes/health.js';
 import { productsRouter } from './routes/products.js';
+
+const frontendDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../../dist');
 
 export function createApp({ auth = null, authProviders = [] } = {}) {
   const app = express();
@@ -42,6 +46,10 @@ export function createApp({ auth = null, authProviders = [] } = {}) {
 
   app.use('/api/health', healthRouter);
   app.use('/api/products', productsRouter);
+
+  if (env.NODE_ENV === 'production') {
+    app.use(express.static(frontendDirectory));
+  }
 
   app.use((request, response) => {
     response.status(404).json({

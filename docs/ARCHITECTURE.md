@@ -8,8 +8,10 @@ Navegador
        ├── catálogo, filtros y carrito
        ├── GET /api/products mediante proxy de Vite
        ├── carrito persistido en localStorage
-       └── menú de acceso social cuando el API lo habilita
+       ├── estado de acceso social desde Express
+       ├── panel Better Auth cargado al abrir la cuenta y si hay proveedor habilitado
        └── enlace wa.me con resumen del pedido
+  └── /cuidados.html (HTML semántico, sin JavaScript de aplicación)
 
 Vite
   └── Express
@@ -35,9 +37,16 @@ React (cliente)
 
 El cliente nunca se conecta directamente a MongoDB. El servidor valida cada operación, controla permisos y conserva los secretos de OAuth. Las rutas de administración requieren autorización. Los identificadores y secretos de proveedor viven en variables de entorno del servidor.
 
+## Topología para los dos despliegues
+
+- **Netlify (prueba):** publica `dist` como sitio estático. `VITE_STATIC_PREVIEW=true` usa el catálogo local y omite consultas de API y autenticación; no requiere secretos ni escribe en Atlas.
+- **Hostinger (final):** un proceso Express sirve `dist` y `/api/*` en el mismo origen. Mongoose y Better Auth usan Atlas; las credenciales OAuth y de base de datos se configuran en el panel del hosting, nunca en Git.
+
 ## Decisiones de la primera entrega
 
 - Vite permite iniciar con un frontend pequeño y evolucionar sin rehacer la interfaz.
+- Vite compila `index.html` y `cuidados.html` como dos entradas estáticas. La guía informativa no hidrata React: el texto y los metadatos están en el HTML inicial y no necesitan estado de cliente.
+- Better Auth se separa en un chunk que el navegador solicita cuando una persona abre el menú de cuenta y el API confirma al menos un proveedor. Así el visitante que solo recorre la tienda no descarga ese código.
 - El catálogo está separado en datos para facilitar su migración posterior a la API.
 - React consulta GET /api/products; si el servidor de desarrollo no está disponible, muestra el catálogo local.
 - MongoDB es obligatorio en producción; el modo local de demostración no guarda cambios.

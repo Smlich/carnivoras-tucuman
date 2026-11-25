@@ -20,9 +20,9 @@ Meta recomienda planificar según objetivo, público, temas, formatos y ritmo, y
 | 1 · Conocer el vivero | Presentación de Carnívoras Tucumán con la foto real del combo. Explicar qué especies incluye según la publicación y que el stock se confirma antes de cerrar. | Reel opcional: recorrido corto por las plantas reales disponibles, grabado esa semana. | Presentación, ubicación general en Tucumán y caja de preguntas sobre plantas carnívoras. | `/#catalogo` |
 | 2 · Mirar de cerca | Carrusel de fotos reales: Sarracenia con trampas tubulares, Drosera con gotitas visibles y Venus atrapamoscas. Usar solo descripciones ya verificadas. | Foto actual de Drosera; pregunta: “¿Qué te gustaría saber de esta especie?”. | Respuestas breves a preguntas frecuentes y enlace al catálogo. | `/#catalogo` |
 | 3 · Cultivares | Comparación visual de Red Piranha y Bohemian Garnet usando las fotos del vivero. Describir solo diferencias que se vean y estén confirmadas. | Reel opcional: video real de una planta de la colección, grabado durante una revisión rutinaria del vivero. | Disponibilidad y precio del día, fechados y confirmados por el negocio. | `/#catalogo` |
-| 4 · Ayudar a elegir | Carrusel “¿Por dónde empezar?” con el combo real y sus tres especies. Invitar a contar qué espacio tiene la persona para orientar la consulta. | Consejo de cuidado tomado de la sección de cuidados del sitio; enlazar esa guía para ampliar. | Preguntas, respuestas y recordatorio de que stock y entrega se confirman por WhatsApp. | `/#cuidados` y `/#contacto` |
+| 4 · Ayudar a elegir | Carrusel “¿Por dónde empezar?” con el combo real y sus tres especies. Invitar a contar qué espacio tiene la persona para orientar la consulta. | Consejo de cuidado tomado de la guía del sitio; enlazarla para ampliar. | Preguntas, respuestas y recordatorio de que stock y entrega se confirman por WhatsApp. | `/cuidados.html` y `/#contacto` |
 
-Las direcciones son anclas relativas; cuando exista un dominio público, agrega ese dominio delante de cada una. No anuncies una promoción o disponibilidad sin confirmarlas el día de publicación.
+Las rutas se enlazan desde el dominio público cuando esté definido. No anuncies una promoción o disponibilidad sin confirmarlas el día de publicación.
 
 ## Reglas para fotos y precios
 
@@ -39,6 +39,7 @@ Plantas carnívoras cultivadas en Tucumán 🌱
 Fotos reales de nuestro vivero. Consultanos por disponibilidad actual, tamaño y entrega antes de confirmar.
 
 Catálogo: [URL pública]/#catalogo
+Cuidados: [URL pública]/cuidados.html
 WhatsApp: [enlace de contacto]
 
 #CarnivorasTucuman #PlantasCarnivoras #Tucuman

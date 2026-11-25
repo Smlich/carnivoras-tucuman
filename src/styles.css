@@ -94,6 +94,8 @@ img { display: block; max-width: 100%; }
 
 .announcement-bar__separator { color: #99ad97; }
 
+.preview-banner { padding: 8px 16px; color: #6e481e; background: #f4dfbf; font-size: 11px; line-height: 1.5; text-align: center; }
+
 .site-header {
   position: sticky;
   z-index: 20;

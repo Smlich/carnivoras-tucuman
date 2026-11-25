@@ -18,6 +18,8 @@ export default function ProductCatalog({ onAdd }) {
   const [catalogProducts, setCatalogProducts] = useState(products);
 
   useEffect(() => {
+    if (import.meta.env.VITE_STATIC_PREVIEW === 'true') return undefined;
+
     const controller = new AbortController();
 
     fetchProducts({ signal: controller.signal })

@@ -9,6 +9,8 @@ Tienda web de plantas carnívoras de Tucumán. Este repositorio es también una 
 - Carrito local que recuerda el pedido en este dispositivo.
 - Pedido enviado a WhatsApp para confirmar precio, disponibilidad y entrega.
 - Diseño adaptable, navegación por teclado y metadatos básicos.
+- Guía educativa en `/cuidados.html`, con contenido HTML indexable y fuentes botánicas enlazadas.
+- En producción, Express sirve el frontend compilado y la API bajo el mismo origen; `npm start` inicia el servidor.
 - API Express de solo lectura para catálogo y salud del servicio.
 - Esquema Mongoose y script de carga inicial preparados para MongoDB.
 - Flujo de cuentas preparado con Better Auth para Google y Facebook; se activa al configurar Atlas y las credenciales OAuth.
@@ -50,16 +52,21 @@ El workflow de GitHub Actions en `.github/workflows/ci.yml` ejecuta `npm ci` y `
 - `docs`: arquitectura, decisiones, cronograma y registro de aprendizaje.
 - `public/images/catalog`: archivos originales compartidos por el negocio.
 - `public/images/catalog/optimized`: variantes optimizadas para la web; conserva intactos los originales.
+- `cuidados.html` y `src/care-page.css`: página informativa independiente, generada junto con la portada por Vite.
 
 Para regenerar variantes después de agregar o actualizar fotos autorizadas, ejecuta `npm run images:optimize`. El script prepara versiones adaptables para móvil y escritorio; usa WebP para los PNG y JPEG para las fotos que ya venían en JPEG. Cada `<picture>` mantiene también la foto original como respaldo, sin alterar los archivos fuente. Aprende el flujo en [la lección de optimización](docs/LESSON_05_IMAGE_OPTIMIZATION.md).
 
 ## Ruta de aprendizaje
 
-Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md) e [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
+Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md), [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md), [la guía de cuidados indexable](docs/LESSON_08_INDEXABLE_CARE_GUIDE.md) y [el recorrido de Netlify a Hostinger](docs/LESSON_09_DEPLOYMENT_PATHS.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
 
 ## Portafolio
 
 Usa [el caso de estudio](docs/PORTFOLIO_CASE_STUDY.md) para presentar la arquitectura, demostrar el estado actual y explicar con honestidad qué falta antes del despliegue.
+
+## Publicación por etapas
+
+La configuración de [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) ya está en el repositorio. Netlify sirve una vista previa estática con catálogo local; Hostinger correrá Express, servirá el frontend compilado y usará Atlas/OAuth cuando la configuración final esté lista. El despliegue todavía requiere conectar el repositorio remoto y configurar las cuentas/variables del hosting.
 
 ## Próximos hitos
 
@@ -76,6 +83,9 @@ Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTI
 ## Fuentes técnicas
 
 - [React: Quick Start](https://react.dev/learn)
+- [React: lazy](https://react.dev/reference/react/lazy)
+- [React: Suspense](https://react.dev/reference/react/Suspense)
+- [Vite: despliegue estático](https://vite.dev/guide/static-deploy.html)
 - [Vite: Getting Started](https://vite.dev/guide/)
 - [Express: Installing](https://expressjs.com/en/starter/installing/)
 - [MongoDB Node.js Driver](https://www.mongodb.com/docs/drivers/node/current/)

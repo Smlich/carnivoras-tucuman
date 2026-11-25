@@ -6,6 +6,7 @@ export default function CareSection() {
           <p className="eyebrow eyebrow--light"><span className="eyebrow__line" /> Un buen comienzo</p>
           <h2 id="care-title">Cuidarlas también es parte de <em>la aventura.</em></h2>
           <p>Las plantas carnívoras tienen necesidades especiales. Cada especie es distinta: consultanos cuál se adapta mejor a tu espacio.</p>
+          <a className="button button--light" href="/cuidados.html">Leer la guía de cuidados <span aria-hidden="true">↗</span></a>
           <a className="button button--light" href="#contacto">Preguntanos por WhatsApp <span aria-hidden="true">↗</span></a>
         </div>
 

@@ -13,6 +13,27 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Aprendizaje:** estructura HTML semántica, componentes React, estado, eventos, CSS adaptable y Git.
 
+## Hito 0.1 — Guía indexable de cuidados
+
+**Estado:** completado. **Duración orientativa:** una sesión.
+
+- Crear `/cuidados.html` como una segunda página estática con título y descripción propios.
+- Explicar cuidados iniciales y enlazar fuentes botánicas; distinguir consejos generales de datos específicos de una especie.
+- Enlazar la guía desde la portada y el calendario de redes.
+
+**Aprendizaje:** entradas HTML múltiples en Vite, etiquetas semánticas, metadatos sociales y cuándo una página informativa no necesita React.
+
+## Hito 0.2 — Preparar Netlify y Hostinger
+
+**Estado:** configuración local lista; despliegues pendientes de conectar el repositorio y los paneles de hosting.
+
+- Netlify compila y publica `dist` para una revisión temprana sin backend ni credenciales.
+- Hostinger ejecutará Express como proceso Node, servirá `dist` y conectará MongoDB Atlas y OAuth desde variables protegidas.
+- Elegir Node 24, disponible en ambos destinos y fijado en `.nvmrc`.
+- Confirmar precios, stock, entrega, dominio y cuentas de OAuth antes de la publicación final.
+
+**Aprendizaje:** diferenciar una vista previa estática de una aplicación MERN en producción y preparar variables por entorno.
+
 ## Semana 1 — Fundamentos y revisión del frontend
 
 - Recorrer cada componente y explicar el flujo de un pedido.

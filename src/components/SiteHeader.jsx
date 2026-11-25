@@ -25,7 +25,7 @@ export default function SiteHeader({ itemCount, onOpenCart }) {
 
         <nav className="main-nav" aria-label="Navegación principal">
           <a href="#catalogo">Catálogo</a>
-          <a href="#cuidados">Cuidados</a>
+          <a href="/cuidados.html">Cuidados</a>
           <a href="#contacto">Contacto</a>
         </nav>
 

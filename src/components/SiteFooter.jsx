@@ -17,7 +17,7 @@ export default function SiteFooter() {
         <p className="site-footer__line">Un rincón extraordinario de la naturaleza, cultivado con paciencia.</p>
         <div className="site-footer__links">
           <a href="#catalogo">Catálogo</a>
-          <a href="#cuidados">Cuidados</a>
+          <a href="/cuidados.html">Cuidados</a>
           <a href="#contacto">Contacto</a>
           {socialLinks.map((item) => <a key={item.label} href={item.href} target="_blank" rel="noreferrer">{item.label}</a>)}
         </div>

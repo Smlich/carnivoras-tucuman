@@ -25,8 +25,9 @@ Google o Facebook → Better Auth → colecciones de Atlas → cookie de sesión
 3. `server/src/auth/create-auth.js` habilita solo proveedores con sus dos credenciales. Usa el cliente de MongoDB que ya abrió Mongoose y cifra los tokens OAuth antes de guardarlos.
 4. `server/src/index.js` intenta conectar Atlas antes de crear la instancia de autenticación. Sin base o sin proveedores, la tienda continúa en modo de demostración y el inicio social queda apagado.
 5. `server/src/app.js` expone `GET /api/auth/status` sin revelar credenciales y monta el handler de Better Auth antes del parser JSON.
-6. `src/services/auth-client.js` crea el cliente oficial de React. `src/components/AccountMenu.jsx` consulta el estado y muestra solo los proveedores habilitados.
-7. En un inicio de sesión, el navegador sale al proveedor y vuelve a la URI callback exacta. Better Auth valida el flujo, persiste la identidad y crea una sesión con cookie `HttpOnly`.
+6. `src/services/auth-client.js` crea el cliente oficial de React. `src/components/AccountMenu.jsx` consulta el estado y muestra solo los proveedores habilitados. El componente visual y el cliente de Better Auth viven en `AccountMenuPanel.jsx`, que se carga al abrir el menú.
+7. `lazy` y `Suspense` de React mantienen el panel en un chunk separado y muestran un estado mientras llega. Un `ErrorBoundary` limita el fallo si el archivo dinámico no se puede cargar. Los visitantes que no abren una cuenta no descargan ese código.
+8. En un inicio de sesión, el navegador sale al proveedor y vuelve a la URI callback exacta. Better Auth valida el flujo, persiste la identidad y crea una sesión con cookie `HttpOnly`.
 
 ## Fronteras de confianza
 
@@ -43,6 +44,7 @@ Google o Facebook → Better Auth → colecciones de Atlas → cookie de sesión
 3. Dibuja en papel qué URLs toca una sesión social y marca qué pasos ocurren en el navegador, Express, el proveedor y MongoDB.
 4. Revisa `.gitignore` y confirma que `.env` no forma parte de los archivos versionados. No abras ni compartas valores privados.
 5. Explica por qué el cliente no escribe directamente en las colecciones de cuentas y sesiones.
+6. ¿Qué parte del panel se solicita al abrir el menú y qué muestra `Suspense` mientras carga?
 
 ## Preparación externa
 
