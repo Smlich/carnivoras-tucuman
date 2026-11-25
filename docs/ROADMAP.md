@@ -83,7 +83,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Entrega:** el cliente puede crear o recuperar su cuenta usando Google o Facebook.
 
-**Estado parcial:** Better Auth está integrado con Atlas. Google OAuth está configurado en desarrollo y el inicio real ya se verificó. **Pendiente:** configurar y probar Facebook, y preparar callbacks HTTPS cuando exista el dominio de producción.
+**Estado parcial:** Better Auth está integrado con Atlas. Google OAuth está configurado en desarrollo; se verificaron inicio, persistencia al recargar, cierre de sesión y nuevo inicio. **Pendiente:** configurar y probar Facebook, y preparar callbacks HTTPS cuando exista el dominio de producción.
 
 **Actualización (25 de noviembre de 2026):** se creó el cliente web de Google `CarnivorasT`, se registró el callback `http://localhost:5173/api/auth/callback/google`, se guardaron las credenciales solo en `.env` y se completó un inicio de sesión real en `http://localhost:5173`. La app permanece en modo Testing. Facebook todavía no está configurado. Seguiremos usando opciones gratuitas y no habilitaremos servicios pagos para esta etapa.
 

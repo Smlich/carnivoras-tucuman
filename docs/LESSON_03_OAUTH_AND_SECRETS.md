@@ -46,6 +46,12 @@ Google o Facebook → Better Auth → colecciones de Atlas → cookie de sesión
 5. Explica por qué el cliente no escribe directamente en las colecciones de cuentas y sesiones.
 6. ¿Qué parte del panel se solicita al abrir el menú y qué muestra `Suspense` mientras carga?
 
+## Comprobación manual del ciclo de sesión
+
+Con el servidor local y Google configurado, abre `http://localhost:5173` e inicia sesión con una cuenta de prueba autorizada en Google. Comprueba que el menú indique una sesión activa, recarga la página y confirma que siga activa. Después cierra sesión, verifica que vuelva a ofrecer el acceso con Google, inicia sesión otra vez y repite la recarga. No copies credenciales ni códigos en el chat ni en Git.
+
+**Resultado observado (25 de noviembre de 2026):** Google completó el ciclo en desarrollo, incluida la persistencia después de recargar. Facebook no está configurado y queda pendiente.
+
 ## Preparación externa
 
 Esta práctica de lectura no necesita cuentas OAuth. Para completar el acceso real se requieren Atlas y aplicaciones creadas en Google Cloud y Meta for Developers. Las URLs callback están en [AUTHENTICATION.md](AUTHENTICATION.md). Se registran exactamente, con el mismo dominio, puerto y ruta que `BETTER_AUTH_URL`.
