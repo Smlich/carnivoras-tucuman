@@ -13,6 +13,8 @@ Esta lección crea credenciales de desarrollo. No publica la aplicación ni habi
 - `.env` debe estar en la raíz del repo. Nunca escribas credenciales dentro de `src`, variables `VITE_*`, capturas públicas o GitHub.
 - No compartas el contenido de `.env` por chat. Para pedir ayuda, comparte el nombre de la variable y el mensaje saneado, nunca su valor.
 
+**Acceso a Google Cloud:** en la sesión de configuración del 25 de noviembre de 2026, Google bloqueó la consola de autenticación hasta que la persona titular active la verificación en dos pasos (2SV) de su cuenta. Si ves ese aviso, completa la activación directamente con tu dispositivo y vuelve a la consola; no envíes códigos ni contraseñas por chat. No se creó una aplicación ni se generaron claves durante ese bloqueo. Consulta el [requisito de MFA de Google Cloud](https://cloud.google.com/docs/authentication/external/mfa-requirement).
+
 El callback local actual es:
 
 ```text

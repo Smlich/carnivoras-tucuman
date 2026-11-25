@@ -36,7 +36,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 ## Hito 0.3 — Sistema visual juvenil y legible
 
-**Estado:** sistema visual implementado en la tienda y la guía, con sellos SVG propios en el pie. La compilación de producción y la revisión responsive de 280 a 1920 px están verificadas; el estado abierto del carrito también se revisó en móvil y tablet. Cada nuevo cambio requiere revisar la versión publicada.
+**Estado:** sistema visual implementado en la tienda y la guía, con sellos SVG propios en el pie. La compilación de producción y la revisión responsive de 240 a 1920 px están verificadas; bajo 316 px el catálogo usa una columna para evitar que los nombres largos se desborden. El estado abierto del carrito también se revisó en móvil y tablet. Cada nuevo cambio requiere revisar la versión publicada.
 
 - Definir tokens de color y tipografía reutilizables.
 - Usar fuentes de personalidad en títulos y acentos cortos y una fuente legible en el catálogo y la guía.
@@ -84,6 +84,8 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 **Entrega:** el cliente puede crear o recuperar su cuenta usando Google o Facebook.
 
 **Estado parcial:** Better Auth está integrado con Atlas y el menú React aparecerá al configurar al menos un proveedor. **Pendiente:** crear las aplicaciones OAuth, guardar IDs y secretos localmente y completar un inicio de sesión real de Google y otro de Facebook.
+
+**Bloqueo actual (25 de noviembre de 2026):** Google Cloud no deja abrir la consola de autenticación de la cuenta elegida hasta que se active la verificación en dos pasos (2SV). La persona titular debe completar esa configuración desde el navegador; no se creó ninguna app ni se generaron claves OAuth. No compartas códigos ni contraseñas por chat. Seguiremos usando solo opciones gratuitas y no habilitaremos facturación ni servicios pagos para esta etapa.
 
 **Lección:** recorre [OAuth, sesiones y secretos](LESSON_03_OAUTH_AND_SECRETS.md) antes de configurar proveedores reales. La lectura enseña el flujo sin necesitar compartir credenciales.
 
