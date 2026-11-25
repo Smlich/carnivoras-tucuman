@@ -5,6 +5,17 @@ import CatalogImage from './CatalogImage';
 
 export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, onClear }) {
   const drawerRef = useRef(null);
+  const emptyStateActionRef = useRef(null);
+  const previousItemCount = useRef(items.length);
+
+  useEffect(() => {
+    const itemCountChangedToEmpty = previousItemCount.current > 0 && items.length === 0;
+    previousItemCount.current = items.length;
+
+    if (isOpen && itemCountChangedToEmpty) {
+      emptyStateActionRef.current?.focus();
+    }
+  }, [isOpen, items.length]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -72,7 +83,7 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
             <span className="cart-empty__icon" aria-hidden="true">✳</span>
             <h3>Tu pedido está vacío</h3>
             <p>Explorá el catálogo y agregá las plantas que te interesen.</p>
-            <button className="button button--dark" type="button" onClick={onClose}>Volver al catálogo</button>
+            <button ref={emptyStateActionRef} className="button button--dark" type="button" onClick={onClose}>Volver al catálogo</button>
           </div>
         ) : (
           <>

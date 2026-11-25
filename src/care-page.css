@@ -7,7 +7,7 @@
 .care-guide__hero h1 { max-width: 760px; margin-bottom: 21px; font-size: clamp(46px, 6.5vw, 78px); line-height: 1.05; }
 .care-guide__hero h1 em, .care-guide__section h2 em { color: var(--color-orange); font-family: var(--marker); font-size: .64em; font-style: normal; font-weight: 400; letter-spacing: -.045em; text-transform: none; }
 .care-guide__contact h2 em { color: var(--color-lime); font-family: var(--marker); font-size: .64em; font-style: normal; font-weight: 400; letter-spacing: -.045em; text-transform: none; }
-.care-guide__lead { max-width: 650px; margin-bottom: 26px; color: #68786a; font-size: 17px; line-height: 1.75; }
+.care-guide__lead { max-width: 650px; margin-bottom: 26px; color: var(--color-muted); font-size: 17px; line-height: 1.75; }
 .button--dark { color: var(--color-forest-deep); background: var(--color-lime); }
 .button--dark:hover { color: white; background: var(--color-forest); }
 .care-guide__note { max-width: 670px; margin: 27px 0 0; padding: 15px 18px; border-left: 3px solid var(--color-orange); color: #596d5b; background: #eeeee4; font-size: 12px; line-height: 1.75; }
@@ -23,7 +23,7 @@
 .care-principle__number { display: block; margin-bottom: 28px; color: var(--color-orange); font-family: var(--heading); font-size: 24px; }
 .care-principle h3, .care-species-card h3 { margin-bottom: 11px; color: var(--color-forest); font-family: var(--sans); font-size: 18px; font-weight: 700; line-height: 1.2; }
 .care-principle p, .care-species-card li { margin-bottom: 0; color: #657468; font-size: 12px; line-height: 1.75; }
-.care-guide__source-line { margin: 18px 0 0; color: #748074; font-size: 10px; line-height: 1.75; }
+.care-guide__source-line { margin: 18px 0 0; color: var(--color-muted); font-size: 10px; line-height: 1.75; }
 .care-guide__source-line a { text-underline-offset: 3px; }
 
 .care-guide__species { padding-block: 86px 80px; background: linear-gradient(180deg, transparent, rgba(232, 235, 224, .64), transparent); }

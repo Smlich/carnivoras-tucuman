@@ -15,12 +15,22 @@ La técnica G1 de W3C comprueba que, al activar el enlace, el foco llegue al con
 - React asigna `tabIndex={-1}` a `<main>`; la guía estática usa `tabindex="-1"`.
 - El foco programático puede llegar al destino, pero Tab sigue yendo a los controles reales.
 - `main:focus-visible` resalta el título de la página con el borde visual del sistema, sin dibujar un marco alrededor de todo el documento.
+- Se aumentó el contraste de etiquetas secundarias y estados del carrito. El campo de búsqueda, el resumen de cuenta y los elementos interactivos usan un indicador de foco naranja visible.
+- Al vaciar el último producto, el foco pasa al botón «Volver al catálogo» para que no quede en un control que ya desapareció.
 
 ## Comprobación manual
 
 En la compilación de producción local, se abrió la portada y `/cuidados.html`, se enfocó “Saltar al contenido” y se pulsó Enter. En ambas páginas `document.activeElement` fue `MAIN#contenido`; el título inicial mostró el indicador y el contenedor principal no dibujó el marco extenso.
 
-Repetí la comprobación en cada página después de cambiar la cabecera o el orden del HTML. Esto verifica el enlace de salto; no sustituye una auditoría WCAG completa ni las pruebas con lectores de pantalla.
+Repetí la comprobación en cada página después de cambiar la cabecera o el orden del HTML. En la vista previa local también recorrí el carrito con Tab y Shift+Tab, lo cerré con Escape y comprobé que el foco vuelva a «Abrir pedido». Al eliminar el último producto, el foco llega a «Volver al catálogo». Esto comprueba estas interacciones concretas; no sustituye una auditoría WCAG completa ni las pruebas con lectores de pantalla.
+
+## Indicadores de foco y contraste
+
+Durante la revisión visual encontré que el borde de foco del menú de cuenta era demasiado tenue y que algunos textos secundarios no alcanzaban el contraste AA para texto normal. Centralicé esos tonos en `--color-muted` (`#5f7163`) y usé el naranja de marca para el foco de la cuenta y del campo de búsqueda.
+
+En los fondos claros de la tienda (`#fbf9f0`, `#fffefb` y `#fff`), `#5f7163` ofrece una relación de contraste mínima de 4.94:1; el foco naranja (`#ed5736`) sobre el fondo papel ofrece 3.31:1. Se corrigieron etiquetas, placeholders, datos secundarios de producto, notas del carrito y enlaces auxiliares que usaban tonos con menor contraste. El criterio AA para texto normal pide al menos 4.5:1; los elementos gráficos de foco requieren una señal perceptible con contraste suficiente.
+
+Esta comprobación cubre combinaciones identificadas en estos dos fondos claros y no equivale a una auditoría de contraste de todos los estados, fotografías, fondos translúcidos o combinaciones del sitio.
 
 ## Práctica guiada
 
