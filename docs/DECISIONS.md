@@ -58,11 +58,11 @@
 
 ## ADR-008 — Sellos SVG de origen y autoría
 
-**Decisión:** añadir al pie de la tienda y la guía tres SVG propios: “Hecho en Argentina”, “Codeado en Argentina” y el lockup “SMlich Soluciones”.
+**Decisión:** añadir al pie de la tienda y la guía tres SVG propios: “Hecho en Argentina”, “Codeado en Argentina” y el lockup “SMlich Soluciones IT”.
 
 **Motivo:** dar crédito al origen del vivero y del desarrollo, además de presentar el alias de programación sin confundirlo con la marca comercial principal.
 
-**Consecuencia:** los sellos son secundarios, accesibles mediante texto alternativo y apilados en pantallas de hasta 600 px. La versión actual de SMlich usa un escudo limpio, una corona geométrica original, un monograma SM angular y tipografía sans; combina el tono helado con una presentación de software más sobria, sin reutilizar arte ni logotipos de franquicias existentes.
+**Consecuencia:** los sellos son secundarios, accesibles mediante texto alternativo y apilados en pantallas de hasta 600 px. La versión actual de SMlich combina un casco de hielo original con arcos cian y violeta, y presenta “SMlich” junto a “SOLUCIONES IT”. El clima de fantasía se mantiene como inspiración sin reutilizar personajes ni logotipos de franquicias.
 
 ## ADR-009 — Mantener gratuita la etapa de aprendizaje
 

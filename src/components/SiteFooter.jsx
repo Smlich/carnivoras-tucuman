@@ -25,7 +25,7 @@ export default function SiteFooter() {
       <section className="page-shell site-footer__seals" aria-label="Sellos de origen y autoría">
         <img className="site-footer__seal" src="/images/brand/hecho-en-argentina.svg" alt="Hecho en Argentina" width="270" height="102" loading="lazy" />
         <img className="site-footer__seal" src="/images/brand/codeado-en-argentina.svg" alt="Codeado en Argentina" width="270" height="102" loading="lazy" />
-        <img className="site-footer__seal" src="/images/brand/smlich-soluciones.svg" alt="SMlich Soluciones" width="270" height="102" loading="lazy" />
+        <img className="site-footer__seal" src="/images/brand/smlich-soluciones.svg" alt="SMlich Soluciones IT" width="270" height="102" loading="lazy" />
       </section>
       <div className="page-shell site-footer__bottom">
         <span>© {new Date().getFullYear()} {store.name}</span>

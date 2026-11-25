@@ -10,7 +10,7 @@ La tienda usa fotos reales de las plantas del negocio. No reemplaces una planta 
 
 La identidad visual mezcla verde botánico y fondos cálidos con una energía inspirada en anime y lettering. Las fuentes con más personalidad aparecen en títulos y acentos cortos; las descripciones, las preguntas frecuentes y los controles usan una fuente fácil de leer.
 
-El pie suma tres sellos SVG: origen argentino, código argentino y la identidad de programación SMlich Soluciones. El último combina un escudo limpio, una corona geométrica original y un monograma SM angular con tipografía sans y tonos helados. El contraste entre un emblema con carácter y una composición simple ayuda a que se lea como firma profesional secundaria; no reemplaza la marca principal del vivero ni reutiliza arte de franquicias.
+El pie suma tres sellos SVG: origen argentino, código argentino y la identidad de programación SMlich Soluciones IT. El último combina un casco de hielo original, un cristal cian y arcos de energía violeta con un wordmark sans. El contraste entre un emblema con carácter y una composición simple ayuda a que se lea como firma profesional secundaria; no reemplaza la marca principal del vivero ni reutiliza arte de franquicias.
 
 ## Paso 1: declarar los valores de la marca
 
