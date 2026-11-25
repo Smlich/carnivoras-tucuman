@@ -15,8 +15,9 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 ### Decisiones de ingeniería
 
 - **Entrega incremental:** el frontend funciona primero con catálogo local; después se agregó Express y una API de lectura. Si MongoDB no está configurado en desarrollo, el mismo API usa el catálogo demo.
-- **Fotos y confianza:** las tarjetas usan archivos reales recibidos del vivero. No se sustituyen por imágenes generadas. Los precios y el inventario se presentan como referencia y se confirman por WhatsApp.
+- **Fotos y confianza:** catálogo y álbum usan fotografías reales del vivero, sin sustituirlas por imágenes generadas. El álbum reúne 24 fotos propias con firmas intactas, textos alternativos descriptivos, selección inicial y visor de originales. Genera miniaturas JPEG adaptables sin tocar las fuentes. Stock y disponibilidad se confirman por WhatsApp. La navegación y el visor se revisaron visualmente en escritorio y a 390 px; la cobertura completa de accesibilidad sigue pendiente.
 - **Rendimiento sin perder trazabilidad:** los originales se conservan; Sharp genera variantes adaptables de 480 y 960 píxeles y `CatalogImage` entrega una por imagen con `<picture>` y `srcset`. PNG se sirve como WebP, JPEG permanece JPEG y los logos se optimizan sin pérdida. La suma de la variante mayor de cada asset bajó de 11.1 MiB a 2.1 MiB (80.7% menos); es una comparación agregada de archivos, no una medición del tiempo de carga real.
+- **Rendimiento del álbum:** Sharp genera JPEG de hasta 480 px; las tarjetas eligen entre esa miniatura y el original mediante `srcSet` y `sizes`, cargan de forma diferida y reservan su espacio con dimensiones explícitas. Las 24 miniaturas pesan en conjunto aproximadamente 1.4 MiB; el navegador solicita las necesarias para la pantalla, no el paquete completo de originales.
 - **Responsive con evidencia:** se revisaron portada y guía entre 240 y 1920 píxeles, incluyendo móvil angosto, pantallas horizontales, tablet y escritorio. No apareció desplazamiento horizontal ni encabezados fuera de sus cajas; las imágenes cargaron y, al abrir el carrito en anchos seleccionados, el enlace de WhatsApp siguió visible. La revisión encontró que las tarjetas se apretaban debajo de 316 px; el catálogo ahora usa una columna en ese rango. Es una muestra representativa, no una afirmación de prueba en cada dispositivo existente.
 - **Carga de código bajo demanda:** React `lazy` y `Suspense` separan el panel de Better Auth. Solo se solicita cuando hay un proveedor social habilitado y la persona abre el menú de cuenta. En el build local MERN del 25 de noviembre de 2026, el chunk inicial es 471.45 kB (139.86 kB gzip) y el panel pesa 34.24 kB (12.66 kB gzip); las cifras describen archivos compilados, no una medición del rendimiento en el navegador.
 - **Publicación por etapas:** la vista estática de revisión está disponible en [Netlify](https://carnivorastucuman.netlify.app/) sin secretos; Hostinger queda aplazado hasta contar con presupuesto. La aplicación MERN completa aún no está desplegada.
@@ -72,4 +73,5 @@ Adapta este guion con tus propias palabras después de recorrer [la lección del
 - [Arquitectura](ARCHITECTURE.md)
 - [Decisiones técnicas](DECISIONS.md)
 - [Cronograma](ROADMAP.md)
+- [Lección del álbum fotográfico](LESSON_14_PHOTO_GALLERY.md)
 - [Contenido y SEO](CONTENT_PLAN.md)

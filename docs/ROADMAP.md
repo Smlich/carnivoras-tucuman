@@ -45,6 +45,16 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Aprendizaje:** seguir [la lección del sistema visual](LESSON_10_VISUAL_SYSTEM.md) y practicar el uso de variables CSS antes de añadir componentes nuevos.
 
+## Hito 0.4 — Álbum real del vivero
+
+**Estado:** completado. El álbum presenta 24 fotografías originales del negocio, una selección inicial de ocho, expansión completa y visor adaptable con navegación de teclado. Conserva la firma en las tarjetas, entrega miniaturas JPEG optimizadas y muestra el original al ampliar. Build y revisión visual en escritorio y a 390 px verificados.
+
+- Mantener el manifiesto de datos separado de los componentes.
+- Usar títulos y texto alternativo fieles a lo que aparece en cada foto, sin inventar la especie ni prometer stock.
+- Regenerar las miniaturas con `npm run images:optimize:gallery` al agregar fotos.
+
+**Aprendizaje:** sigue [la lección del álbum](LESSON_14_PHOTO_GALLERY.md) y practica cómo `srcSet`, `sizes`, carga diferida y CSS multi-column trabajan juntos.
+
 ## Semana 1 — Fundamentos y revisión del frontend
 
 - Recorrer cada componente y explicar el flujo de un pedido.

@@ -17,6 +17,7 @@
     "test:integration:mongo": "node --test server/test/integration/mongodb-products.integration.js",
     "seed:products": "node server/src/scripts/seed-products.js",
     "images:optimize": "node scripts/optimize-catalog-images.mjs",
+    "images:optimize:gallery": "node scripts/optimize-gallery-images.mjs",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1"
   },

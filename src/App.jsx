@@ -4,6 +4,7 @@ import PreviewBanner from './components/PreviewBanner';
 import CareSection from './components/CareSection';
 import CartDrawer from './components/CartDrawer';
 import ContactSection from './components/ContactSection';
+import GallerySection from './components/GallerySection';
 import HeroSection from './components/HeroSection';
 import ProductCatalog from './components/ProductCatalog';
 import SiteFooter from './components/SiteFooter';
@@ -32,6 +33,7 @@ export default function App() {
       <main id="contenido" tabIndex={-1}>
         <HeroSection />
         <ProductCatalog onAdd={handleAdd} />
+        <GallerySection />
         <CareSection />
         <ContactSection />
       </main>

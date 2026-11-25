@@ -55,16 +55,17 @@ Ejecuta `npm test` para correr la suite de la API con datos demo. Para comprobar
 - `src/utils`: formato de precios y construcción del pedido para WhatsApp.
 - `src/services`: comunicación entre React y la API.
 - `server/src`: API Express, configuración, esquema Mongo, lectura del catálogo y autenticación.
-- `docs`: arquitectura, decisiones, sistema visual, cronograma y registro de aprendizaje.
+- `docs`: arquitectura, decisiones, sistema visual, cronograma, [álbum fotográfico](docs/GALLERY.md), [lección para entender su implementación](docs/LESSON_14_PHOTO_GALLERY.md) y registro de aprendizaje.
 - `public/images/catalog`: archivos originales compartidos por el negocio.
 - `public/images/catalog/optimized`: variantes optimizadas para la web; conserva intactos los originales.
+- `public/images/gallery`: las 24 fotografías originales del vivero y las miniaturas generadas para el álbum.
 - `cuidados.html` y `src/care-page.css`: página informativa independiente, generada junto con la portada por Vite.
 
 Para regenerar variantes después de agregar o actualizar fotos autorizadas, ejecuta `npm run images:optimize`. El script prepara versiones adaptables para móvil y escritorio; usa WebP para los PNG y JPEG para las fotos que ya venían en JPEG. Cada `<picture>` mantiene también la foto original como respaldo, sin alterar los archivos fuente. Aprende el flujo en [la lección de optimización](docs/LESSON_05_IMAGE_OPTIMIZATION.md).
 
 ## Ruta de aprendizaje
 
-Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md), [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md), [pruebas de configuración y OAuth](docs/LESSON_11_API_CONFIGURATION_TESTS.md), [pruebas del catálogo](docs/LESSON_12_CATALOG_API_TESTS.md), [la guía de cuidados indexable](docs/LESSON_08_INDEXABLE_CARE_GUIDE.md), [navegación accesible por teclado](docs/LESSON_13_ACCESSIBLE_KEYBOARD_NAVIGATION.md), [el recorrido de Netlify a Hostinger](docs/LESSON_09_DEPLOYMENT_PATHS.md) y [el sistema visual](docs/LESSON_10_VISUAL_SYSTEM.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
+Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md), [álbum y visor de fotos](docs/LESSON_14_PHOTO_GALLERY.md), [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md), [pruebas de configuración y OAuth](docs/LESSON_11_API_CONFIGURATION_TESTS.md), [pruebas del catálogo](docs/LESSON_12_CATALOG_API_TESTS.md), [la guía de cuidados indexable](docs/LESSON_08_INDEXABLE_CARE_GUIDE.md), [navegación accesible por teclado](docs/LESSON_13_ACCESSIBLE_KEYBOARD_NAVIGATION.md), [el recorrido de Netlify a Hostinger](docs/LESSON_09_DEPLOYMENT_PATHS.md) y [el sistema visual](docs/LESSON_10_VISUAL_SYSTEM.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
 
 ## Portafolio
 
