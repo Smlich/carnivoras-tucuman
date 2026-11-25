@@ -33,6 +33,12 @@ El contrato del catálogo también se prueba en [la lección de pruebas del cat�
 4. Prueba una categoría que no exista; la API debe responder 400 y describir la validación.
 5. Explica por qué la URI de MongoDB está en el servidor y no en React.
 
+### Recorrido verificado en desarrollo
+
+El 25 de noviembre de 2026, Express respondió `data.status: ok`, `data.database: connected` y `data.catalogMode: mongodb` en `/api/health`. La consulta `/api/products?category=venus&limit=2` devolvió dos plantas y `meta.source: mongodb`. Así se puede seguir el dato de punta a punta: el navegador pide un recurso, Express valida los filtros y Mongoose lee los documentos de Atlas.
+
+En ese mismo entorno, `/api/auth/status` devolvió `enabled: false` y `providers: []`. Esto separa dos estados: Atlas ya persiste el catálogo, pero el acceso social no estará disponible hasta configurar Better Auth y las credenciales de los proveedores. Las credenciales se mantienen en `.env` y el endpoint solo revela si están activas.
+
 ## Lecturas oficiales
 
 - [Express 5: manejo de errores](https://expressjs.com/en/5x/guide/error-handling/)

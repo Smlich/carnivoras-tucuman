@@ -6,7 +6,18 @@ Base local: http://127.0.0.1:4000. En desarrollo, Vite reenvía /api al servidor
 
 ### GET /api/health
 
-Devuelve el estado del servidor y de la base. Si responde status: degraded, database: not-configured y catalogMode: demo-catalog, la API está usando datos locales y no guarda cambios.
+Devuelve el estado dentro de `data`. Una conexión activa a Atlas debe tener una respuesta de esta forma:
+
+    {
+      "data": {
+        "service": "carnivoras-tucuman-api",
+        "status": "ok",
+        "database": "connected",
+        "catalogMode": "mongodb"
+      }
+    }
+
+Si `data.status` es `degraded`, `data.database` es `not-configured` y `data.catalogMode` es `demo-catalog`, la API usa el catálogo local y no persiste cambios.
 
 ### GET /api/products
 
@@ -31,7 +42,7 @@ Respuesta:
 
 Cada elemento de data usa la misma forma que el catálogo de React. source identifica si los datos vienen de MongoDB o del modo de demostración.
 
-**Comprobación local (25 de noviembre de 2026):** `/api/health` informó `database: connected` y `catalogMode: mongodb`; `/api/products` devolvió ocho productos con `meta.source: mongodb`. OAuth sigue desactivado hasta configurar las credenciales de Google y Facebook.
+**Comprobación local (25 de noviembre de 2026):** `/api/health` informó `data.status: ok`, `data.database: connected` y `data.catalogMode: mongodb`; `/api/products` devolvió ocho productos con `meta.source: mongodb`. La consulta `/api/products?category=venus&limit=2` devolvió dos Venus desde MongoDB. `/api/auth/status` informó `enabled: false` y una lista vacía de proveedores; OAuth sigue pendiente de `BETTER_AUTH_SECRET`, las credenciales de Google y Facebook, y las URLs registradas.
 
 ### GET /api/products/:slug
 

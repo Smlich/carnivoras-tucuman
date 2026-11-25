@@ -15,7 +15,11 @@ async function startServer() {
 
   const authConfig = databaseConnected ? createAuth() : null;
   if (!authConfig) {
-    console.info('Autenticación social pendiente de MongoDB Atlas y credenciales OAuth.');
+    if (!databaseConnected) {
+      console.info('Autenticación social pendiente: se requiere una conexión a MongoDB Atlas.');
+    } else {
+      console.info('Autenticación social pendiente: configura BETTER_AUTH_SECRET, BETTER_AUTH_URL y al menos un proveedor.');
+    }
   } else {
     console.info('Proveedores sociales disponibles:', authConfig.providers.join(', '));
   }

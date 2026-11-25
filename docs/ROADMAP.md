@@ -62,7 +62,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 - Validar filtros y paginación, normalizar errores y documentar la API.
 - Conectar React al endpoint y conservar un fallback local durante desarrollo.
 
-**Estado:** API y lectura de catálogo implementadas. **Pendiente de aprendizaje:** recorrer el flujo y consultar la respuesta en el navegador. **Entrega:** API local en modo de demostración.
+**Estado:** API y lectura de catálogo implementadas. La comprobación local del 25 de noviembre de 2026 confirmó ocho productos en MongoDB Atlas y los filtros de Venus. **Práctica pendiente:** repetir el recorrido en el navegador y explicar cómo Express valida la consulta antes de que Mongoose lea Atlas; la evidencia técnica está en [la lección de API](LESSON_02_API.md). **Entrega:** API local conectada a Atlas, con modo de demostración como respaldo de desarrollo.
 
 ## Semana 3 — MongoDB y persistencia
 
