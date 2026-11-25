@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#142b21" />
+    <meta name="theme-color" content="#0b2119" />
     <meta
       name="description"
       content="Guía inicial para cuidar Venus atrapamoscas, Drosera capensis y Sarracenia. Agua, luz, sustrato y reposo explicados con fuentes botánicas."
@@ -18,17 +18,17 @@
       property="og:description"
       content="Una guía práctica para empezar con Venus atrapamoscas, Drosera capensis y Sarracenia, con recomendaciones basadas en fuentes botánicas."
     />
-    <meta property="og:image" content="https://carnivorastucuman.netlify.app/images/catalog/combo-three-plants.png" />
-    <meta property="og:image:alt" content="Fotografía real de plantas carnívoras cultivadas por Carnívoras Tucumán." />
+    <meta property="og:image" content="https://carnivorastucuman.netlify.app/images/gallery/floracion-drosera.jpeg" />
+    <meta property="og:image:alt" content="Flores rosada y blanca entre las hojas de una planta carnívora del vivero." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Cómo cuidar plantas carnívoras | Carnívoras Tucumán" />
     <meta name="twitter:description" content="Una guía práctica para cuidar Venus atrapamoscas, Drosera capensis y Sarracenia." />
-    <meta name="twitter:image" content="https://carnivorastucuman.netlify.app/images/catalog/combo-three-plants.png" />
-    <meta name="twitter:image:alt" content="Fotografía real de plantas carnívoras cultivadas por Carnívoras Tucumán." />
+    <meta name="twitter:image" content="https://carnivorastucuman.netlify.app/images/gallery/floracion-drosera.jpeg" />
+    <meta name="twitter:image:alt" content="Flores rosada y blanca entre las hojas de una planta carnívora del vivero." />
     <link rel="icon" type="image/png" href="/images/catalog/logo-light.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=DM+Sans:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/src/styles.css" />
     <link rel="stylesheet" href="/src/care-page.css" />
     <title>Cómo cuidar plantas carnívoras | Carnívoras Tucumán</title>
@@ -59,6 +59,8 @@
       </nav>
 
       <header class="care-guide__hero">
+        <img class="botanical-ornament care-guide__ornament" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
+        <img class="botanical-bloom care-guide__bloom" src="/images/botanical/drosera-bloom.svg" alt="" aria-hidden="true" />
         <p class="eyebrow"><span class="eyebrow__line"></span> Guía de Carnívoras Tucumán</p>
         <h1>Cómo cuidar <em>plantas carnívoras</em></h1>
         <p class="care-guide__lead">Un comienzo claro para cuidar Venus atrapamoscas, Drosera capensis y Sarracenia. Agua, luz y reposo cambian según la especie y el lugar donde crece.</p>
@@ -172,17 +174,35 @@
         <p class="site-footer__line">Un rincón extraordinario de la naturaleza, cultivado con paciencia.</p>
         <nav class="site-footer__links" aria-label="Navegación del pie de página">
           <a href="/#catalogo">Catálogo</a>
+          <a href="/#galeria">Álbum</a>
           <a href="/cuidados.html">Cuidados</a>
           <a href="/#contacto">Contacto</a>
           <a href="https://www.instagram.com/canivoras_tucuman/" target="_blank" rel="noopener noreferrer">@canivoras_tucuman</a>
         </nav>
       </div>
-      <section class="page-shell site-footer__seals" aria-label="Sellos de origen y autoría">
-        <img class="site-footer__seal" src="/images/brand/hecho-en-argentina.svg" alt="Hecho en Argentina" width="270" height="102" loading="lazy" />
-        <img class="site-footer__seal" src="/images/brand/codeado-en-argentina.svg" alt="Codeado en Argentina" width="270" height="102" loading="lazy" />
-        <img class="site-footer__seal" src="/images/brand/smlich-soluciones.svg" alt="SMlich Soluciones IT" width="270" height="102" loading="lazy" />
+      <section class="page-shell site-footer__marks" aria-label="Origen y desarrollo">
+        <figure class="site-footer__mark"><img src="/images/brand/hecho-en-argentina.svg" alt="" width="52" height="52" loading="lazy" /><figcaption><span>Hecho en</span><strong>Argentina</strong></figcaption></figure>
+        <figure class="site-footer__mark"><img src="/images/brand/codeado-en-argentina.svg" alt="" width="52" height="52" loading="lazy" /><figcaption><span>Codeado en</span><strong>Argentina</strong></figcaption></figure>
+        <figure class="site-footer__mark site-footer__mark--smlich"><img src="/images/brand/smlich-soluciones.svg" alt="" width="52" height="52" loading="lazy" /><figcaption><span>Desarrollo web</span><strong>SMlich Soluciones IT</strong></figcaption></figure>
       </section>
-      <div class="page-shell site-footer__bottom"><span>Carnívoras Tucumán · Tucumán, Argentina</span><span>Consultá cuidados según especie y ejemplar.</span></div>
+      <div class="page-shell site-footer__bottom">
+        <span>Carnívoras Tucumán · Tucumán, Argentina</span>
+        <span>Consultá cuidados según especie y ejemplar.</span>
+        <div class="visit-counter" data-visit-counter aria-live="polite" aria-atomic="true">
+          <span class="visit-counter__plant" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path d="M15.8 27c1.2-7.7 1-14.8-.2-21.5M15.7 20c-4.6-4.2-8.5-5.3-12.1-4.9 1.3 5.2 5.1 8.2 11.8 8.7M15.7 15.7c3.8-5.2 7.7-7.5 12.1-7.7-1 5.7-4.7 9.2-11.6 11.3" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" />
+              <circle cx="4.1" cy="15.1" r="1.8" fill="currentColor" />
+              <circle cx="27.8" cy="7.8" r="1.8" fill="currentColor" />
+              <circle cx="15.6" cy="5.1" r="1.6" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="visit-counter__label">Visitas del vivero</span>
+          <strong class="visit-counter__value" data-visit-count>—</strong>
+          <span class="visit-counter__caption" data-visit-caption>conectando el contador</span>
+        </div>
+      </div>
     </footer>
+    <script type="module" src="/visit-counter.js"></script>
   </body>
 </html>

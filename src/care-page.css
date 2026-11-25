@@ -47,6 +47,12 @@
 .care-guide__contact p:not(.eyebrow) { max-width: 590px; margin: 0; color: #c6d2c3; font-size: 13px; line-height: 1.7; }
 .care-guide__contact .button { flex: 0 0 auto; }
 
+/* Contraste de la página de cuidados: el hero es oscuro y el cuerpo usa papel claro. */
+.care-guide__hero .care-guide__lead { color: #d1ddcf; }
+.care-guide__hero h1 em { color: var(--color-lime); }
+.care-guide__section > h2 em { color: #a83e2c; }
+.care-guide__contact h2 em { color: #e2a5e7; }
+
 @media (max-width: 900px) {
   .care-principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .care-principle { min-height: 205px; }

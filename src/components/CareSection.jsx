@@ -1,13 +1,18 @@
+import { createContactUrl } from '../utils/whatsapp';
+
 export default function CareSection() {
   return (
     <section className="care-section section-pad" id="cuidados" aria-labelledby="care-title">
+      <img className="botanical-ornament botanical-ornament--care" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
       <div className="page-shell care-section__inner">
         <div className="care-section__intro">
           <p className="eyebrow eyebrow--light"><span className="eyebrow__line" /> Un buen comienzo</p>
           <h2 id="care-title">Cuidarlas también es parte de <em>la aventura.</em></h2>
           <p>Las plantas carnívoras tienen necesidades especiales. Cada especie es distinta: consultanos cuál se adapta mejor a tu espacio.</p>
-          <a className="button button--light" href="/cuidados.html">Leer la guía de cuidados <span aria-hidden="true">↗</span></a>
-          <a className="button button--light" href="#contacto">Preguntanos por WhatsApp <span aria-hidden="true">↗</span></a>
+          <div className="care-section__actions">
+            <a className="button button--light" href="/cuidados.html">Leer la guía de cuidados <span aria-hidden="true">↗</span></a>
+            <a className="button button--outline-light" href={createContactUrl()} target="_blank" rel="noopener noreferrer">Preguntanos por WhatsApp <span aria-hidden="true">↗</span></a>
+          </div>
         </div>
 
         <div className="care-list">
@@ -24,7 +29,9 @@ export default function CareSection() {
           <article className="care-tip">
             <span className="care-tip__number">03</span>
             <div><h3>Sustrato especializado</h3><p>No uses tierra de jardín ni fertilizante común. El sustrato debe ser pobre en nutrientes y adecuado para cada especie.</p></div>
-            <span className="care-tip__symbol" aria-hidden="true">✿</span>
+            <span className="care-tip__symbol care-tip__symbol--bloom" aria-hidden="true">
+              <img src="/images/botanical/drosera-bloom.svg" alt="" width="32" height="32" />
+            </span>
           </article>
           <article className="care-tip">
             <span className="care-tip__number">04</span>

@@ -10,6 +10,7 @@ Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/
 - Búsqueda y filtros básicos.
 - Carrito local que recuerda el pedido en este dispositivo.
 - Pedido enviado a WhatsApp para confirmar precio, disponibilidad y entrega.
+- Contador compartido de visitas por sesión de pestaña, persistido en Netlify Blobs; no guarda identificadores personales.
 - Diseño adaptable, navegación por teclado y metadatos básicos.
 - Sistema visual juvenil y legible: titulares tipo cómic, acentos lettering y paleta botánica viva documentados en [el sistema visual](docs/DESIGN_SYSTEM.md).
 - Tres sellos originales en el pie: Hecho en Argentina, Codeado en Argentina y SMlich Soluciones IT; el logo del área de programación es una identidad secundaria.
@@ -17,7 +18,7 @@ Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/
 - En producción, Express sirve el frontend compilado y la API bajo el mismo origen; `npm start` inicia el servidor.
 - API Express de solo lectura para catálogo y salud del servicio.
 - Esquema Mongoose y script de carga inicial preparados para MongoDB.
-- Inicio de sesión con Better Auth: Google está configurado y probado localmente; Facebook sigue pendiente. Netlify solo sirve la vista estática.
+- Inicio de sesión con Better Auth: Google está configurado y probado localmente; Facebook sigue pendiente. Netlify sirve el frontend estático y la función acotada del contador; la API MERN y OAuth siguen locales.
 
 Los productos y valores del catálogo se transcribieron de las publicaciones compartidas el 25 de noviembre de 2026. El stock se confirma por WhatsApp. Actualiza los datos antes de anunciar la web como catálogo vigente.
 
@@ -55,6 +56,8 @@ Ejecuta `npm test` para correr la suite de la API con datos demo. Para comprobar
 - `src/utils`: formato de precios y construcción del pedido para WhatsApp.
 - `src/services`: comunicación entre React y la API.
 - `server/src`: API Express, configuración, esquema Mongo, lectura del catálogo y autenticación.
+- `netlify/functions`: endpoint de contador compartido con persistencia en Netlify Blobs.
+- `public/visit-counter.js`: conecta el pie a la función y limita el incremento a una sesión por pestaña.
 - `docs`: arquitectura, decisiones, sistema visual, cronograma, [álbum fotográfico](docs/GALLERY.md), [lección para entender su implementación](docs/LESSON_14_PHOTO_GALLERY.md) y registro de aprendizaje.
 - `public/images/catalog`: archivos originales compartidos por el negocio.
 - `public/images/catalog/optimized`: variantes optimizadas para la web; conserva intactos los originales.
@@ -73,7 +76,7 @@ Usa [el caso de estudio](docs/PORTFOLIO_CASE_STUDY.md) para presentar la arquite
 
 ## Publicación por etapas
 
-La vista previa estática se publica desde `main` mediante la integración de GitHub con [Netlify](https://carnivorastucuman.netlify.app/), con catálogo local, fotos reales y la guía `/cuidados.html`. No representa la API MERN ni verifica OAuth. Hostinger queda aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica el despliegue de cada etapa.
+La vista de prueba se publica desde `main` mediante la integración de GitHub con [Netlify](https://carnivorastucuman.netlify.app/), con catálogo local, fotos reales, la guía `/cuidados.html` y una función persistente para el contador. No representa la API MERN ni verifica OAuth. Hostinger queda aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica el despliegue de cada etapa.
 
 ### Presupuesto de esta etapa
 
@@ -81,7 +84,7 @@ Por ahora, usa únicamente funciones y planes sin costo. No habilites facturaci�
 
 ## Próximos hitos
 
-Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTICATION.md) y el [plan de contenidos y SEO local](docs/CONTENT_PLAN.md). Google OAuth ya pasó un inicio de sesión real en desarrollo usando `http://localhost:5173`; Facebook todavía no está configurado. La vista estática de Netlify no incluye la API ni la sesión. No hay escritura de pedidos en la API.
+Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTICATION.md), [la lección del contador en Netlify](docs/LESSON_15_NETLIFY_COUNTER.md) y el [plan de contenidos y SEO local](docs/CONTENT_PLAN.md). Google OAuth ya pasó un inicio de sesión real en desarrollo usando `http://localhost:5173`; Facebook todavía no está configurado. Netlify no incluye la API MERN ni la sesión OAuth. No hay escritura de pedidos en la API.
 
 ## Datos que faltan antes del lanzamiento
 

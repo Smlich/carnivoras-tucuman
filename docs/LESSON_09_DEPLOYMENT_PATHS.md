@@ -4,7 +4,7 @@
 
 Separar una vista previa rápida del despliegue final MERN. La vista estática ya fue publicada para revisión; el servidor full stack sigue siendo local.
 
-## 1. Netlify: vista previa estática
+## 1. Netlify: vista previa estática con una función pequeña
 
 El archivo `netlify.toml` establece:
 
@@ -15,9 +15,11 @@ El archivo `netlify.toml` establece:
 
 En esa variante, React usa el catálogo local de `src/data/products.js` y no consulta `/api` ni muestra acceso social. Un aviso visible aclara que precio, stock y entrega deben confirmarse por WhatsApp. No hacen falta la URI de Atlas ni secretos OAuth. La tienda conserva filtros, carrito de consulta y WhatsApp; la guía estática `/cuidados.html` también se publica.
 
+`netlify.toml` además declara `netlify/functions` como carpeta de Functions. `visit-counter.mjs` solo lee y actualiza un total agregado en Netlify Blobs; no sustituye la API Express ni requiere conexión a Atlas. El navegador llama `/.netlify/functions/visit-counter`. Vite sirve solo el frontend y no monta esa ruta. Para revisar la función localmente se necesita `netlify dev` con la CLI de Netlify.
+
 ### Publicar la vista previa
 
-La vista de prueba está en [Carnívoras Tucumán en Netlify](https://carnivorastucuman.netlify.app/) y el código en [GitHub](https://github.com/Smlich/carnivoras-tucuman). Netlify ya está conectado a `Smlich/carnivoras-tucuman`, rama `main`; al subir cambios allí, Netlify ejecuta `npm run build` y publica `dist`. La ruta `/cuidados.html` también se publica. Esta URL de prueba usa catálogo local, muestra el aviso de confirmación por WhatsApp y no activa API, Atlas ni autenticación social.
+La vista de prueba está en [Carnívoras Tucumán en Netlify](https://carnivorastucuman.netlify.app/) y el código en [GitHub](https://github.com/Smlich/carnivoras-tucuman). Netlify ya está conectado a `Smlich/carnivoras-tucuman`, rama `main`; al subir cambios allí, Netlify ejecuta `npm run build`, publica `dist` e instala la función del contador. La ruta `/cuidados.html` también se publica. Esta URL de prueba usa catálogo local y no activa la API MERN, Atlas ni autenticación social.
 
 ### Revisar un deploy nuevo
 
@@ -34,7 +36,7 @@ Netlify crea deploys de prueba por rama o pull request cuando el repositorio que
 
 ### Límites para mantener el costo en cero
 
-Al 25 de noviembre de 2026, el plan Free nuevo de Netlify incluye 300 créditos mensuales y un límite estricto: cuando se agotan, los sitios se pausan hasta el siguiente ciclo, sin cargos por exceso. Las cuentas creadas antes del 4 de septiembre de 2025 pueden conservar condiciones heredadas. Revisa **Usage & billing** de la cuenta antes de asumir qué límite aplica; no cambies de plan ni actives recargas automáticas. Si se pausa, espera el reinicio mensual.
+El plan Free basado en créditos tiene un límite estricto y no recarga automáticamente; al agotarse, los sitios del equipo pueden pausarse hasta el siguiente ciclo. Las cuentas creadas antes del 4 de septiembre de 2025 pueden conservar condiciones heredadas. Revisa **Usage & billing** de la cuenta antes de asumir qué límite aplica; no cambies de plan ni actives recargas automáticas. La función consume recursos de Functions/Blobs dentro de los límites del plan. Si el equipo se pausa o la función supera su cuota, la cifra deja de actualizarse y el frontend indica que no está disponible. [Límites de Netlify Functions](https://docs.netlify.com/build/functions/usage-and-billing/) · [Planes y créditos](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/) · [Netlify Blobs](https://docs.netlify.com/build/data-and-storage/netlify-blobs/).
 
 MongoDB Atlas M0 ofrece 512 MB de almacenamiento y recursos compartidos sin costo, pensado para aprendizaje y pruebas pequeñas. Tiene menos capacidad que un clúster dedicado; no cambies a M2 u otro nivel pago. Si el límite gratuito no alcanza, pausa el trabajo de datos y revisamos otra opción gratuita antes de cambiar nada.
 
@@ -84,7 +86,7 @@ CORS_ORIGINS=https://<dominio-final>
 
 ## Lo que este plan no activa
 
-La vista previa de Netlify no es una API MERN ni prueba OAuth; sirve para revisión visual y de contenido. La aplicación completa podrá desplegarse cuando haya presupuesto para el hosting y estén preparados dominio y ambas aplicaciones sociales. El código y CI están en GitHub y Netlify publica la rama `main` automáticamente.
+La vista previa de Netlify no es la API MERN ni prueba OAuth; sirve para revisión visual y de contenido y mantiene la Function pequeña del contador. La aplicación completa podrá desplegarse cuando haya presupuesto para el hosting y estén preparados dominio y ambas aplicaciones sociales. El código y CI están en GitHub y Netlify publica la rama `main` automáticamente.
 
 ## Fuentes oficiales
 

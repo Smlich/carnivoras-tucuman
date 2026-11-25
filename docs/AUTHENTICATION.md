@@ -25,7 +25,7 @@ La tienda conserva WhatsApp como contacto del pedido. Una cuenta social todavía
 
 ## Estado verificado en desarrollo
 
-El 25 de noviembre de 2026, `/api/auth/status` respondió `enabled: true` y `providers: ["google"]`. Se completó un inicio real de sesión con Google desde `http://localhost:5173`; Better Auth procesó el callback y la tienda mostró una sesión activa. En la misma sesión se comprobó que el acceso persistía al recargar, que cerrar sesión devolvía la opción de acceso con Google y que un nuevo inicio volvía a persistir tras otra recarga. Las credenciales permanecen en `.env`, que Git ignora. Facebook aún no está configurado y la vista pública de Netlify sigue siendo estática.
+El 25 de noviembre de 2026, `/api/auth/status` respondió `enabled: true` y `providers: ["google"]`. Se completó un inicio real de sesión con Google desde `http://localhost:5173`; Better Auth procesó el callback y la tienda mostró una sesión activa. En la misma sesión se comprobó que el acceso persistía al recargar, que cerrar sesión devolvía la opción de acceso con Google y que un nuevo inicio volvía a persistir tras otra recarga. Las credenciales permanecen en `.env`, que Git ignora. Facebook aún no está configurado. La vista pública de Netlify publica el frontend y una Netlify Function exclusiva del contador, sin API MERN ni sesiones OAuth.
 
 Usa siempre el mismo host en `BETTER_AUTH_URL`, el navegador y el URI de retorno. `localhost` y `127.0.0.1` son orígenes distintos: mezclarlos produjo `state_mismatch` en una prueba; usar `localhost` en los tres lugares lo corrigió.
 

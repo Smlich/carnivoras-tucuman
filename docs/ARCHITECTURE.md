@@ -39,7 +39,7 @@ El cliente nunca se conecta directamente a MongoDB. El servidor valida cada oper
 
 ## Topología para los dos despliegues
 
-- **Netlify (prueba):** publica `dist` como sitio estático. `VITE_STATIC_PREVIEW=true` usa el catálogo local y omite consultas de API y autenticación; no requiere secretos ni escribe en Atlas.
+- **Netlify (prueba):** publica `dist` y una Netlify Function acotada al contador de visitas. `VITE_STATIC_PREVIEW=true` usa el catálogo local y omite consultas de la API MERN y autenticación; no requiere secretos ni escribe en Atlas. La función guarda solo el total agregado en Netlify Blobs.
 - **Hostinger (final):** un proceso Express sirve `dist` y `/api/*` en el mismo origen. Mongoose y Better Auth usan Atlas; las credenciales OAuth y de base de datos se configuran en el panel del hosting, nunca en Git.
 
 ## Decisiones de la primera entrega

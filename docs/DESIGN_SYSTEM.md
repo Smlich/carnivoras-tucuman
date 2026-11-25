@@ -1,48 +1,63 @@
 # Sistema visual
 
-Esta guía registra las decisiones visuales de Carnívoras Tucumán para poder mantener la marca coherente al sumar páginas y componentes.
+Esta guía registra las decisiones visuales de Carnívoras Tucumán para mantener la marca coherente al sumar páginas y componentes.
 
 ## Dirección
 
-La interfaz combina la seriedad de un vivero especializado con energía juvenil inspirada en el lettering de cómics y el grafiti. Las formas y tipografías expresivas se reservan para momentos breves; el catálogo, la navegación y los textos informativos priorizan lectura y confianza.
+La interfaz mezcla la calma de un vivero especializado con una energía juvenil inspirada en cómics y lettering urbano. Las formas expresivas se reservan para titulares y acentos breves. La navegación, el catálogo y la información de cuidados conservan jerarquía y lectura clara.
 
 ## Tipografía
 
 | Uso | Familia | Regla |
 | --- | --- | --- |
-| Titulares y cifras destacadas | Bangers | Títulos `h1` y `h2`, precios y números breves. En mayúsculas por CSS. |
-| Acentos dibujados | Permanent Marker | Palabras enfatizadas dentro de titulares y etiquetas cortas. No usar en párrafos ni instrucciones. |
-| Lectura e interfaz | DM Sans | Párrafos, navegación, formularios, botones, fichas y preguntas frecuentes. |
+| Titulares y cifras | Bangers | Usar en encabezados principales, precios y cifras breves. Evitar párrafos largos. |
+| Acentos expresivos | Permanent Marker | Usar en una frase corta dentro de un titular o en una etiqueta. No aplicar a instrucciones. |
+| Lectura e interfaz | Space Grotesk | Usar en párrafos, navegación, botones, formularios, fichas y preguntas frecuentes. |
 
-Las fuentes se cargan desde Google Fonts en las dos páginas HTML. Las familias de respaldo mantienen una presentación usable si no se puede acceder al servicio.
+Las dos páginas HTML cargan las fuentes desde Google Fonts y declaran alternativas locales. Si el proveedor no responde, la jerarquía y el contenido siguen siendo legibles.
 
 ## Paleta
 
 | Token CSS | Valor | Uso |
 | --- | --- | --- |
-| `--color-forest-deep` | `#142B21` | Fondos oscuros y áreas de marca. |
-| `--color-forest` | `#214F38` | Color principal, vínculos y detalles botánicos. |
-| `--color-leaf` | `#37834B` | Variantes verdes para elementos de planta. |
-| `--color-lime` | `#D2F46A` | Llamadas a la acción, filtros activos y acentos brillantes. |
-| `--color-orange` | `#ED5736` | Acento cálido, foco de teclado y detalles destacados. |
-| `--color-paper` | `#FBF9F0` | Fondo general cálido. |
-| `--color-white` | `#FFFEFB` | Tarjetas y superficies. |
+| `--color-forest-deep` | `#0b2119` | Fondo principal oscuro y footer. |
+| `--color-forest` | `#1d583d` | Elementos de marca y detalles botánicos. |
+| `--color-leaf` | `#48a65c` | Hojas, superficies secundarias y decoración. |
+| `--color-lime` | `#c8f451` | Llamadas a la acción y acento de alto contraste en fondos oscuros. |
+| `--color-orange` | `#fb6348` | Detalles cálidos y estados de foco. En texto sobre fondos claros se usa una variante más oscura para conservar contraste. |
+| `--color-orchid` | `#d995dc` | Acento floral inspirado en la floración de Drosera. |
+| `--color-paper` | `#f7f4e8` | Fondo general cálido. |
+| `--color-white` | `#fffef9` | Tarjetas y superficies claras. |
 
-Usa el verde oscuro y el fondo cálido como base. Lima y coral dan energía en superficies pequeñas o texto grande; conserva contraste suficiente para lectura y foco visible con teclado.
+Mantén el verde profundo y el papel cálido como base. Reserva lima, coral y orquídea para áreas pequeñas. No uses un acento claro como texto pequeño sobre papel claro.
 
-## Fotografía de producto
+## Fotografía e ilustración
 
-El catálogo usa fotos reales provistas por el negocio para que las plantas ofrecidas se parezcan a lo que recibe el cliente. No reemplaces plantas por imágenes de stock o generadas. Las versiones optimizadas, cuando existan, deben provenir de los mismos originales. Los recortes visuales pueden ajustarse con CSS sin alterar las fotos fuente.
+- Las fotos del catálogo muestran los ejemplares ofrecidos y usan únicamente imágenes reales autorizadas por el vivero.
+- Las fotos originales de `public/images/gallery/` pueden aparecer fuera del catálogo como escenas editoriales del vivero, siempre sin precio o reclamo que las haga parecer una publicación de otro producto.
+- El hero usa `jarro-con-gotas.jpeg`, una foto real del vivero. La galería conserva las 24 fotografías originales para descubrir las especies, el cultivo y las trampas.
+- Las ilustraciones de lianas, trampas de jarro y flor de Drosera en `public/images/botanical/` son SVG originales inspirados en las formas observadas en las fotos del vivero. No se agregan flores de plantas no carnívoras.
+- No uses imágenes de stock ni generadas como representación de una planta vendida. Las miniaturas deben proceder de los originales y no reemplazarlos.
 
-## Al extender el diseño
+## Movimiento y profundidad
 
-- Reutiliza las variables de color y tipografía declaradas al principio de `src/styles.css`.
-- Mantén el contenido largo en DM Sans y comprueba los estados de foco y hover.
-- Aplica el mismo vocabulario visual a `/cuidados.html` desde `src/care-page.css`.
-- Revisa diseños móviles: no reduzcas texto largo ni escondas información esencial.
+Usa perspectiva 3D ligera en tarjetas y marcos de fotografía para dar profundidad al desplazarse o pasar el puntero. Las lianas y flores pueden tener una oscilación lenta; no deben cubrir textos, botones ni detalles de las plantas. Respeta `prefers-reduced-motion` para desactivar desplazamientos y transiciones.
 
-## Sellos de pie de página
+## Sellos de marca
 
-El pie comparte tres gráficos SVG hechos para el proyecto: “Hecho en Argentina”, “Codeado en Argentina” y el logo “SMlich Soluciones IT”. Son secundarios frente al logo del vivero y conservan contraste sobre el fondo verde. El sello argentino combina la bandera celeste y blanca; el de programación usa los signos `</>`; SMlich integra un casco de hielo original, arcos de energía cian y violeta y un wordmark sans. La referencia de fantasía inspira el clima del dibujo, pero el sello no reproduce logotipos, personajes ni emblemas de otras franquicias.
+El pie reúne “Hecho en Argentina”, “Codeado en Argentina” y “SMlich Soluciones IT” en marcas del mismo tamaño, centradas y equilibradas en una sola grilla. Son información secundaria: la identidad de Carnívoras Tucumán conserva el primer plano en encabezado y pie.
 
-Los archivos viven en `public/images/brand/` y se usan tanto en el pie React como en `/cuidados.html`. El lockup SMlich incorpora su emblema PNG transparente dentro del SVG para mantener la ilustración y el wordmark en un solo recurso; el resto del dibujo y el texto se conservan como vectores. En el pie se muestran en tres columnas en pantallas amplias y en una columna hasta 600 px; cada imagen tiene texto alternativo.
+Los archivos SVG viven en `public/images/brand/` y tienen texto visible junto a sus símbolos. En pantallas estrechas se mantiene la grilla de tres columnas, con tamaños de texto que pueden envolver sin deformar ni superponer las marcas.
+
+## Contador de visitas
+
+El contador del pie retoma la forma de una hoja y usa los acentos lima y coral. Presenta el total de sesiones de pestaña compartido desde Netlify Blobs; no lo rotules como personas únicas. Si el endpoint no responde, conserva un estado neutral y no inventa cifras.
+
+## Responsive y accesibilidad
+
+- Reutiliza las variables de color y tipografía declaradas en `src/styles.css`.
+- Mantén espacio visible entre llamadas a la acción; organiza botones contiguos con un contenedor flex o grid y define `gap`.
+- Comprueba que el encabezado, las marcas, las tarjetas y el contador no provoquen desplazamiento horizontal en móvil.
+- Conserva foco de teclado visible, texto alternativo fiel y jerarquía semántica.
+- Revisa `prefers-reduced-motion` después de añadir animación.
+- Aplica las mismas variables a `/cuidados.html` mediante `src/care-page.css`.

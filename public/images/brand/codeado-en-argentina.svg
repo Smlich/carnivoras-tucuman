@@ -1,12 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="270" height="102" viewBox="0 0 270 102" role="img" aria-labelledby="title description">
-  <title id="title">Codeado en Argentina</title>
-  <desc id="description">Sello argentino de programación con corchetes de código.</desc>
-  <rect x="2" y="2" width="266" height="98" rx="22" fill="#10281f" stroke="#ed5736" stroke-opacity=".72" stroke-width="2" />
-  <circle cx="51" cy="51" r="33" fill="#183d2d" stroke="#d2f46a" stroke-width="1.5" />
-  <path d="m44 38-12 13 12 13M58 38l12 13-12 13M55 34l-8 34" fill="none" stroke="#fffefb" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" />
-  <circle cx="75" cy="28" r="4" fill="#ed5736" />
-  <text x="96" y="39" fill="#ff986d" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="2">CODEADO EN</text>
-  <text x="95" y="68" fill="#fffefb" font-family="Arial, sans-serif" font-size="23" font-weight="800" letter-spacing=".6">ARGENTINA</text>
-  <path d="M96 79h142" stroke="#ed5736" stroke-opacity=".55" stroke-width="1" />
-  <text x="96" y="91" fill="#b7c9b8" font-family="Arial, sans-serif" font-size="8" font-weight="600" letter-spacing="1.6">HECHO CON CÓDIGO Y PASIÓN</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  <circle cx="32" cy="32" r="29" fill="#10281F" stroke="#FF6848" stroke-width="2" />
+  <circle cx="32" cy="32" r="21" stroke="#C6F451" stroke-opacity=".72" />
+  <path d="m27 23-9 9 9 9M37 23l9 9-9 9M35 20l-7 24" stroke="#F8F5E9" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.4" />
 </svg>

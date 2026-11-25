@@ -25,9 +25,9 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 ## Hito 0.2 — Preparar Netlify y Hostinger
 
-**Estado:** la vista estática pública de Netlify quedó vinculada al repositorio GitHub y despliega los cambios de `main`. Conserva catálogo local y no activa API, Atlas ni OAuth. Hostinger queda aplazado hasta contar con presupuesto.
+**Estado:** Netlify está vinculado a GitHub y publica los cambios de `main`. La vista usa catálogo local y suma una Netlify Function para el contador compartido; no activa la API MERN, Atlas ni OAuth. Hostinger queda aplazado hasta contar con presupuesto.
 
-- Netlify compila y publica `dist` para una revisión temprana sin backend ni credenciales.
+- Netlify compila y publica `dist`; una función mínima persiste el contador sin credenciales de Atlas ni OAuth.
 - Hostinger ejecutará Express como proceso Node, servirá `dist` y conectará MongoDB Atlas y OAuth desde variables protegidas.
 - Elegir Node 24, disponible en ambos destinos y fijado en `.nvmrc`.
 - Confirmar precios, stock, entrega, dominio y cuentas de OAuth antes de la publicación final.
@@ -36,7 +36,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 ## Hito 0.3 — Sistema visual juvenil y legible
 
-**Estado:** sistema visual implementado en la tienda y la guía, con sellos SVG propios en el pie. La compilación de producción y la revisión responsive de 240 a 1920 px están verificadas; bajo 316 px el catálogo usa una columna para evitar que los nombres largos se desborden. El estado abierto del carrito también se revisó en móvil y tablet. Cada nuevo cambio requiere revisar la versión publicada.
+**Estado:** rediseño implementado en la tienda y la guía. En la revisión móvil a 390 px, los dos botones de cuidados quedan separados por 11 px, los sellos del pie miden 42 × 42 px y sus centros se distribuyen en tres columnas iguales. El documento no presenta desbordamiento horizontal; la compilación de producción es correcta.
 
 - Definir tokens de color y tipografía reutilizables.
 - Usar fuentes de personalidad en títulos y acentos cortos y una fuente legible en el catálogo y la guía.
@@ -54,6 +54,16 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 - Regenerar las miniaturas con `npm run images:optimize:gallery` al agregar fotos.
 
 **Aprendizaje:** sigue [la lección del álbum](LESSON_14_PHOTO_GALLERY.md) y practica cómo `srcSet`, `sizes`, carga diferida y CSS multi-column trabajan juntos.
+
+## Hito 0.5 — Contador compartido de visitas
+
+**Estado:** implementado con `/.netlify/functions/visit-counter` y Netlify Blobs. Incrementa una vez por sesión de pestaña, muestra el total persistente en ambas páginas y no guarda IP, cuenta ni identificadores. Es un contador aproximado de sesiones; no sustituye a una herramienta de analítica ni identifica personas.
+
+- La API acepta GET para leer y POST para incrementar; las escrituras usan ETag condicional para no perder incrementos simultáneos.
+- El entorno Vite local no incluye la función desplegada, así que allí el contador se muestra como no disponible.
+- Revisar el total y el uso del plan en el sitio publicado; Netlify Free tiene límite duro de créditos y, al agotarlo, puede pausar los sitios del equipo.
+
+**Aprendizaje:** sigue [la lección de Netlify Functions y Blobs](LESSON_15_NETLIFY_COUNTER.md) para repetir el patrón en otro proyecto.
 
 ## Semana 1 — Fundamentos y revisión del frontend
 

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Flor de Drosera</title>
+  <desc id="desc">Flor rosada de cinco pétalos inspirada en la floración fotografiada en el vivero.</desc>
+  <g fill="#E7A0E1" stroke="#FFE5FA" stroke-width="2">
+    <path d="M80 69c-18-3-31-21-24-37 6-13 21-11 24 37Z" />
+    <path d="M88 74c4-18 23-29 38-20 12 7 9 22-38 20Z" />
+    <path d="M85 87c17 6 27 26 17 40-8 11-23 7-17-40Z" />
+    <path d="M73 87c-7 17-28 25-41 14-10-9-5-24 41-14Z" />
+    <path d="M70 75C54 66 48 45 60 34c11-9 25-2 10 41Z" />
+  </g>
+  <circle cx="79" cy="79" r="11" fill="#D5F572" stroke="#FFF4B1" stroke-width="2" />
+  <g stroke="#FFDC78" stroke-linecap="round" stroke-width="2.5">
+    <path d="m79 77-19-12" /><path d="m82 77 18-15" /><path d="m84 80 22 2" />
+    <path d="m82 84 12 21" /><path d="m77 84-14 18" />
+  </g>
+  <g fill="#F07A45">
+    <circle cx="59" cy="64" r="3" /><circle cx="102" cy="60" r="3" /><circle cx="108" cy="82" r="3" />
+    <circle cx="96" cy="107" r="3" /><circle cx="62" cy="104" r="3" />
+  </g>
+</svg>

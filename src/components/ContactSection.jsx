@@ -5,7 +5,7 @@ export default function ContactSection() {
   return (
     <section className="contact-section section-pad" id="contacto" aria-labelledby="contact-title">
       <div className="page-shell contact-card">
-        <div className="contact-card__ornament" aria-hidden="true">✳</div>
+        <img className="contact-card__ornament" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
         <div className="contact-card__copy">
           <p className="eyebrow"><span className="eyebrow__line" /> Hablemos de plantas</p>
           <h2 id="contact-title">Tu próxima planta está <em>a un mensaje.</em></h2>

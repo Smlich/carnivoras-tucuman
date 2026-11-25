@@ -1,6 +1,6 @@
 # Caso de estudio para portafolio
 
-> Borrador basado en el estado actual. La vista estática de Netlify se actualiza desde `main`. Google OAuth ya se verificó en desarrollo local; la aplicación MERN de producción no está desplegada. Facebook queda diferido mientras Meta no complete la verificación por SMS.
+> Borrador basado en el estado actual. Netlify publica el frontend estático más una función pequeña para el contador; la API MERN y OAuth se ejecutan en desarrollo local. Google OAuth ya se verificó en local. Facebook queda diferido mientras Meta no complete la verificación por SMS.
 
 ## Carnívoras Tucumán — tienda web full stack en evolución
 
@@ -10,7 +10,7 @@ El vivero vende plantas carnívoras con consultas directas por WhatsApp. Las pub
 
 ### La solución
 
-Una tienda en español para explorar productos, buscar por especie, filtrar categorías, preparar un pedido local y enviarlo como consulta a WhatsApp. El API Express sirve el catálogo desde Atlas en el entorno local y reporta si usa MongoDB o el modo de demostración. Better Auth autentica con Google en desarrollo local; Facebook y la publicación full stack siguen pendientes. Netlify muestra únicamente la vista estática.
+Una tienda en español para explorar productos, buscar por especie, filtrar categorías, preparar un pedido local y enviarlo como consulta a WhatsApp. El API Express sirve el catálogo desde Atlas en el entorno local y reporta si usa MongoDB o el modo de demostración. Better Auth autentica con Google en desarrollo local; Facebook y la publicación full stack siguen pendientes. Netlify publica la interfaz estática y un contador compartido con persistencia de Blobs.
 
 ### Decisiones de ingeniería
 
@@ -22,6 +22,7 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 - **Carga de código bajo demanda:** React `lazy` y `Suspense` separan el panel de Better Auth. Solo se solicita cuando hay un proveedor social habilitado y la persona abre el menú de cuenta. En el build local MERN del 25 de noviembre de 2026, el chunk inicial es 471.45 kB (139.86 kB gzip) y el panel pesa 34.24 kB (12.66 kB gzip); las cifras describen archivos compilados, no una medición del rendimiento en el navegador.
 - **Publicación por etapas:** la vista estática de revisión está disponible en [Netlify](https://carnivorastucuman.netlify.app/) sin secretos; Hostinger queda aplazado hasta contar con presupuesto. La aplicación MERN completa aún no está desplegada.
 - **Identidad secundaria:** el pie usa sellos SVG propios de origen argentino, desarrollo argentino y SMlich Soluciones IT, con diseño accesible y adaptable. La marca del vivero sigue siendo la principal.
+- **Contador compartido:** una Netlify Function lee o incrementa un total en Netlify Blobs con escritura condicional por ETag; el cliente incrementa una vez por sesión de pestaña. El valor aproxima sesiones, no personas únicas, y no se guardan identificadores. El contador no sustituye métricas analíticas.
 - **Carrito sin promesa de compra:** el navegador recuerda la selección y genera una consulta; no cobra, reserva stock ni crea pedidos en servidor. El precio debe recalcularse en el backend antes de incorporar pagos.
 - **Separación de secretos:** React no recibe credenciales OAuth ni la URI de Atlas. Express valida el entorno y Better Auth gestiona las sesiones cuando la base y los proveedores estén configurados.
 - **Datos verificables:** Zod valida filtros de API, Mongoose define restricciones del producto y el seed hace upsert por slug sin borrar otros documentos.
@@ -37,11 +38,12 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 | Datos | MongoDB Atlas, Mongoose | Clúster Free conectado en AWS São Paulo; ocho productos sembrados; la API confirma `meta.source: mongodb`. |
 | Autenticación | Better Auth, Google y Facebook | Google configurado en modo Testing y probado con una sesión real en `http://localhost:5173`; secretos en `.env`, ignorado por Git. Facebook pendiente. |
 | Pedido | localStorage y enlace WhatsApp | Genera una consulta; no registra una orden ni procesa pagos. |
+| Hosting de prueba | Netlify Functions y Blobs | Persisten el total del contador sin usar Atlas ni secretos; sujeto al límite gratuito del equipo. |
 | Calidad | documentación, ADR, plan de aprendizaje, Node test runner y CI en GitHub Actions | Suite automatizada para configuración, perfil de Facebook, estado OAuth y contratos de lectura del catálogo demo; CI ejecuta pruebas y build. Google se verificó manualmente; faltan prueba real de Facebook, más integración de consultas MongoDB, pruebas de compra y auditoría integral. |
 
 ### Vista previa pública
 
-URL: [https://carnivorastucuman.netlify.app/](https://carnivorastucuman.netlify.app/). Permite revisar la interfaz estática, el catálogo, el carrito de consulta, WhatsApp, la guía y el enlace de Instagram. Antes de compartirla como catálogo vigente, confirma precios, stock y entrega. La autenticación Google/Facebook y la API MERN no forman parte de esta vista previa.
+URL: [https://carnivorastucuman.netlify.app/](https://carnivorastucuman.netlify.app/). Permite revisar la interfaz estática, el catálogo, el carrito de consulta, WhatsApp, la guía, Instagram y el contador compartido. Antes de compartirla como catálogo vigente, confirma precios, stock y entrega. La autenticación Google/Facebook y la API MERN no forman parte de esta vista previa.
 
 ### Demostración local
 

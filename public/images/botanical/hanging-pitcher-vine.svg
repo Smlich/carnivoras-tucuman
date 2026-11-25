@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 620" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Liana con trampas de jarro</title>
+  <desc id="desc">Ilustración botánica de una liana con hojas y trampas colgantes, inspirada en las plantas del vivero.</desc>
+  <defs>
+    <linearGradient id="vine" x1="125" y1="0" x2="301" y2="584" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#BEF34F" />
+      <stop offset="1" stop-color="#39A85B" />
+    </linearGradient>
+    <linearGradient id="pitcher" x1="244" y1="218" x2="302" y2="513" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8A4E9" />
+      <stop offset=".48" stop-color="#BD4E74" />
+      <stop offset="1" stop-color="#F26046" />
+    </linearGradient>
+    <linearGradient id="leaf" x1="72" y1="101" x2="174" y2="173" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B7F266" />
+      <stop offset="1" stop-color="#3A9850" />
+    </linearGradient>
+  </defs>
+  <path d="M128-20c-23 65 69 92 23 153-43 57 64 88 33 148-33 62 74 92 45 151-20 42-13 96-3 150" stroke="url(#vine)" stroke-linecap="round" stroke-width="9" />
+  <path d="M145 65c-46-12-80-1-105 36 44 17 78 5 105-36Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".5" stroke-width="2" />
+  <path d="M146 64 63 98" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M163 143c36-38 75-47 121-27-30 43-69 55-121 27Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".45" stroke-width="2" />
+  <path d="m164 143 96-26" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M158 232c-51-25-91-20-130 11 42 30 83 27 130-11Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".45" stroke-width="2" />
+  <path d="m158 231-98 12" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M184 324c35-44 75-58 126-42-28 49-66 66-126 42Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".45" stroke-width="2" />
+  <path d="m184 324 99-34" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M229 416c-46-34-88-36-134-10 37 38 79 44 134 10Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".45" stroke-width="2" />
+  <path d="m229 416-100 1" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M174 172c-24 46-19 77 13 108 23-37 19-71-13-108Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".4" stroke-width="2" />
+  <path d="m174 177 11 91" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M208 344c3 41 20 67 58 79 1-43-17-68-58-79Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".4" stroke-width="2" />
+  <path d="m210 349 48 64" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M222 191c45 6 65 30 64 70-40-5-61-29-64-70Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".4" stroke-width="2" />
+  <path d="m226 195 52 56" stroke="#D4FF8A" stroke-opacity=".5" stroke-width="2" />
+  <path d="M177 143c38 28 57 56 65 93" stroke="url(#vine)" stroke-linecap="round" stroke-width="5" />
+  <path d="M241 232c-4 36 6 58 32 74 8-33-2-56-32-74Z" fill="#6EBE4E" stroke="#CFFF83" stroke-opacity=".55" stroke-width="2" />
+  <path d="M272 306c4 9 10 15 19 19" stroke="url(#vine)" stroke-linecap="round" stroke-width="5" />
+  <path d="M289 319c4 11 4 18 2 28" stroke="url(#vine)" stroke-linecap="round" stroke-width="4" />
+  <path d="M266 338c-18 3-28 17-26 37 18-2 29-15 26-37Z" fill="#A7E260" />
+  <path d="M299 345c-5 26-2 50 11 73 16-21 15-46-11-73Z" fill="url(#leaf)" />
+  <path d="M283 366c-4 33 7 52 31 64 9-31-1-51-31-64Z" fill="#76C14D" stroke="#CFFF83" stroke-opacity=".45" stroke-width="2" />
+  <path d="m286 373 23 48" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M286 337c-6 18-8 42-6 68" stroke="url(#vine)" stroke-linecap="round" stroke-width="5" />
+  <path d="M280 399c-1 15-5 24-16 33" stroke="url(#vine)" stroke-linecap="round" stroke-width="4" />
+  <path d="M263 430c-3 20-1 43 7 68 20-17 21-38-7-68Z" fill="url(#pitcher)" stroke="#F4C5E8" stroke-opacity=".8" stroke-width="2" />
+  <path d="M259 430c4-10 13-16 25-15 10 1 16 7 19 15-9 7-35 8-44 0Z" fill="#F2B2DB" stroke="#FFF0F7" stroke-width="3" />
+  <path d="M266 438c8 7 17 9 28 6" stroke="#8D315F" stroke-opacity=".6" stroke-width="3" />
+  <path d="M286 374c20 8 33 23 38 46" stroke="url(#vine)" stroke-linecap="round" stroke-width="5" />
+  <path d="M323 416c19 14 27 37 24 68-25-9-37-29-24-68Z" fill="url(#leaf)" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="m324 421 18 52" stroke="#D4FF8A" stroke-opacity=".55" stroke-width="2" />
+  <path d="M271 497c-4 24-1 50 11 80 24-22 25-50-11-80Z" fill="url(#pitcher)" stroke="#F4C5E8" stroke-opacity=".8" stroke-width="2" />
+  <path d="M266 499c5-11 14-17 26-16 10 1 17 6 20 16-10 8-37 8-46 0Z" fill="#F2B2DB" stroke="#FFF0F7" stroke-width="3" />
+  <path d="M274 507c9 7 19 9 31 5" stroke="#8D315F" stroke-opacity=".6" stroke-width="3" />
+</svg>
