@@ -42,7 +42,7 @@ Respuesta:
 
 Cada elemento de data usa la misma forma que el catálogo de React. source identifica si los datos vienen de MongoDB o del modo de demostración.
 
-**Comprobación local (25 de noviembre de 2026):** `/api/health` informó `data.status: ok`, `data.database: connected` y `data.catalogMode: mongodb`; `/api/products` devolvió ocho productos con `meta.source: mongodb`. La consulta `/api/products?category=venus&limit=2` devolvió dos Venus desde MongoDB. `/api/auth/status` informó `enabled: false` y una lista vacía de proveedores; OAuth sigue pendiente de `BETTER_AUTH_SECRET`, las credenciales de Google y Facebook, y las URLs registradas.
+**Comprobación local (25 de noviembre de 2026):** `/api/health` informó `data.status: ok`, `data.database: connected` y `data.catalogMode: mongodb`; `/api/products` devolvió ocho productos con `meta.source: mongodb`. La consulta `/api/products?category=venus&limit=2` devolvió dos Venus desde MongoDB. `/api/auth/status` informó `enabled: false` y una lista vacía de proveedores. Se comprobó solo la presencia de variables (sin leer ni mostrar valores): Atlas, `BETTER_AUTH_SECRET` y `BETTER_AUTH_URL` ya están configurados; faltan los IDs y secretos OAuth de Google y Facebook.
 
 ### GET /api/products/:slug
 

@@ -14,14 +14,30 @@ async function startServer() {
   }
 
   const authConfig = databaseConnected ? createAuth() : null;
+  const hasGoogleCredentials = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
+  const hasFacebookCredentials = Boolean(env.FACEBOOK_CLIENT_ID && env.FACEBOOK_CLIENT_SECRET);
+  const missingAuthRequirements = [];
+  if (!env.BETTER_AUTH_SECRET) missingAuthRequirements.push('BETTER_AUTH_SECRET');
+  if (!env.BETTER_AUTH_URL) missingAuthRequirements.push('BETTER_AUTH_URL');
+  if (!hasGoogleCredentials && !hasFacebookCredentials) {
+    missingAuthRequirements.push('credenciales de Google o Facebook');
+  }
+
   if (!authConfig) {
     if (!databaseConnected) {
       console.info('Autenticación social pendiente: se requiere una conexión a MongoDB Atlas.');
     } else {
-      console.info('Autenticación social pendiente: configura BETTER_AUTH_SECRET, BETTER_AUTH_URL y al menos un proveedor.');
+      console.info('Autenticación social pendiente. Completa: ' + missingAuthRequirements.join(', ') + '.');
     }
   } else {
     console.info('Proveedores sociales disponibles:', authConfig.providers.join(', '));
+    const missingProductionProviders = [
+      !hasGoogleCredentials && 'Google',
+      !hasFacebookCredentials && 'Facebook',
+    ].filter(Boolean);
+    if (missingProductionProviders.length > 0) {
+      console.info('Para producción también faltan credenciales de:', missingProductionProviders.join(', '));
+    }
   }
 
   const app = createApp({
