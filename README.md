@@ -25,15 +25,16 @@ Requisitos: Node.js 20.19+ o 22.12+ y npm.
 
 También puedes usar `npm run dev` para trabajar solo en el frontend.
 
-## MongoDB local
+## MongoDB Atlas
 
 La API funciona sin base de datos en modo de demostración durante desarrollo y muestra claramente ese estado en `GET /api/health`. No persiste cambios en ese modo.
 
-1. Copia `.env.example` a `.env` y define `MONGODB_URI` con una instancia local o de MongoDB Atlas.
-2. Ejecuta `npm run seed:products` para crear o actualizar los productos de ejemplo en MongoDB.
-3. Ejecuta `npm run dev:all`; `GET /api/health` debe indicar que la base está conectada.
+1. Sigue [la guía de configuración de Atlas](docs/MONGODB_ATLAS_SETUP.md) para crear el clúster, un usuario de base de datos y limitar el acceso a tu IP.
+2. Copia `.env.example` a `.env` y pega localmente la URI de conexión en `MONGODB_URI`.
+3. Ejecuta `npm run seed:products` para crear o actualizar los productos de ejemplo en MongoDB.
+4. Ejecuta `npm run dev:all`; `GET /api/health` debe indicar que la base está conectada.
 
-En producción, el servidor no inicia sin `MONGODB_URI`. No incluyas el archivo `.env` ni secretos en Git.
+En producción, el servidor no inicia sin `MONGODB_URI`. No incluyas el archivo `.env` ni secretos en Git ni los envíes por chat.
 
 Para generar la versión de producción, ejecuta `npm run build`; la carpeta `dist` contiene el sitio estático.
 
