@@ -63,7 +63,7 @@ La tienda y `/cuidados.html` se revisaron en anchos CSS de 280, 320, 360, 390, 4
 
 Esa interacción encontró un caso real: el aviso flotante de confirmación tenía `z-index: 55` y se pintaba encima del carrito (`z-index: 50`), tapando parte del botón de consulta. En `src/styles.css`, el aviso ahora usa `z-index: 45`; el diálogo queda por delante y el aviso ya no intercepta ni cubre la acción. La región `contact-card__ornament` puede salir parcialmente de la pantalla en móvil, pero la tarjeta la recorta intencionalmente con `overflow: hidden`.
 
-Para repetir la revisión, abre DevTools, activa la emulación de dispositivo y cambia el ancho del viewport, no el zoom del navegador. Revisa ambas páginas, el título, la franja superior, las tarjetas, el pie y los estados abiertos del carrito y la cuenta. Compara `document.documentElement.scrollWidth` con `window.innerWidth` y confirma visualmente los elementos interactivos: la igualdad de esos dos números por sí sola no detecta texto recortado dentro de un componente.
+Para repetir la revisión, abre DevTools, activa la emulación de dispositivo y cambia el ancho del viewport, no el zoom del navegador. Revisa ambas páginas, el título, la franja superior, las tarjetas, el pie y los estados abiertos del carrito y la cuenta. Compara `document.documentElement.scrollWidth` con `document.documentElement.clientWidth`; `window.innerWidth` también incluye el espacio de la barra de desplazamiento en escritorio. Confirma visualmente los elementos interactivos: la igualdad de los anchos por sí sola no detecta texto recortado dentro de un componente.
 
 ## Práctica para repetir
 
