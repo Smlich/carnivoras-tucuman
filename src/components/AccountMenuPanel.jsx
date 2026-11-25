@@ -9,6 +9,7 @@ const providerLabels = {
 export default function AccountMenuPanel({ providers, onAccountNameChange }) {
   const { data: session, isPending, refetch } = authClient.useSession();
   const [message, setMessage] = useState('');
+  const [progress, setProgress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function AccountMenuPanel({ providers, onAccountNameChange }) {
 
   async function handleSignIn(provider) {
     setMessage('');
+    setProgress(`Conectando con ${providerLabels[provider] || provider}…`);
     setIsSubmitting(true);
 
     try {
@@ -28,12 +30,14 @@ export default function AccountMenuPanel({ providers, onAccountNameChange }) {
       if (result.error) throw new Error('Inicio de sesión rechazado.');
     } catch {
       setMessage('No pudimos iniciar sesión. Volvé a intentarlo.');
+      setProgress('');
       setIsSubmitting(false);
     }
   }
 
   async function handleSignOut() {
     setMessage('');
+    setProgress('Cerrando sesión…');
     setIsSubmitting(true);
 
     try {
@@ -44,6 +48,7 @@ export default function AccountMenuPanel({ providers, onAccountNameChange }) {
       setMessage('No pudimos cerrar la sesión. Volvé a intentarlo.');
     } finally {
       setIsSubmitting(false);
+      setProgress('');
     }
   }
 
@@ -57,6 +62,7 @@ export default function AccountMenuPanel({ providers, onAccountNameChange }) {
         <button className="account-menu__secondary" type="button" onClick={handleSignOut} disabled={isSubmitting}>
           Cerrar sesión
         </button>
+        {progress && <p className="account-menu__status" role="status" aria-live="polite">{progress}</p>}
         {message && <p className="account-menu__error" role="alert">{message}</p>}
       </>
     );
@@ -79,6 +85,7 @@ export default function AccountMenuPanel({ providers, onAccountNameChange }) {
           </button>
         ))}
       </div>
+      {progress && <p className="account-menu__status" role="status" aria-live="polite">{progress}</p>}
       {message && <p className="account-menu__error" role="alert">{message}</p>}
     </>
   );
