@@ -41,6 +41,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
   outline-offset: 3px;
 }
 
+.care-section :focus-visible {
+  outline-color: var(--color-lime);
+}
+
 main:focus-visible {
   outline: none;
 }

@@ -26,7 +26,7 @@ Repetí la comprobación en cada página después de cambiar la cabecera o el or
 
 ## Indicadores de foco y contraste
 
-Durante la revisión visual encontré que el borde de foco del menú de cuenta era demasiado tenue y que algunos textos secundarios no alcanzaban el contraste AA para texto normal. Centralicé esos tonos en `--color-muted` (`#5f7163`) y usé el naranja de marca para el foco de la cuenta y del campo de búsqueda.
+Durante la revisión visual encontré que el borde de foco del menú de cuenta era demasiado tenue y que algunos textos secundarios no alcanzaban el contraste AA para texto normal. Centralicé esos tonos en `--color-muted` (`#5f7163`) y usé el naranja de marca para el foco de la cuenta y del campo de búsqueda. En la sección verde oscura el naranja solo alcanzaba 2.69:1, por eso los controles de esa sección usan un borde lima, con 7.54:1 de contraste.
 
 En los fondos claros de la tienda (`#fbf9f0`, `#fffefb` y `#fff`), `#5f7163` ofrece una relación de contraste mínima de 4.94:1; el foco naranja (`#ed5736`) sobre el fondo papel ofrece 3.31:1. Se corrigieron etiquetas, placeholders, datos secundarios de producto, notas del carrito y enlaces auxiliares que usaban tonos con menor contraste. El criterio AA para texto normal pide al menos 4.5:1; los elementos gráficos de foco requieren una señal perceptible con contraste suficiente.
 
