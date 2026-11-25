@@ -17,6 +17,7 @@ La técnica G1 de W3C comprueba que, al activar el enlace, el foco llegue al con
 - `main:focus-visible` resalta el título de la página con el borde visual del sistema, sin dibujar un marco alrededor de todo el documento.
 - Se aumentó el contraste de etiquetas secundarias y estados del carrito. El campo de búsqueda, el resumen de cuenta y los elementos interactivos usan un indicador de foco naranja visible.
 - Al vaciar el último producto, el foco pasa al botón «Volver al catálogo» para que no quede en un control que ya desapareció.
+- El catálogo anuncia con una región `role="status"` cuántas plantas quedan después de cambiar filtros o búsqueda, sin agregar texto visual ni mover el foco.
 
 ## Comprobación manual
 
@@ -25,6 +26,8 @@ En la compilación de producción local, se abrió la portada y `/cuidados.html`
 Repetí la comprobación en cada página después de cambiar la cabecera o el orden del HTML. En la vista previa local también recorrí el carrito con Tab y Shift+Tab, lo cerré con Escape y comprobé que el foco vuelva a «Abrir pedido». Al eliminar el último producto, el foco llega a «Volver al catálogo». Esto comprueba estas interacciones concretas; no sustituye una auditoría WCAG completa ni las pruebas con lectores de pantalla.
 
 En una revisión posterior, recorrí la página con Tab hasta «Leer la guía de cuidados». El borde lima se vio con claridad sobre el fondo verde oscuro; la compilación publicada por Netlify contiene la misma regla CSS. El flujo CI de ese commit finalizó correctamente. Esta evidencia cubre el control y el fondo revisados, no todos los estados ni todas las combinaciones de contraste.
+
+En la compilación local del 25 de noviembre de 2026, el filtro «Combos y promos» cambió el anuncio accesible de ocho a dos plantas; una búsqueda sin coincidencias anunció «No se encontraron plantas». En el carrito vacío, Shift+Tab y Tab recorrieron solo los controles del diálogo, Escape lo cerró y el foco volvió al botón «Mi pedido». En `/cuidados.html`, el enlace «Saltar al contenido» recibió foco, Enter movió el fragmento a `#contenido` y el indicador quedó sobre el título principal. La región de resultados es visualmente oculta y no mueve el foco.
 
 ## Indicadores de foco y contraste
 
@@ -40,6 +43,7 @@ Esta comprobación cubre combinaciones identificadas en estos dos fondos claros 
 2. Pulsa Enter y comprueba que el foco pase al contenido; usa Tab una vez más para continuar hacia el primer control de contenido.
 3. Repite en la portada y en la guía.
 4. Abre el carrito con teclado y comprueba su retorno de foco al cerrar, usando la [lección del sistema visual](LESSON_10_VISUAL_SYSTEM.md) para revisar el estilo de foco.
+5. Cambia un filtro y escribe en la búsqueda; confirma que el anuncio de resultados cambia sin robar el foco del control.
 
 ## Preguntas de repaso
 

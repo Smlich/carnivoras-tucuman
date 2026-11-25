@@ -40,6 +40,12 @@ export default function ProductCatalog({ onAdd }) {
     });
   }, [activeFilter, catalogProducts, searchTerm]);
 
+  const resultAnnouncement = visibleProducts.length === 0
+    ? 'No se encontraron plantas.'
+    : visibleProducts.length === 1
+      ? 'Se encontró 1 planta.'
+      : `Se encontraron ${visibleProducts.length} plantas.`;
+
   return (
     <section className="catalog-section section-pad" id="catalogo" aria-labelledby="catalog-title">
       <div className="page-shell">
@@ -76,6 +82,10 @@ export default function ProductCatalog({ onAdd }) {
             />
           </label>
         </div>
+
+        <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
+          {resultAnnouncement}
+        </p>
 
         <p className="catalog-note"><span aria-hidden="true">i</span> Valores publicados en pesos argentinos. Consultá vigencia y stock antes de confirmar.</p>
 
