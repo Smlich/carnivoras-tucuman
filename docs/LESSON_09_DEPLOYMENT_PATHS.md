@@ -32,6 +32,12 @@ La insignia flotante **Powered by Netlify** está desactivada en la configuraci�
 
 Netlify crea deploys de prueba por rama o pull request cuando el repositorio queda conectado. Trata la URL de prueba como pública: no la anuncies como catálogo vigente hasta verificar precios, stock, entrega y derechos de las fotos.
 
+### Límites para mantener el costo en cero
+
+Al 25 de noviembre de 2026, el plan Free nuevo de Netlify incluye 300 créditos mensuales y un límite estricto: cuando se agotan, los sitios se pausan hasta el siguiente ciclo, sin cargos por exceso. Las cuentas creadas antes del 4 de septiembre de 2025 pueden conservar condiciones heredadas. Revisa **Usage & billing** de la cuenta antes de asumir qué límite aplica; no cambies de plan ni actives recargas automáticas. Si se pausa, espera el reinicio mensual.
+
+MongoDB Atlas M0 ofrece 512 MB de almacenamiento y recursos compartidos sin costo, pensado para aprendizaje y pruebas pequeñas. Tiene menos capacidad que un clúster dedicado; no cambies a M2 u otro nivel pago. Si el límite gratuito no alcanza, pausa el trabajo de datos y revisamos otra opción gratuita antes de cambiar nada.
+
 ## 2. Hostinger: aplicación MERN final
 
 En producción, el proceso Node arranca `server/src/index.js`. Express sirve la salida `dist` y mantiene `/api/health`, `/api/products` y Better Auth en el mismo origen. Por eso el sitio conserva el fallback `/api` local desactivado solo en Netlify; en Hostinger se deja vacía `VITE_STATIC_PREVIEW`.
@@ -85,6 +91,8 @@ La vista previa de Netlify no es una API MERN ni prueba OAuth; sirve para revisi
 - [Vite — desplegar sitios estáticos en Netlify](https://vite.dev/guide/static-deploy.html#netlify)
 - [Netlify — Express con una app frontend](https://docs.netlify.com/build/frameworks/framework-setup-guides/express/)
 - [Netlify — versiones de Node en el entorno de build](https://docs.netlify.com/build/configure-builds/available-software-at-build-time/)
+- [Netlify — precios y límites del plan Free](https://www.netlify.com/pricing/)
+- [MongoDB Atlas — precios y tamaños de clúster](https://www.mongodb.com/pricing)
 - [Hostinger — publicar una app Node.js](https://www.hostinger.com/support/how-to-deploy-a-nodejs-website-in-hostinger/)
 - [Hostinger — límites Node.js por plan](https://www.hostinger.com/support/hostinger-node-js-limits-for-web-and-cloud-plans/)
 - [Autenticación y callbacks](AUTHENTICATION.md)
