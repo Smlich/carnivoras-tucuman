@@ -26,22 +26,24 @@ Better Auth construye estas direcciones desde `BETTER_AUTH_URL` y `basePath`. Si
 
 ## 1. Crear el cliente web de Google
 
-1. Abre [Google Cloud Console — Credentials](https://console.cloud.google.com/apis/credentials) y crea o selecciona un proyecto para la tienda.
-2. Completa la configuración de consentimiento/branding con el nombre del negocio y un correo de contacto que controles. Para desarrollo, mantén la aplicación en modo de prueba y añade las cuentas que usarás para probar como usuarios de prueba.
-3. En **Credentials**, crea un **OAuth client ID** de tipo **Web application**.
-4. Añade este origen autorizado para el sitio local:
+La consola actual organiza esta tarea en **Google Auth Platform → Branding, Audience y Clients**. Abre [Google Auth Platform — Clients](https://console.cloud.google.com/auth/clients) y selecciona el proyecto de la tienda; si no hay uno seleccionado, la consola te pedirá elegirlo o crear uno.
 
-   ```text
-   http://localhost:5173
-   ```
-
-5. Añade este URI autorizado de redirección:
+1. Si es la primera configuración, abre **Overview → Get started**. Usa `Carnívoras Tucumán` como nombre visible y elige un correo de soporte que controles y quieras mostrar a quienes inicien sesión. No pongas ese correo en Git ni en el README.
+2. En **Audience**, elige **External** y deja el estado de publicación en **Testing**. Agrega como test users las cuentas que usarás para comprobar el flujo. No elijas **Personal** para la tienda: Google indica que ese modo queda limitado a quien lo crea y no se puede convertir después a External. Google documenta un límite normal de hasta 100 test users y una caducidad de siete días para autorizaciones en Testing; también enumera una excepción para Sign in with Google que solo pide nombre, email y perfil (`openid`, `email`, `profile`). Better Auth está preparado para identidad básica, pero hay que verificar el comportamiento con un inicio real antes de afirmar qué restricciones aplican. Para la publicación general se revisarán los requisitos de producción y marca.
+3. En **Clients → Create client**, elige **Web application** y usa un nombre como `Carnívoras Tucumán — Desarrollo`.
+4. Registra este URI autorizado de redirección:
 
    ```text
    http://localhost:5173/api/auth/callback/google
    ```
 
-6. Guarda el cliente. Copia el client ID y el client secret solo en tu `.env` local.
+   Este servidor usa Better Auth en Express y la dirección coincide con `BETTER_AUTH_URL` y el proxy de Vite. No necesita invocar Google desde JavaScript ni agregar scopes de Drive u otras APIs. Si la consola muestra **Authorized JavaScript origins**, no es necesario para este flujo de servidor; solo añádelo si luego implementas un cliente JavaScript directo:
+
+   ```text
+   http://localhost:5173
+   ```
+
+5. Crea el cliente cuando hayas revisado que el nombre, el proyecto y el callback sean correctos. Google muestra el client secret al crearlo; guárdalo directamente en `.env` y no lo copies al chat ni a Git. La URL de redirección debe coincidir exactamente con la registrada, incluidos esquema, host, ruta y barra final.
 
 La tienda solo necesita identidad básica: Better Auth usa el flujo de autorización en el servidor y no solicita acceso a Drive, Gmail ni otros datos de Google. La documentación de Google exige que el `redirect_uri` enviado por el servidor coincida con uno registrado. Consulta [OAuth para aplicaciones web de servidor](https://developers.google.com/identity/protocols/oauth2/web-server) y la [guía de Google de Better Auth](https://better-auth.com/docs/authentication/google).
 
@@ -131,6 +133,8 @@ Para recorrer la configuración del servidor y el cliente antes de crear aplicac
 ## Fuentes oficiales consultadas
 
 - [Google — OAuth 2.0 para aplicaciones web de servidor](https://developers.google.com/identity/protocols/oauth2/web-server)
+- [Google Cloud — empezar con Google Auth Platform](https://support.google.com/cloud/answer/15544987)
+- [Google Cloud — audiencia y estado de publicación](https://support.google.com/cloud/answer/15549945)
 - [Better Auth — Google](https://better-auth.com/docs/authentication/google)
 - [Better Auth — Facebook](https://better-auth.com/docs/authentication/facebook)
 - [Meta — Managing Development Cycles](https://developers.facebook.com/docs/apps/managing-development-cycle)
