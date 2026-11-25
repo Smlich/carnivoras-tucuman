@@ -41,6 +41,17 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   outline-offset: 3px;
 }
 
+main:focus-visible {
+  outline: none;
+}
+
+main:focus-visible .hero h1,
+main:focus-visible .care-guide__hero h1 {
+  outline: 3px solid var(--color-orange);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
 img { display: block; max-width: 100%; }
 
 .page-shell { width: var(--shell); margin-inline: auto; }

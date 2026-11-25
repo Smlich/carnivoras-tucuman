@@ -29,7 +29,7 @@ export default function App() {
       <AnnouncementBar />
       <PreviewBanner />
       <SiteHeader itemCount={cart.count} onOpenCart={() => setIsCartOpen(true)} />
-      <main id="contenido">
+      <main id="contenido" tabIndex={-1}>
         <HeroSection />
         <ProductCatalog onAdd={handleAdd} />
         <CareSection />

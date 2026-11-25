@@ -108,7 +108,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 - Crear páginas indexables por producto con descripciones propias y datos estructurados únicamente cuando precio y disponibilidad sean reales.
 - Vincular las redes oficiales y crear un calendario de contenido útil sobre especies y cuidados.
 
-**Estado parcial de accesibilidad:** el diálogo del carrito gestiona el foco de teclado, limita la tabulación a su contenido y lo devuelve al control de apertura al cerrarse. La revisión integral de accesibilidad sigue pendiente.
+**Estado parcial de accesibilidad:** el enlace “Saltar al contenido” ahora enfoca `<main>` en la portada y la guía, con un indicador visible sobre el título. El diálogo del carrito también limita la tabulación y devuelve el foco al control de apertura al cerrarse. La revisión integral con lector de pantalla, contraste y todos los estados interactivos sigue pendiente; practica la [lección de navegación por teclado](LESSON_13_ACCESSIBLE_KEYBOARD_NAVIGATION.md).
 
 **Estado parcial de rendimiento:** el catálogo genera variantes adaptables de imágenes y conserva los originales; recorre la [lección de optimización de imágenes](LESSON_05_IMAGE_OPTIMIZATION.md) y completa la medición de red en DevTools.
 

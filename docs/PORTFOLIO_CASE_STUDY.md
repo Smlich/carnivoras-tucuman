@@ -24,7 +24,7 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 - **Separación de secretos:** React no recibe credenciales OAuth ni la URI de Atlas. Express valida el entorno y Better Auth gestiona las sesiones cuando la base y los proveedores estén configurados.
 - **Datos verificables:** Zod valida filtros de API, Mongoose define restricciones del producto y el seed hace upsert por slug sin borrar otros documentos.
 - **SEO honesto:** hay título, descripción y secciones enlazables. No se afirma que Google ya indexó el sitio ni se agrega marcado de oferta mientras el stock, precios y páginas individuales no estén confirmados.
-- **Accesibilidad práctica:** el catálogo tiene controles etiquetados; el diálogo del carrito gestiona foco, teclado y retorno al control de apertura.
+- **Accesibilidad práctica:** el catálogo tiene controles etiquetados; el enlace de salto mueve el foco a `<main>` y el título visible en ambas páginas; el diálogo del carrito gestiona foco, teclado y retorno al control de apertura. Sigue pendiente una auditoría WCAG completa.
 
 ### Stack actual
 
