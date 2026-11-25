@@ -20,7 +20,7 @@ Los productos y valores del catálogo se transcribieron de las publicaciones com
 Requisitos: Node.js 20.19+ o 22.12+ y npm.
 
 1. Abre una terminal en esta carpeta.
-2. Ejecuta `npm install`.
+2. Ejecuta `npm ci` para instalar las versiones bloqueadas en `package-lock.json`.
 3. Ejecuta `npm run dev:all` para iniciar web y API en dos procesos.
 4. Abre `http://localhost:5173`.
 
