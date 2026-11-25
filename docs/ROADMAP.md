@@ -53,6 +53,8 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado:** Better Auth, MongoDB y las rutas Express están integrados; el menú React aparece cuando hay configuración válida. **Pendiente:** conectar Atlas, crear las aplicaciones OAuth, guardar secretos localmente y completar un inicio de sesión real de cada proveedor.
 
+**Lección:** recorre [OAuth, sesiones y secretos](LESSON_03_OAUTH_AND_SECRETS.md) antes de configurar proveedores reales. La lectura enseña el flujo sin necesitar compartir credenciales.
+
 **Bloqueo externo:** requiere IDs/secretos OAuth, URLs definitivas y revisión de requisitos de cada proveedor. Los secretos se guardan en variables de entorno y nunca en Git.
 
 ## Semana 5 — Gestión de venta

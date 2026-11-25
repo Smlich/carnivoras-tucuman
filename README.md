@@ -51,6 +51,10 @@ Para generar la versión de producción, ejecuta `npm run build`; la carpeta `di
 - `docs`: arquitectura, decisiones, cronograma y registro de aprendizaje.
 - `public/images/catalog`: archivos originales compartidos por el negocio.
 
+## Ruta de aprendizaje
+
+Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md) y [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
+
 ## Próximos hitos
 
 Lee `docs/ROADMAP.md`, `docs/API.md` y [la guía de autenticación](docs/AUTHENTICATION.md). Los botones de cuenta aparecen cuando Atlas y al menos un proveedor están configurados. El flujo está preparado, pero todavía no se ha conectado a credenciales reales ni verificado con cuentas de Google o Facebook. No hay escritura de pedidos en la API.
