@@ -62,7 +62,7 @@
 
 **Motivo:** dar crédito al origen del vivero y del desarrollo, además de presentar el alias de programación sin confundirlo con la marca comercial principal.
 
-**Consecuencia:** los sellos son secundarios, accesibles mediante texto alternativo y apilados en pantallas de hasta 600 px. El monograma angular con tema helado usa una interpretación original de fantasía; no reutiliza arte ni logotipos de franquicias existentes.
+**Consecuencia:** los sellos son secundarios, accesibles mediante texto alternativo y apilados en pantallas de hasta 600 px. La versión actual de SMlich usa un escudo limpio, una corona geométrica original, un monograma SM angular y tipografía sans; combina el tono helado con una presentación de software más sobria, sin reutilizar arte ni logotipos de franquicias existentes.
 
 ## ADR-009 — Mantener gratuita la etapa de aprendizaje
 

@@ -1,19 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="270" height="102" viewBox="0 0 270 102" role="img" aria-labelledby="title description">
   <title id="title">SMlich Soluciones</title>
-  <desc id="description">Identidad original de fantasía helada con una corona de hielo y un monograma angular SM.</desc>
+  <desc id="description">Marca de software con un monograma SM geométrico bajo una corona de hielo original.</desc>
   <defs>
-    <linearGradient id="ice" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f4ffff" />
-      <stop offset=".48" stop-color="#80ddff" />
-      <stop offset="1" stop-color="#748fe9" />
+    <linearGradient id="smlich-ice" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e5faff" />
+      <stop offset=".52" stop-color="#8bd9f5" />
+      <stop offset="1" stop-color="#8194dc" />
     </linearGradient>
   </defs>
-  <rect x="2" y="2" width="266" height="98" rx="22" fill="#101a2b" stroke="#78c8f2" stroke-opacity=".78" stroke-width="2" />
-  <path d="m51 10 8 12 12-9-3 17 13-5-8 15v40L52 94 31 80V40l-8-15 14 5-3-17 12 9z" fill="#16263d" stroke="url(#ice)" stroke-linejoin="round" stroke-width="2" />
-  <path d="m28 27 12 8 12-20 9 20 12-8-5 16H33z" fill="url(#ice)" stroke="#d8f7ff" stroke-linejoin="round" stroke-width="1" />
-  <path d="M61 44H43l-5 6 5 6h16l4 4v3l-5 5H39l-5 8h23l12-10V56l-6-6H47M69 78V44l9 12 9-12v34h-8V63l-1 1-1-1v15" fill="none" stroke="url(#ice)" stroke-linecap="square" stroke-linejoin="miter" stroke-width="4" />
-  <path d="m30 47-4 3 4 3M74 30l3-5M44 84l8 5 8-5" fill="none" stroke="#d2f46a" stroke-linecap="round" stroke-width="1.5" />
-  <text x="101" y="59" fill="#f5fbff" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-weight="700" letter-spacing="-.7"><tspan fill="#89dcff">SM</tspan>lich</text>
-  <path d="M103 68h137" stroke="#78c8f2" stroke-opacity=".55" stroke-width="1" />
-  <text x="104" y="84" fill="#c6d8ea" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="3.1">SOLUCIONES</text>
+
+  <rect x="1.5" y="1.5" width="267" height="99" rx="16" fill="#0d1726" stroke="#33465c" stroke-width="1.5" />
+  <path d="M51 9 77 20v27c0 17-10 30-26 39-16-9-26-22-26-39V20z" fill="#132238" stroke="#4b6b85" stroke-width="1.5" />
+  <path d="m31 36-2-10 11 7 11-16 11 16 11-7-2 10-4 5H35z" fill="url(#smlich-ice)" stroke="#e1f8ff" stroke-linejoin="round" stroke-width="1.2" />
+  <path d="M60 47H43l-4 4v5l4 4h12l4 4v4l-4 4H39M65 72V47l7 11 7-11v25" fill="none" stroke="url(#smlich-ice)" stroke-linecap="square" stroke-linejoin="miter" stroke-width="3.5" />
+  <path d="m33 41-5 5m37 31-14 9-14-9" fill="none" stroke="#526f88" stroke-linecap="round" stroke-width="1.4" />
+
+  <path d="M101 25v52" stroke="#31475e" stroke-width="1" />
+  <text x="115" y="55" fill="#f4f8fc" font-family="DM Sans, Segoe UI, Arial, sans-serif" font-size="29" font-weight="700" letter-spacing="-.9"><tspan fill="#9bdff5">SM</tspan>lich</text>
+  <path d="M116 64h124" stroke="#536b82" stroke-opacity=".78" stroke-width="1" />
+  <text x="116" y="80" fill="#c4d2df" font-family="DM Sans, Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="700" letter-spacing="2.2">SOLUCIONES DIGITALES</text>
 </svg>
