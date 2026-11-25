@@ -1,17 +1,56 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { formatPrice } from '../utils/format-price';
 import { createWhatsAppUrl } from '../utils/whatsapp';
 
 export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, onClear }) {
+  const drawerRef = useRef(null);
+
   useEffect(() => {
     if (!isOpen) return undefined;
 
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    const drawer = drawerRef.current;
+    const firstFocusable = drawer?.querySelector('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+
+    document.body.style.overflow = 'hidden';
+    firstFocusable?.focus();
+
     function handleKeyDown(event) {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') {
+        onClose();
+        return;
+      }
+
+      if (event.key !== 'Tab' || !drawer) return;
+
+      const focusable = Array.from(drawer.querySelectorAll(
+        'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ));
+      if (focusable.length === 0) {
+        event.preventDefault();
+        drawer.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && (document.activeElement === first || !drawer.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !drawer.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -20,8 +59,8 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
 
   return (
     <div className="cart-layer">
-      <button className="cart-layer__scrim" type="button" onClick={onClose} aria-label="Cerrar pedido" />
-      <aside className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+      <button className="cart-layer__scrim" type="button" onClick={onClose} aria-label="Cerrar pedido" tabIndex={-1} />
+      <aside ref={drawerRef} className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title" tabIndex={-1}>
         <div className="cart-drawer__header">
           <div><p className="eyebrow"><span className="eyebrow__line" /> Tu selección</p><h2 id="cart-title">Mi pedido</h2></div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Cerrar pedido">×</button>
@@ -43,7 +82,7 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
                   <div className="cart-item__info">
                     <strong>{item.name}</strong>
                     <span>{formatPrice(item.price)} cada uno</span>
-                    <div className="quantity-control" aria-label={'Cantidad de ' + item.name}>
+                    <div className="quantity-control" role="group" aria-label={'Cantidad de ' + item.name}>
                       <button type="button" onClick={() => onQuantityChange(item.id, item.quantity - 1)} aria-label={'Quitar una unidad de ' + item.name}>−</button>
                       <span aria-live="polite">{item.quantity}</span>
                       <button type="button" onClick={() => onQuantityChange(item.id, item.quantity + 1)} aria-label={'Agregar una unidad de ' + item.name}>+</button>
