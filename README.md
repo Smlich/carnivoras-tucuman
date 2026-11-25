@@ -36,6 +36,8 @@ En producción, el servidor no inicia sin `MONGODB_URI`. No incluyas el archivo 
 
 Para generar la versión de producción, ejecuta `npm run build`; la carpeta `dist` contiene el sitio estático.
 
+El workflow de GitHub Actions en `.github/workflows/ci.yml` ejecuta `npm ci` y `npm run build` al abrir o actualizar un pull request, y al subir cambios a `main`. Esta primera verificación asegura que el frontend compila; las pruebas automatizadas de rutas y flujos siguen en el cronograma.
+
 ## Estructura
 
 - `src/components`: piezas reutilizables de interfaz.

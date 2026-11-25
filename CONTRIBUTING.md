@@ -6,7 +6,7 @@
 2. Crea una rama con un nombre descriptivo, por ejemplo `feat/catalog-search` o `docs/first-session`.
 3. Haz commits pequeños que describan una sola intención: `feat: agrega filtros al catálogo`, `fix: conserva cantidades del carrito` o `docs: explica el flujo de pedido`.
 4. Revisa el cambio en el navegador y ejecuta `npm run build`.
-5. Abre un pull request con el resumen, el impacto para el cliente, cómo se revisó y qué aprendiste.
+5. Abre un pull request con el resumen, el impacto para el cliente, cómo se revisó y qué aprendiste. Espera a que el workflow de GitHub Actions termine antes de integrar el cambio.
 
 ## Reglas de colaboración
 
