@@ -47,3 +47,11 @@
 **Motivo:** conservar MERN, evitar una segunda base y mantener las cuentas, identidades OAuth y sesiones en el servidor.
 
 **Consecuencia:** Better Auth usa el driver nativo de MongoDB a través del mismo cliente conectado por Mongoose. Los tokens OAuth se cifran antes de guardarse; el inicio de sesión nunca habilita permisos administrativos por sí solo.
+
+## ADR-007 — Tipografía expresiva con lectura clara
+
+**Decisión:** usar Bangers y Permanent Marker para titulares y acentos breves, y DM Sans para lectura e interfaz. La paleta mantiene verde profundo y papel cálido como base, con lima y coral para acentos.
+
+**Motivo:** darle a la tienda una personalidad joven inspirada en anime y grafiti sin quitar claridad al catálogo ni confianza a la marca.
+
+**Consecuencia:** los estilos se comparten con la guía de cuidados y quedan documentados en [el sistema visual](DESIGN_SYSTEM.md). Las fotos de las plantas siguen siendo las imágenes reales del negocio.

@@ -11,6 +11,7 @@ Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/
 - Carrito local que recuerda el pedido en este dispositivo.
 - Pedido enviado a WhatsApp para confirmar precio, disponibilidad y entrega.
 - Diseño adaptable, navegación por teclado y metadatos básicos.
+- Sistema visual juvenil y legible: titulares tipo cómic, acentos lettering y paleta botánica viva documentados en [el sistema visual](docs/DESIGN_SYSTEM.md).
 - Guía educativa en `/cuidados.html`, con contenido HTML indexable y fuentes botánicas enlazadas.
 - En producción, Express sirve el frontend compilado y la API bajo el mismo origen; `npm start` inicia el servidor.
 - API Express de solo lectura para catálogo y salud del servicio.
@@ -51,7 +52,7 @@ El workflow de GitHub Actions en `.github/workflows/ci.yml` ejecuta `npm ci` y `
 - `src/utils`: formato de precios y construcción del pedido para WhatsApp.
 - `src/services`: comunicación entre React y la API.
 - `server/src`: API Express, configuración, esquema Mongo, lectura del catálogo y autenticación.
-- `docs`: arquitectura, decisiones, cronograma y registro de aprendizaje.
+- `docs`: arquitectura, decisiones, sistema visual, cronograma y registro de aprendizaje.
 - `public/images/catalog`: archivos originales compartidos por el negocio.
 - `public/images/catalog/optimized`: variantes optimizadas para la web; conserva intactos los originales.
 - `cuidados.html` y `src/care-page.css`: página informativa independiente, generada junto con la portada por Vite.

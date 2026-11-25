@@ -5,10 +5,11 @@
 
 .care-guide__hero { max-width: 790px; padding-block: 72px 60px; }
 .care-guide__hero h1 { max-width: 760px; margin-bottom: 21px; font-size: clamp(46px, 6.5vw, 78px); line-height: 1.05; }
-.care-guide__hero h1 em, .care-guide__section h2 em, .care-guide__contact h2 em { color: #718666; font-weight: 500; }
+.care-guide__hero h1 em, .care-guide__section h2 em { color: var(--color-orange); font-family: var(--marker); font-size: .64em; font-style: normal; font-weight: 400; letter-spacing: -.045em; text-transform: none; }
+.care-guide__contact h2 em { color: var(--color-lime); font-family: var(--marker); font-size: .64em; font-style: normal; font-weight: 400; letter-spacing: -.045em; text-transform: none; }
 .care-guide__lead { max-width: 650px; margin-bottom: 26px; color: #68786a; font-size: 17px; line-height: 1.75; }
-.button--dark { color: white; background: var(--color-forest); }
-.button--dark:hover { background: var(--color-forest-deep); }
+.button--dark { color: var(--color-forest-deep); background: var(--color-lime); }
+.button--dark:hover { color: white; background: var(--color-forest); }
 .care-guide__note { max-width: 670px; margin: 27px 0 0; padding: 15px 18px; border-left: 3px solid var(--color-orange); color: #596d5b; background: #eeeee4; font-size: 12px; line-height: 1.75; }
 
 .care-toc { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 24px; padding: 16px 0; border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
@@ -19,16 +20,16 @@
 .care-guide__section > h2, .care-guide__contact h2 { max-width: 700px; margin-bottom: 28px; font-size: clamp(34px, 4.5vw, 53px); line-height: 1.12; }
 .care-principles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 .care-principle { min-height: 240px; padding: 25px 22px; border: 1px solid #e1e4db; border-radius: 15px; background: var(--color-white); box-shadow: 0 10px 28px rgba(35, 58, 41, .035); }
-.care-principle__number { display: block; margin-bottom: 28px; color: #bf762e; font-family: var(--serif); font-size: 20px; }
-.care-principle h3, .care-species-card h3 { margin-bottom: 11px; color: var(--color-forest); font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.2; }
+.care-principle__number { display: block; margin-bottom: 28px; color: var(--color-orange); font-family: var(--heading); font-size: 24px; }
+.care-principle h3, .care-species-card h3 { margin-bottom: 11px; color: var(--color-forest); font-family: var(--sans); font-size: 18px; font-weight: 700; line-height: 1.2; }
 .care-principle p, .care-species-card li { margin-bottom: 0; color: #657468; font-size: 12px; line-height: 1.75; }
 .care-guide__source-line { margin: 18px 0 0; color: #748074; font-size: 10px; line-height: 1.75; }
 .care-guide__source-line a { text-underline-offset: 3px; }
 
 .care-guide__species { padding-block: 86px 80px; background: linear-gradient(180deg, transparent, rgba(232, 235, 224, .64), transparent); }
 .care-species-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; }
-.care-species-card { display: flex; flex-direction: column; min-height: 340px; padding: 27px 25px; border: 1px solid #e0e4da; border-radius: 15px; background: #fffefa; box-shadow: 0 12px 30px rgba(35, 58, 41, .045); }
-.care-species-card__latin { margin-bottom: 8px; color: #9b6d40; font-family: var(--serif); font-size: 13px; font-style: italic; }
+.care-species-card { display: flex; flex-direction: column; min-height: 340px; padding: 27px 25px; border: 1px solid #e0e4da; border-radius: 15px; background: var(--color-white); box-shadow: 0 12px 30px rgba(35, 58, 41, .045); }
+.care-species-card__latin { margin-bottom: 8px; color: #a54830; font-family: var(--sans); font-size: 13px; font-style: italic; }
 .care-species-card ul { display: grid; gap: 11px; margin: 8px 0 22px; padding-left: 18px; }
 .care-species-card li { padding-left: 2px; }
 .care-species-card > a { margin-top: auto; color: #385a3c; font-size: 11px; font-weight: 600; text-underline-offset: 4px; }
@@ -37,13 +38,12 @@
 .care-faq { max-width: 860px; margin-inline: auto; }
 .care-faq details { border-top: 1px solid var(--color-line); }
 .care-faq details:last-of-type { border-bottom: 1px solid var(--color-line); }
-.care-faq summary { padding: 20px 3px; color: var(--color-forest); cursor: pointer; font-family: var(--serif); font-size: 19px; }
+.care-faq summary { padding: 20px 3px; color: var(--color-forest); cursor: pointer; font-family: var(--sans); font-size: 16px; font-weight: 700; }
 .care-faq details p { max-width: 700px; padding: 0 3px 17px; color: #667569; font-size: 13px; line-height: 1.75; }
 
 .care-guide__contact { display: flex; align-items: center; justify-content: space-between; gap: 32px; margin-top: 96px; padding: 46px clamp(24px, 5vw, 60px); border-radius: 18px; color: white; background: var(--color-forest-deep); }
 .care-guide__contact > div { max-width: 690px; }
 .care-guide__contact h2 { margin-bottom: 13px; color: white; }
-.care-guide__contact h2 em { color: #b0c49b; }
 .care-guide__contact p:not(.eyebrow) { max-width: 590px; margin: 0; color: #c6d2c3; font-size: 13px; line-height: 1.7; }
 .care-guide__contact .button { flex: 0 0 auto; }
 
