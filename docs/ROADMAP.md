@@ -36,7 +36,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 ## Hito 0.3 — Sistema visual juvenil y legible
 
-**Estado:** sistema visual implementado en la tienda y la guía, con sellos SVG propios en el pie. La compilación de producción y la revisión responsive de anchos representativos están verificadas; cada nuevo cambio requiere revisar la versión publicada.
+**Estado:** sistema visual implementado en la tienda y la guía, con sellos SVG propios en el pie. La compilación de producción y la revisión responsive de 280 a 1920 px están verificadas; el estado abierto del carrito también se revisó en móvil y tablet. Cada nuevo cambio requiere revisar la versión publicada.
 
 - Definir tokens de color y tipografía reutilizables.
 - Usar fuentes de personalidad en títulos y acentos cortos y una fuente legible en el catálogo y la guía.

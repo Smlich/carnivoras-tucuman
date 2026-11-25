@@ -57,6 +57,14 @@ Los botones primarios, los filtros seleccionados y las etiquetas de producto reu
 
 En este entorno, la compilación se verificó con `node node_modules/vite/bin/vite.js build` porque el comando `npm` aún no está disponible en la terminal. La compilación de Vite es la comprobación de que el HTML, CSS y JavaScript se pueden preparar para producción; no reemplaza la revisión visual del navegador.
 
+## Comprobación responsive realizada
+
+La tienda y `/cuidados.html` se revisaron en anchos CSS de 280, 320, 360, 390, 430, 600, 760, 768, 900, 1000, 1024, 1280, 1440 y 1920 px. En cada ancho, el ancho desplazable del documento coincidió con el viewport y las fotos cargaron. También se abrió el carrito a 280, 320, 390 y 768 px; el enlace de WhatsApp siguió visible y fue el elemento que recibía el clic en el centro del botón.
+
+Esa interacción encontró un caso real: el aviso flotante de confirmación tenía `z-index: 55` y se pintaba encima del carrito (`z-index: 50`), tapando parte del botón de consulta. En `src/styles.css`, el aviso ahora usa `z-index: 45`; el diálogo queda por delante y el aviso ya no intercepta ni cubre la acción. La región `contact-card__ornament` puede salir parcialmente de la pantalla en móvil, pero la tarjeta la recorta intencionalmente con `overflow: hidden`.
+
+Para repetir la revisión, abre DevTools, activa la emulación de dispositivo y cambia el ancho del viewport, no el zoom del navegador. Revisa ambas páginas, el título, la franja superior, las tarjetas, el pie y los estados abiertos del carrito y la cuenta. Compara `document.documentElement.scrollWidth` con `window.innerWidth` y confirma visualmente los elementos interactivos: la igualdad de esos dos números por sí sola no detecta texto recortado dentro de un componente.
+
 ## Práctica para repetir
 
 1. Cambia temporalmente `--color-lime` por otro color que conserve contraste con el texto oscuro.

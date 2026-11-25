@@ -433,7 +433,8 @@ h1, h2 { font-family: var(--heading); font-weight: 400; letter-spacing: .025em; 
 
 .site-footer__bottom { display: flex; justify-content: space-between; gap: 16px; padding-block: 15px 18px; border-top: 1px solid rgba(223, 232, 219, .17); color: #a8b6a7; font-size: 10px; }
 
-.live-announcement { position: fixed; z-index: 55; right: 20px; bottom: 20px; max-width: min(360px, calc(100% - 40px)); padding: 12px 16px; border: 1px solid #d6dfd3; border-radius: 5px; color: var(--color-forest); background: #fffefa; box-shadow: 0 12px 36px rgba(26, 52, 37, .16); font-size: 12px; pointer-events: none; }
+/* Keep success notices below the cart dialog so they cannot cover its actions. */
+.live-announcement { position: fixed; z-index: 45; right: 20px; bottom: 20px; max-width: min(360px, calc(100% - 40px)); padding: 12px 16px; border: 1px solid #d6dfd3; border-radius: 5px; color: var(--color-forest); background: #fffefa; box-shadow: 0 12px 36px rgba(26, 52, 37, .16); font-size: 12px; pointer-events: none; }
 
 .live-announcement:empty { display: none; }
 
