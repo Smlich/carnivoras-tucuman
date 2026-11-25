@@ -55,6 +55,8 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Lección:** recorre [OAuth, sesiones y secretos](LESSON_03_OAUTH_AND_SECRETS.md) antes de configurar proveedores reales. La lectura enseña el flujo sin necesitar compartir credenciales.
 
+**Práctica guiada:** sigue [la configuración de Google y Facebook](LESSON_07_OAUTH_PROVIDER_SETUP.md) para crear credenciales locales, registrar los callbacks exactos y probar las cuentas de desarrollo sin exponer secretos.
+
 **Bloqueo externo:** requiere IDs/secretos OAuth, URLs definitivas y revisión de requisitos de cada proveedor. Los secretos se guardan en variables de entorno y nunca en Git.
 
 ## Semana 5 — Gestión de venta

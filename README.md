@@ -55,7 +55,7 @@ Para regenerar variantes después de agregar o actualizar fotos autorizadas, eje
 
 ## Ruta de aprendizaje
 
-Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md) e [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
+Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md) e [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
 
 ## Portafolio
 
