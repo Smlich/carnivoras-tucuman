@@ -1,6 +1,6 @@
 # Lección 6 — Integración continua con GitHub Actions
 
-La integración continua comprueba que el código compila; no publica la web. El despliegue por etapas se estudia aparte en [la lección 09](LESSON_09_DEPLOYMENT_PATHS.md).
+La integración continua ejecuta pruebas del servidor y compila el frontend; no publica la web. El despliegue por etapas se estudia aparte en [la lección 09](LESSON_09_DEPLOYMENT_PATHS.md).
 
 La primera ejecución de este repositorio terminó correctamente para Node 22, 24 y 26: [CI del commit f04fb7b](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45595845180). La corrida que verificó el ajuste responsive de `f7d385a` terminó correctamente: [CI del commit f7d385a](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45604158956). El build comprueba la instalación y compilación; no reemplaza pruebas de interfaz ni una revisión manual.
 
@@ -17,17 +17,19 @@ Entender cómo GitHub obtiene el código, instala exactamente las dependencias b
 5. `actions/checkout` descarga la revisión que GitHub debe compilar.
 6. `actions/setup-node` instala cada versión LTS admitida (22, 24 y 26) según la matriz, y reutiliza la caché de npm basada en `package-lock.json`.
 7. `npm ci` instala las versiones bloqueadas y falla si el manifiesto y el lockfile no coinciden.
-8. `npm run build` compila el frontend para producción. Si el comando falla, el pull request mostrará el paso rojo y su log.
+8. `npm test` valida variables de entorno y el contrato de disponibilidad de OAuth sin credenciales reales ni una conexión a Atlas.
+9. `npm run build` compila el frontend para producción. Si una prueba o el build fallan, el pull request mostrará el paso rojo y su log.
 
-El workflow actual verifica la instalación y el build. Todavía no existen pruebas automatizadas en este proyecto; un build exitoso no comprueba por sí solo todos los flujos de compra, autenticación o accesibilidad.
+El workflow verifica la instalación, las reglas de configuración, una respuesta de API y el build. Estas pruebas no demuestran el inicio de sesión de Google o Facebook, ni cubren el catálogo completo, el carrito o la accesibilidad. Recorre [la lección de pruebas del servidor](LESSON_11_API_CONFIGURATION_TESTS.md) para entender el alcance.
 
 ## Práctica guiada
 
 1. Abre `.github/workflows/ci.yml` y señala qué evento ejecutaría el flujo ante un pull request.
 2. Explica por qué el job usa `npm ci` en lugar de cambiar automáticamente las versiones instaladas.
 3. Comprueba las series LTS admitidas en `package.json` y relaciónalas con `matrix.node-version`.
-4. Después de publicar el repositorio, crea una rama para un cambio pequeño de documentación y abre un pull request. Mira **Actions → Production build** y localiza cada comando en su log.
-5. Si el build falla, identifica el primer paso rojo y relaciona el mensaje con el cambio; corrige el problema en la misma rama y actualiza el pull request.
+4. Abre los archivos `*.test.js`, identifica qué valores son sintéticos y qué rutas reciben solicitudes.
+5. Después de publicar el repositorio, crea una rama para un cambio pequeño y abre un pull request. Mira **Actions → Production build**, localiza `npm test` y `npm run build` en su log.
+6. Si una prueba falla, corrige primero la regla o el contrato que cubre; si falla el build, relaciona el error con el cambio de frontend.
 
 No agregues secretos de Atlas ni OAuth a este workflow. El build del frontend no los necesita y GitHub puede mostrar sus logs a las personas con acceso al repositorio.
 
@@ -40,10 +42,11 @@ No agregues secretos de Atlas ni OAuth a este workflow. El build del frontend no
 
 ## Patrón reutilizable
 
-Para otro proyecto Node, empieza con una verificación que pueda repetirse en cualquier equipo: checkout del commit → versión compatible de Node → instalación desde lockfile → build. Agrega pruebas automáticas cuando existan y ejecútalas como pasos explícitos; no llames “pruebas” a una compilación.
+Para otro proyecto Node, empieza con una verificación que pueda repetirse en cualquier equipo: checkout del commit → versión compatible de Node → instalación desde lockfile → pruebas → build. Mantén los datos de test artificiales y limita cada prueba a un contrato observable.
 
 ## Referencias oficiales
 
 - [GitHub Actions: crear un flujo para Node.js](https://docs.github.com/en/actions/tutorials/build-and-test-code/nodejs)
 - [actions/checkout](https://github.com/actions/checkout)
 - [actions/setup-node](https://github.com/actions/setup-node)
+- [Node.js — Test runner](https://nodejs.org/api/test.html)

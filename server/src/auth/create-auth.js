@@ -1,6 +1,7 @@
 import { mongodbAdapter } from '@better-auth/mongo-adapter';
 import { betterAuth } from 'better-auth';
 import mongoose from 'mongoose';
+import { mapFacebookProfileToUser } from './facebook-profile.js';
 import { env } from '../config/env.js';
 
 export function createAuth() {
@@ -19,9 +20,7 @@ export function createAuth() {
       clientId: env.FACEBOOK_CLIENT_ID,
       clientSecret: env.FACEBOOK_CLIENT_SECRET,
       scopes: ['email', 'public_profile'],
-      mapProfileToUser: (profile) => ({
-        email: profile.email || `${String(profile.id)}@facebook.carnivorastucuman.invalid`,
-      }),
+      mapProfileToUser: mapFacebookProfileToUser,
     };
   }
 

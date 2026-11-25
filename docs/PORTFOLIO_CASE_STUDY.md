@@ -35,7 +35,7 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 | Datos | MongoDB Atlas, Mongoose | Clúster Free conectado en AWS São Paulo; ocho productos sembrados; la API confirma `meta.source: mongodb`. |
 | Autenticación | Better Auth, Google y Facebook | Adaptador conectado a Atlas; faltan credenciales de proveedores y sesiones OAuth verificadas. |
 | Pedido | localStorage y enlace WhatsApp | Genera una consulta; no registra una orden ni procesa pagos. |
-| Calidad | documentación, ADR, plan de aprendizaje y CI en GitHub Actions | Build local correcto y CI completada para `f7d385a`; auditoría integral y pruebas automatizadas siguen en el cronograma. |
+| Calidad | documentación, ADR, plan de aprendizaje, Node test runner y CI en GitHub Actions | Suite automatizada local para reglas de configuración, perfil de Facebook y estado OAuth; CI ejecuta pruebas y build. Faltan las sesiones OAuth reales, pruebas de compra y auditoría integral. |
 
 ### Vista previa pública
 

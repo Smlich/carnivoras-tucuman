@@ -13,6 +13,7 @@
     "dev:all": "concurrently -k -n web,api -c green,blue \"vite --host 127.0.0.1\" \"node --watch server/src/index.js\"",
     "start": "node server/src/index.js",
     "start:server": "node server/src/index.js",
+    "test": "node --test \"server/test/**/*.test.js\"",
     "seed:products": "node server/src/scripts/seed-products.js",
     "images:optimize": "node scripts/optimize-catalog-images.mjs",
     "build": "vite build",

@@ -21,6 +21,8 @@ Entender el recorrido de una petición web desde React hasta Express y distingui
 - **Repositorio y persistencia:** el servidor sabe de dónde viene el producto. El cliente no conoce ni contiene una conexión a MongoDB.
 - **Estado degradado:** la API puede servir datos de demostración y seguir funcionando; ese estado no significa que se estén guardando cambios.
 
+La ruta `GET /api/auth/status` aplica el mismo principio de contrato explícito: informa si OAuth está activo y qué proveedores se habilitaron, pero nunca devuelve IDs ni secretos. Los tests de configuración y esta ruta están descritos en [la lección de pruebas](LESSON_11_API_CONFIGURATION_TESTS.md).
+
 ## Práctica guiada
 
 1. Con npm run dev:all activo, abre GET /api/health y lee database y catalogMode.

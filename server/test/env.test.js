@@ -1,0 +1,70 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { parseEnvironment } from '../src/config/env.js';
+
+const validOAuthEnvironment = {
+  BETTER_AUTH_URL: 'https://tienda.example',
+  BETTER_AUTH_SECRET: 'test-only-secret-that-is-at-least-32-characters',
+  GOOGLE_CLIENT_ID: 'google-client-id',
+  GOOGLE_CLIENT_SECRET: 'google-client-secret',
+  FACEBOOK_CLIENT_ID: 'facebook-app-id',
+  FACEBOOK_CLIENT_SECRET: 'facebook-app-secret',
+};
+
+test('usa los valores de desarrollo seguros cuando no hay variables locales', () => {
+  const environment = parseEnvironment({});
+
+  assert.equal(environment.NODE_ENV, 'development');
+  assert.equal(environment.PORT, 4000);
+  assert.equal(environment.MONGODB_DATABASE, 'carnivoras_tucuman');
+  assert.deepEqual(environment.corsOrigins, [
+    'http://127.0.0.1:5173',
+    'http://localhost:5173',
+  ]);
+});
+
+test('rechaza un ID de proveedor sin su secreto correspondiente', () => {
+  assert.throws(
+    () => parseEnvironment({ GOOGLE_CLIENT_ID: 'google-client-id' }),
+    /Configura ID y secreto de Google juntos/,
+  );
+});
+
+test('requiere secreto de sesión y URL al activar un proveedor social', () => {
+  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ...withoutSession } = validOAuthEnvironment;
+
+  assert.throws(
+    () => parseEnvironment({ GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, BETTER_AUTH_URL: 'https://tienda.example' }),
+    /Genera un secreto de al menos 32 caracteres/,
+  );
+  assert.throws(
+    () => parseEnvironment({ GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, BETTER_AUTH_SECRET: withoutSession.BETTER_AUTH_SECRET }),
+    /Configura la URL pública exacta/,
+  );
+});
+
+test('exige MongoDB y ambos proveedores en producción', () => {
+  assert.throws(
+    () => parseEnvironment({ NODE_ENV: 'production' }),
+    /Google y Facebook deben estar configurados/,
+  );
+
+  assert.throws(
+    () => parseEnvironment({ NODE_ENV: 'production', ...validOAuthEnvironment }),
+    /MONGODB_URI es obligatorio/,
+  );
+});
+
+test('normaliza orígenes y acepta una configuración de producción completa', () => {
+  const environment = parseEnvironment({
+    NODE_ENV: 'production',
+    MONGODB_URI: 'mongodb://127.0.0.1:27017',
+    CORS_ORIGINS: 'https://tienda.example, https://admin.example ',
+    ...validOAuthEnvironment,
+  });
+
+  assert.deepEqual(environment.corsOrigins, [
+    'https://tienda.example',
+    'https://admin.example',
+  ]);
+});

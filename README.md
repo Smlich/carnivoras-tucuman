@@ -42,7 +42,9 @@ En producción, el servidor no inicia sin `MONGODB_URI`. No incluyas el archivo 
 
 Para generar la versión de producción, ejecuta `npm run build`; la carpeta `dist` contiene el sitio estático.
 
-El workflow de GitHub Actions en `.github/workflows/ci.yml` ejecuta `npm ci` y `npm run build` al abrir o actualizar un pull request, y al subir cambios a `main`. Esta primera verificación asegura que el frontend compila; las pruebas automatizadas de rutas y flujos siguen en el cronograma.
+El workflow de GitHub Actions en `.github/workflows/ci.yml` ejecuta `npm ci`, `npm test` y `npm run build` al abrir o actualizar un pull request, y al subir cambios a `main`. Las pruebas cubren reglas de configuración y el estado de OAuth; no hacen un inicio de sesión real con Google o Facebook.
+
+Ejecuta `npm test` para correr la suite de configuración y disponibilidad de autenticación. La [lección de pruebas del servidor](docs/LESSON_11_API_CONFIGURATION_TESTS.md) explica cada caso y sus límites.
 
 ## Estructura
 
@@ -62,7 +64,7 @@ Para regenerar variantes después de agregar o actualizar fotos autorizadas, eje
 
 ## Ruta de aprendizaje
 
-Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md), [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md), [la guía de cuidados indexable](docs/LESSON_08_INDEXABLE_CARE_GUIDE.md), [el recorrido de Netlify a Hostinger](docs/LESSON_09_DEPLOYMENT_PATHS.md) y [el sistema visual](docs/LESSON_10_VISUAL_SYSTEM.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
+Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md), [configuración de Google y Facebook](docs/LESSON_07_OAUTH_PROVIDER_SETUP.md), [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md), [integración continua](docs/LESSON_06_GITHUB_ACTIONS.md), [pruebas de configuración y OAuth](docs/LESSON_11_API_CONFIGURATION_TESTS.md), [la guía de cuidados indexable](docs/LESSON_08_INDEXABLE_CARE_GUIDE.md), [el recorrido de Netlify a Hostinger](docs/LESSON_09_DEPLOYMENT_PATHS.md) y [el sistema visual](docs/LESSON_10_VISUAL_SYSTEM.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
 
 ## Portafolio
 

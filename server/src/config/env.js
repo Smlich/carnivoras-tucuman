@@ -61,25 +61,33 @@ const environmentSchema = z.object({
       message: 'Google y Facebook deben estar configurados antes de iniciar producción.',
     });
   }
+
+  if (values.NODE_ENV === 'production' && !values.MONGODB_URI) {
+    context.addIssue({
+      code: 'custom',
+      path: ['MONGODB_URI'],
+      message: 'MONGODB_URI es obligatorio cuando NODE_ENV=production.',
+    });
+  }
 });
 
-const parsedEnvironment = environmentSchema.safeParse(process.env);
+export function parseEnvironment(source) {
+  const parsedEnvironment = environmentSchema.safeParse(source);
 
-if (!parsedEnvironment.success) {
-  const issues = parsedEnvironment.error.issues
-    .map((issue) => issue.path.join('.') + ': ' + issue.message)
-    .join('; ');
-  throw new Error('Configuración del servidor inválida: ' + issues);
+  if (!parsedEnvironment.success) {
+    const issues = parsedEnvironment.error.issues
+      .map((issue) => issue.path.join('.') + ': ' + issue.message)
+      .join('; ');
+    throw new Error('Configuración del servidor inválida: ' + issues);
+  }
+
+  return {
+    ...parsedEnvironment.data,
+    corsOrigins: parsedEnvironment.data.CORS_ORIGINS
+      .split(',')
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+  };
 }
 
-export const env = {
-  ...parsedEnvironment.data,
-  corsOrigins: parsedEnvironment.data.CORS_ORIGINS
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean),
-};
-
-if (env.NODE_ENV === 'production' && !env.MONGODB_URI) {
-  throw new Error('MONGODB_URI es obligatorio cuando NODE_ENV=production.');
-}
+export const env = parseEnvironment(process.env);
