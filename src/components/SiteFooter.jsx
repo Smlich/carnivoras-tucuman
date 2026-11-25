@@ -3,7 +3,7 @@ import CatalogImage from './CatalogImage';
 
 export default function SiteFooter() {
   const socialLinks = [
-    { label: 'Instagram', href: store.instagramUrl },
+    { label: store.instagramHandle, href: store.instagramUrl },
     { label: 'Facebook', href: store.facebookUrl },
   ].filter((item) => item.href);
 
@@ -19,7 +19,7 @@ export default function SiteFooter() {
           <a href="#catalogo">Catálogo</a>
           <a href="/cuidados.html">Cuidados</a>
           <a href="#contacto">Contacto</a>
-          {socialLinks.map((item) => <a key={item.label} href={item.href} target="_blank" rel="noreferrer">{item.label}</a>)}
+          {socialLinks.map((item) => <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>)}
         </div>
       </div>
       <div className="page-shell site-footer__bottom">

@@ -66,7 +66,7 @@ Usa [el caso de estudio](docs/PORTFOLIO_CASE_STUDY.md) para presentar la arquite
 
 ## Publicación por etapas
 
-La configuración de [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) ya está en el repositorio. Netlify sirve una vista previa estática con catálogo local; Hostinger correrá Express, servirá el frontend compilado y usará Atlas/OAuth cuando la configuración final esté lista. El despliegue todavía requiere conectar el repositorio remoto y configurar las cuentas/variables del hosting.
+La vista previa estática está publicada en [Netlify](https://carnivorastucuman.netlify.app/) con catálogo local y la guía `/cuidados.html`. No representa la API MERN ni verifica OAuth. Por ahora Hostinger está aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica qué hace falta para cada etapa.
 
 ## Próximos hitos
 
@@ -76,7 +76,7 @@ Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTI
 
 - Confirmar precios y disponibilidad actual.
 - Definir zonas, costos y condiciones de entrega.
-- Compartir los enlaces oficiales de Instagram y Facebook.
+- Confirmar que `@canivoras_tucuman` es la cuenta oficial; compartir Facebook si se decide usarlo.
 - Definir dominio, política de privacidad y condiciones de venta.
 - Configurar credenciales de Google y Meta para OAuth.
 

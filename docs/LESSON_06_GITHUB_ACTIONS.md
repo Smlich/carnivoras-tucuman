@@ -24,7 +24,7 @@ El workflow actual verifica la instalación y el build. Todavía no existen prue
 1. Abre `.github/workflows/ci.yml` y señala qué evento ejecutaría el flujo ante un pull request.
 2. Explica por qué el job usa `npm ci` en lugar de cambiar automáticamente las versiones instaladas.
 3. Comprueba las series LTS admitidas en `package.json` y relaciónalas con `matrix.node-version`.
-4. Cuando el repositorio esté publicado, crea una rama para un cambio pequeño de documentación y abre un pull request. Mira **Actions → Production build** y localiza cada comando en su log.
+4. Después de publicar el repositorio, crea una rama para un cambio pequeño de documentación y abre un pull request. Mira **Actions → Production build** y localiza cada comando en su log.
 5. Si el build falla, identifica el primer paso rojo y relaciona el mensaje con el cambio; corrige el problema en la misma rama y actualiza el pull request.
 
 No agregues secretos de Atlas ni OAuth a este workflow. El build del frontend no los necesita y GitHub puede mostrar sus logs a las personas con acceso al repositorio.

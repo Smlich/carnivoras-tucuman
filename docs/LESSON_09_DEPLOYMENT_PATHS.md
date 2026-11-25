@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Separar una vista previa rápida del despliegue final MERN. La configuración está versionada; ninguno de los dos sitios se publicó todavía.
+Separar una vista previa rápida del despliegue final MERN. La vista estática ya fue publicada para revisión; el servidor full stack sigue siendo local.
 
 ## 1. Netlify: vista previa estática
 
@@ -17,8 +17,10 @@ En esa variante, React usa el catálogo local de `src/data/products.js` y no con
 
 ### Publicar la vista previa
 
-1. Conecta esta carpeta a un repositorio GitHub cuando esté creado.
-2. En Netlify, importa ese repositorio y conserva el directorio raíz.
+La primera versión de revisión está disponible en [Carnívoras Tucumán en Netlify](https://carnivorastucuman.netlify.app/). El código está versionado en [GitHub](https://github.com/Smlich/carnivoras-tucuman), pero el proyecto Netlify se creó con una carga manual desde `dist` y aún no está conectado al repositorio. La ruta `/cuidados.html` también está publicada. Esta URL es una vista de prueba: muestra el aviso de confirmación por WhatsApp y no activa API, Atlas ni autenticación social.
+
+1. En Netlify, importa el repositorio GitHub existente y conserva el directorio raíz.
+2. Autoriza la integración de Netlify con GitHub y selecciona `Smlich/carnivoras-tucuman`.
 3. Revisa que el build use `npm run build`, la carpeta `dist` y Node 24; `netlify.toml` ya define esos valores.
 4. Espera el resultado del build y abre la URL de despliegue.
 5. Recorre portada, `/cuidados.html`, catálogo, filtros y enlaces. No confirmes ni envíes un pedido durante la revisión.
@@ -39,7 +41,7 @@ En producción, el proceso Node arranca `server/src/index.js`. Express sirve la 
 - Output directory, si el preset lo solicita: `dist`.
 - Framework: Express si Hostinger detecta el servidor; si el preset no refleja el proyecto combinado Vite + Express, elegir `Other` y completar los campos anteriores.
 
-La publicación de Node.js administrado requiere actualmente un plan Business/Unlimited o Cloud. El soporte y los límites dependen del plan; verifica el panel antes de iniciar. Un VPS permite más control y exige administración manual del proceso.
+La publicación de Node.js administrado requiere actualmente un plan Business/Unlimited o Cloud. El soporte y los límites dependen del plan; verifica el panel antes de iniciar. Un VPS permite más control y exige administración manual del proceso. **La publicación en Hostinger está aplazada por decisión del negocio hasta contar con presupuesto**; no compres un plan para esta etapa.
 
 ### Variables runtime
 
@@ -71,7 +73,7 @@ CORS_ORIGINS=https://<dominio-final>
 
 ## Lo que este plan no activa
 
-La vista previa de Netlify no es una API MERN ni prueba OAuth; sirve para revisión visual y de contenido. La app completa corre en Hostinger una vez configurados dominio, Atlas y ambas aplicaciones sociales. El repo todavía necesita un remoto GitHub para conectar los deploys automáticos.
+La vista previa de Netlify no es una API MERN ni prueba OAuth; sirve para revisión visual y de contenido. La aplicación completa podrá desplegarse cuando haya presupuesto para el hosting y estén preparados dominio y ambas aplicaciones sociales. El código y CI están en GitHub; el deploy de prueba se actualiza manualmente hasta conectar Netlify con ese repositorio.
 
 ## Fuentes oficiales
 

@@ -9,7 +9,7 @@ export const products = [
     categoryLabel: 'Combo',
     image: '/images/catalog/combo-three-plants.png',
     imageAlt: 'Combo real de tres plantas carnívoras pequeñas del vivero: Venus, Drosera y Sarracenia.',
-    note: 'Publicación recibida · $13.000',
+    note: 'Tres especies distintas · tamaño pequeño',
   },
   {
     id: 'sarracenia-pequena',
@@ -21,7 +21,7 @@ export const products = [
     categoryLabel: 'Sarracenia',
     image: '/images/catalog/sarracenia-small.jpg',
     imageAlt: 'Sarracenia pequeña real, cultivada en una maceta de vivero.',
-    note: 'Maceta n.º 6 · $4.000',
+    note: 'Maceta n.º 6 · tamaño pequeño',
   },
   {
     id: 'drosera-capensis-unidad',
@@ -33,7 +33,7 @@ export const products = [
     categoryLabel: 'Drosera',
     image: '/images/catalog/drosera-single.png',
     imageAlt: 'Drosera capensis real en maceta, fotografiada en el vivero.',
-    note: 'Precio por unidad · $5.000',
+    note: 'Venta por unidad',
   },
   {
     id: 'promo-dos-droseras',
@@ -45,7 +45,7 @@ export const products = [
     categoryLabel: 'Promoción',
     image: '/images/catalog/drosera-promo.jpg',
     imageAlt: 'Dos Droseras capensis reales del vivero en su publicación promocional.',
-    note: 'Promo publicada · $7.000',
+    note: 'Promoción por dos plantas',
   },
   {
     id: 'venus-pequena',
@@ -57,7 +57,7 @@ export const products = [
     categoryLabel: 'Venus',
     image: '/images/catalog/venus-small.png',
     imageAlt: 'Varias Venus atrapamoscas pequeñas reales cultivadas por Carnívoras Tucumán.',
-    note: 'Maceta n.º 6 · $6.000',
+    note: 'Tamaño pequeño · maceta n.º 6',
   },
   {
     id: 'venus-mediana',
@@ -69,7 +69,7 @@ export const products = [
     categoryLabel: 'Venus',
     image: '/images/catalog/venus-medium.jpg',
     imageAlt: 'Venus atrapamoscas mediana real sostenida en la mano de una persona.',
-    note: 'Maceta n.º 8 · $10.000',
+    note: 'Tamaño mediano · maceta n.º 8',
   },
   {
     id: 'venus-red-piranha',
@@ -81,7 +81,7 @@ export const products = [
     categoryLabel: 'Cultivar',
     image: '/images/catalog/venus-red-piranha.jpeg',
     imageAlt: 'Venus atrapamoscas cultivar Red Piranha real, en maceta rosada.',
-    note: 'Maceta n.º 8 · incluye Drosera de regalo · $25.000',
+    note: 'Maceta n.º 8 · incluye Drosera de regalo',
   },
   {
     id: 'venus-bohemian-garnet',
@@ -93,6 +93,6 @@ export const products = [
     categoryLabel: 'Cultivar',
     image: '/images/catalog/venus-bohemian-garnet.jpeg',
     imageAlt: 'Venus atrapamoscas cultivar Bohemian Garnet real, con trampas rojizas.',
-    note: 'Maceta n.º 8 · incluye Drosera de regalo · $25.000',
+    note: 'Maceta n.º 8 · incluye Drosera de regalo',
   },
 ];

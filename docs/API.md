@@ -31,6 +31,8 @@ Respuesta:
 
 Cada elemento de data usa la misma forma que el catálogo de React. source identifica si los datos vienen de MongoDB o del modo de demostración.
 
+**Comprobación local (25 de noviembre de 2026):** `/api/health` informó `database: connected` y `catalogMode: mongodb`; `/api/products` devolvió ocho productos con `meta.source: mongodb`. OAuth sigue desactivado hasta configurar las credenciales de Google y Facebook.
+
 ### GET /api/products/:slug
 
 Devuelve un producto publicado o un 404 PRODUCT_NOT_FOUND.
@@ -56,5 +58,5 @@ Después de configurar MONGODB_URI en .env, ejecuta npm run seed:products. El sc
 - La API solo permite leer catálogo y estado.
 - Las rutas de autenticación no se activan hasta que MongoDB y proveedores OAuth estén configurados.
 - No hay rutas de administración ni escritura de pedidos.
-- La base MongoDB aún no está conectada en este entorno.
+- En el entorno local verificado, MongoDB Atlas está conectado; el modo demo se conserva para equipos sin URI local.
 - El modo de demostración existe solo para desarrollo; producción exige MONGODB_URI.

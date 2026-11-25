@@ -21,6 +21,7 @@ export default function HeroSection() {
       </div>
 
       <div className="hero__visual">
+        <span className="hero__location-tag"><span aria-hidden="true" /> Cultivado en Tucumán</span>
         <div className="hero__photo-frame">
           <CatalogImage
             src="/images/catalog/combo-three-plants.png"
@@ -34,9 +35,6 @@ export default function HeroSection() {
             <span><strong>Del vivero a tu casa</strong><small>Fotos reales, plantas reales</small></span>
           </div>
         </div>
-        <span className="hero__decor hero__decor--one" aria-hidden="true">✳</span>
-        <span className="hero__decor hero__decor--two" aria-hidden="true">✳</span>
-        <div className="hero__seal"><span>CURIOSAS</span><strong>por naturaleza</strong></div>
       </div>
     </section>
   );

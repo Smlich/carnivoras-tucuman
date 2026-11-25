@@ -25,7 +25,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 ## Hito 0.2 — Preparar Netlify y Hostinger
 
-**Estado:** configuración local lista; despliegues pendientes de conectar el repositorio y los paneles de hosting.
+**Estado:** vista estática publicada para revisión en Netlify; el proyecto GitHub público y su CI ya están activos. Netlify sigue actualizándose manualmente porque todavía no está conectado al repositorio. Hostinger queda aplazado hasta contar con presupuesto.
 
 - Netlify compila y publica `dist` para una revisión temprana sin backend ni credenciales.
 - Hostinger ejecutará Express como proceso Node, servirá `dist` y conectará MongoDB Atlas y OAuth desde variables protegidas.
@@ -101,7 +101,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado parcial de rendimiento:** el catálogo genera variantes adaptables de imágenes y conserva los originales; recorre la [lección de optimización de imágenes](LESSON_05_IMAGE_OPTIMIZATION.md) y completa la medición de red en DevTools.
 
-**Estado parcial de integración continua:** `.github/workflows/ci.yml` está preparado para instalar con `npm ci` y construir el frontend en pull requests y cambios a `main`. Se activará al publicar el repositorio; las pruebas automatizadas siguen pendientes.
+**Estado parcial de integración continua:** `.github/workflows/ci.yml` instala con `npm ci` y construye el frontend en pull requests y cambios a `main`. El build local pasa; falta revisar la primera ejecución de GitHub Actions y las pruebas automatizadas siguen pendientes.
 
 **Lección:** recorre [integración continua con GitHub Actions](LESSON_06_GITHUB_ACTIONS.md) para relacionar el YAML del workflow con cada paso de compilación.
 
