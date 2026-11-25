@@ -17,7 +17,9 @@ En esa variante, React usa el catálogo local de `src/data/products.js` y no con
 
 ### Publicar la vista previa
 
-La primera versión de revisión está disponible en [Carnívoras Tucumán en Netlify](https://carnivorastucuman.netlify.app/). El código está versionado en [GitHub](https://github.com/Smlich/carnivoras-tucuman), pero el proyecto Netlify se creó con una carga manual desde `dist` y aún no está conectado al repositorio. La ruta `/cuidados.html` también está publicada. Esta URL es una vista de prueba: muestra el aviso de confirmación por WhatsApp y no activa API, Atlas ni autenticación social.
+La versión de revisión está disponible en [Carnívoras Tucumán en Netlify](https://carnivorastucuman.netlify.app/). El código está versionado en [GitHub](https://github.com/Smlich/carnivoras-tucuman), pero el proyecto Netlify se creó con una carga manual desde `dist` y aún no está conectado al repositorio. La ruta `/cuidados.html` también está publicada. Esta URL es una vista de prueba: muestra el aviso de confirmación por WhatsApp y no activa API, Atlas ni autenticación social.
+
+**Estado observado el 25 de noviembre de 2026:** la URL responde con HTTP 200, pero sigue mostrando los metadatos y estilos de la entrega anterior al rediseño. El código nuevo sí está en GitHub y pasó el build local y CI; el sitio solo podrá reflejarlo después de conectar Netlify o publicar la carpeta `dist`. Al abrir el panel, Netlify pidió iniciar sesión; completa el acceso desde la pestaña abierta y luego se puede continuar con el vínculo.
 
 1. En Netlify, importa el repositorio GitHub existente y conserva el directorio raíz.
 2. Autoriza la integración de Netlify con GitHub y selecciona `Smlich/carnivoras-tucuman`.

@@ -25,7 +25,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 ## Hito 0.2 — Preparar Netlify y Hostinger
 
-**Estado:** vista estática publicada para revisión en Netlify; el proyecto GitHub público y su CI ya están activos. Netlify sigue actualizándose manualmente porque todavía no está conectado al repositorio. Hostinger queda aplazado hasta contar con presupuesto.
+**Estado:** hay una vista estática pública en Netlify y el proyecto GitHub con CI están activos. El sitio Netlify responde, pero todavía entrega el diseño anterior; el vínculo de GitHub no se completó porque el panel requiere iniciar sesión. Netlify no se actualiza con los cambios que se suben a GitHub hasta conectar la cuenta o publicar `dist` manualmente. Hostinger queda aplazado hasta contar con presupuesto.
 
 - Netlify compila y publica `dist` para una revisión temprana sin backend ni credenciales.
 - Hostinger ejecutará Express como proceso Node, servirá `dist` y conectará MongoDB Atlas y OAuth desde variables protegidas.
@@ -112,7 +112,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado parcial de rendimiento:** el catálogo genera variantes adaptables de imágenes y conserva los originales; recorre la [lección de optimización de imágenes](LESSON_05_IMAGE_OPTIMIZATION.md) y completa la medición de red en DevTools.
 
-**Estado parcial de integración continua:** `.github/workflows/ci.yml` instala con `npm ci` y construye el frontend en pull requests y cambios a `main`. La primera ejecución de GitHub Actions pasó para Node 22, 24 y 26 ([ejecución f04fb7b](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45595845180)); las pruebas automatizadas y la integración de Netlify con el repositorio siguen pendientes.
+**Estado parcial de integración continua:** `.github/workflows/ci.yml` instala con `npm ci` y construye el frontend en pull requests y cambios a `main`. La última ejecución verificada, para `4a608b3`, pasó sus tres trabajos de compilación ([CI #4](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45599476044)); las pruebas automatizadas y la integración de Netlify con el repositorio siguen pendientes.
 
 **Lección:** recorre [integración continua con GitHub Actions](LESSON_06_GITHUB_ACTIONS.md) para relacionar el YAML del workflow con cada paso de compilación.
 

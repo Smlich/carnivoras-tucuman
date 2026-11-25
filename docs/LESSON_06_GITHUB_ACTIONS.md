@@ -2,7 +2,7 @@
 
 La integración continua comprueba que el código compila; no publica la web. El despliegue por etapas se estudia aparte en [la lección 09](LESSON_09_DEPLOYMENT_PATHS.md).
 
-La primera ejecución de este repositorio terminó correctamente para Node 22, 24 y 26: [CI del commit f04fb7b](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45595845180).
+La primera ejecución de este repositorio terminó correctamente para Node 22, 24 y 26: [CI del commit f04fb7b](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45595845180). La ejecución más reciente verificada, para `4a608b3`, también pasó los tres trabajos de compilación: [CI #4](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45599476044).
 
 ## Objetivo
 

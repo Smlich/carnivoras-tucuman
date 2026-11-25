@@ -1,6 +1,6 @@
 # Caso de estudio para portafolio
 
-> Borrador basado en el estado actual. La vista estática está publicada para revisión en Netlify; la aplicación MERN de producción y los inicios OAuth aún no están desplegados ni verificados.
+> Borrador basado en el estado actual. La vista estática está publicada en Netlify, aunque el sitio público todavía muestra una entrega anterior al rediseño. La aplicación MERN de producción y los inicios OAuth aún no están desplegados ni verificados.
 
 ## Carnívoras Tucumán — tienda web full stack en evolución
 

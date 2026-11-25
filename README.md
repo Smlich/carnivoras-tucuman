@@ -69,7 +69,7 @@ Usa [el caso de estudio](docs/PORTFOLIO_CASE_STUDY.md) para presentar la arquite
 
 ## Publicación por etapas
 
-La vista previa estática está publicada en [Netlify](https://carnivorastucuman.netlify.app/) con catálogo local y la guía `/cuidados.html`. No representa la API MERN ni verifica OAuth. Por ahora Hostinger está aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica qué hace falta para cada etapa.
+La vista previa estática responde en [Netlify](https://carnivorastucuman.netlify.app/) con catálogo local y la guía `/cuidados.html`, pero todavía muestra la entrega anterior al rediseño. El último código vive en GitHub; Netlify sigue desconectado y necesita una sesión para vincularse o recibir una publicación manual. No representa la API MERN ni verifica OAuth. Por ahora Hostinger está aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica qué hace falta para cada etapa.
 
 ## Próximos hitos
 
