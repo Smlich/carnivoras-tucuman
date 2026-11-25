@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { store } from '../config/store';
 import { products } from '../data/products';
+import { fetchProducts } from '../services/products-api';
 import ProductCard from './ProductCard';
 
 const filters = [
@@ -14,15 +15,28 @@ const filters = [
 export default function ProductCatalog({ onAdd }) {
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchTerm, setSearchTerm] = useState('');
+  const [catalogProducts, setCatalogProducts] = useState(products);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetchProducts({ signal: controller.signal })
+      .then(setCatalogProducts)
+      .catch((error) => {
+        if (error.name !== 'AbortError') setCatalogProducts(products);
+      });
+
+    return () => controller.abort();
+  }, []);
 
   const visibleProducts = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLocaleLowerCase('es-AR');
-    return products.filter((product) => {
+    return catalogProducts.filter((product) => {
       const matchesCategory = activeFilter === 'todos' || product.category === activeFilter;
       const searchable = [product.name, product.species, product.description, product.categoryLabel].join(' ').toLocaleLowerCase('es-AR');
       return matchesCategory && searchable.includes(normalizedSearch);
     });
-  }, [activeFilter, searchTerm]);
+  }, [activeFilter, catalogProducts, searchTerm]);
 
   return (
     <section className="catalog-section section-pad" id="catalogo" aria-labelledby="catalog-title">

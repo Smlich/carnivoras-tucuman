@@ -31,3 +31,11 @@
 **Motivo:** el servidor debe validar la identidad, mantener los secretos privados y controlar la sesión.
 
 **Consecuencia:** las cuentas de cliente aún no están activas. El requisito se considera pendiente para el lanzamiento con registro.
+
+## ADR-005 — El catálogo se lee desde Express y MongoDB
+
+**Decisión:** React consulta una API de solo lectura; Express consulta MongoDB cuando hay una conexión activa.
+
+**Motivo:** separar interfaz y datos ahora facilita aprender API REST y añadir persistencia sin exponer la base al navegador.
+
+**Consecuencia:** en desarrollo sin MongoDB, Express sirve el catálogo de demostración y el endpoint de salud lo identifica. En producción, la API requiere MongoDB. No hay rutas para editar productos ni guardar pedidos hasta implementar autorización y reglas de venta.

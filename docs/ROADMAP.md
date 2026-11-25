@@ -4,7 +4,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 ## Hito 0 — Tienda funcional inicial
 
-**Estado:** en construcción en esta sesión. **Duración prevista:** 1 a 2 jornadas.
+**Estado:** completado. **Duración prevista:** 1 a 2 jornadas.
 
 - Construir la portada, el catálogo, los filtros y el carrito.
 - Enviar un pedido armado a WhatsApp.
@@ -25,20 +25,21 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 ## Semana 2 — API con Node.js y Express
 
 - Crear una carpeta `server` independiente.
-- Levantar Express con configuración por variables de entorno.
-- Definir rutas REST para productos y pedidos.
-- Validar entradas, normalizar errores y documentar la API.
+- Levantar Express con configuración validada por variables de entorno.
+- Crear GET /api/health, GET /api/products y GET /api/products/:slug.
+- Validar filtros y paginación, normalizar errores y documentar la API.
+- Conectar React al endpoint y conservar un fallback local durante desarrollo.
 
-**Entrega:** API local con catálogo servido desde el backend.
+**Estado:** API y lectura de catálogo implementadas. **Pendiente de aprendizaje:** recorrer el flujo y consultar la respuesta en el navegador. **Entrega:** API local en modo de demostración.
 
 ## Semana 3 — MongoDB y persistencia
 
-- Crear modelos de productos, clientes y pedidos.
+- Crear y verificar modelos de productos, clientes y pedidos.
 - Conectar con MongoDB Atlas usando una URI privada.
 - Añadir operaciones de lectura y administración de productos.
 - Registrar pedidos con estado y fecha, sin guardar datos de pago sensibles.
 
-**Entrega:** productos y pedidos persisten al reiniciar la aplicación.
+**Estado:** modelo de producto y carga inicial preparados. **Pendiente:** conectar una base MongoDB, cargar el catálogo y comprobar persistencia; el modelo de pedidos se añadirá después de definir identidad y privacidad.
 
 ## Semana 4 — Cuentas con Google y Facebook
 

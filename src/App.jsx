@@ -17,7 +17,7 @@ export default function App() {
   const closeCart = useCallback(() => setIsCartOpen(false), []);
 
   function handleAdd(product) {
-    cart.addItem(product.id);
+    cart.addItem(product);
     setAnnouncement(product.name + ' se agregó a tu pedido.');
     window.setTimeout(() => setAnnouncement(''), 2600);
   }

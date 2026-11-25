@@ -1,17 +1,23 @@
 # Arquitectura del proyecto
 
-## Entrega 0: frontend
+## Frontend y primera API
 
 ```text
 Navegador
   └── React + Vite
-       ├── componentes de página y catálogo
-       ├── catálogo local en src/data
+       ├── catálogo, filtros y carrito
+       ├── GET /api/products mediante proxy de Vite
        ├── carrito persistido en localStorage
        └── enlace wa.me con resumen del pedido
+
+Vite
+  └── Express
+       ├── GET /api/health
+       ├── GET /api/products
+       └── Mongoose → MongoDB o catálogo de demostración durante desarrollo
 ```
 
-El navegador mantiene el carrito de este dispositivo. WhatsApp recibe un borrador del pedido; el negocio confirma stock, precio y entrega manualmente. No se reciben pagos ni se crean cuentas en esta entrega.
+El navegador mantiene el carrito de este dispositivo. WhatsApp recibe un borrador del pedido; el negocio confirma stock, precio y entrega manualmente. No se reciben pagos ni se crean cuentas en esta entrega. Si MongoDB no está configurado en desarrollo, la API devuelve el catálogo local con source: demo-catalog; esa respuesta no es persistencia.
 
 ## Arquitectura objetivo: MERN
 
@@ -30,6 +36,8 @@ El cliente nunca se conecta directamente a MongoDB. El servidor valida cada oper
 
 - Vite permite iniciar con un frontend pequeño y evolucionar sin rehacer la interfaz.
 - El catálogo está separado en datos para facilitar su migración posterior a la API.
+- React consulta GET /api/products; si el servidor de desarrollo no está disponible, muestra el catálogo local.
+- MongoDB es obligatorio en producción; el modo local de demostración no guarda cambios.
 - El contacto comercial se concentra en WhatsApp hasta definir pagos, entrega y backend.
 - No se inventa el acceso social: botones de autenticación solo aparecerán cuando los proveedores estén configurados y el flujo pueda completarse.
 - Las imágenes del catálogo son los archivos originales compartidos por Carnívoras Tucumán. No se generan plantas artificiales ni se cambia su contenido.
