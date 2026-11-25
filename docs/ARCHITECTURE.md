@@ -22,7 +22,7 @@ Vite
        └── Mongoose → MongoDB o catálogo de demostración durante desarrollo
 ```
 
-El navegador mantiene el carrito de este dispositivo. WhatsApp recibe un borrador del pedido; el negocio confirma stock, precio y entrega manualmente. No se reciben pagos ni se crean pedidos en el servidor. El flujo social está implementado pero permanece inactivo hasta configurar Atlas y credenciales de OAuth. Si MongoDB no está configurado en desarrollo, la API devuelve el catálogo local con source: demo-catalog; esa respuesta no es persistencia.
+El navegador mantiene el carrito de este dispositivo. WhatsApp recibe un borrador del pedido; el negocio confirma stock, precio y entrega manualmente. No se reciben pagos ni se crean pedidos en el servidor. Atlas y Google OAuth ya funcionan en desarrollo; Facebook sigue pendiente. Si MongoDB no está configurado en desarrollo, la API devuelve el catálogo local con source: demo-catalog; esa respuesta no es persistencia.
 
 ## Arquitectura objetivo: MERN
 

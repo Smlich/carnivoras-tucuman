@@ -42,7 +42,7 @@ Respuesta:
 
 Cada elemento de data usa la misma forma que el catálogo de React. source identifica si los datos vienen de MongoDB o del modo de demostración.
 
-**Comprobación local (25 de noviembre de 2026):** `/api/health` informó `data.status: ok`, `data.database: connected` y `data.catalogMode: mongodb`; `/api/products` devolvió ocho productos con `meta.source: mongodb`. La consulta `/api/products?category=venus&limit=2` devolvió dos Venus desde MongoDB. `/api/auth/status` informó `enabled: false` y una lista vacía de proveedores. Se comprobó solo la presencia de variables (sin leer ni mostrar valores): Atlas, `BETTER_AUTH_SECRET` y `BETTER_AUTH_URL` ya están configurados; faltan los IDs y secretos OAuth de Google y Facebook.
+**Comprobación local (25 de noviembre de 2026):** `/api/health` informó `data.status: ok`, `data.database: connected` y `data.catalogMode: mongodb`; `/api/products` devolvió ocho productos con `meta.source: mongodb`. La consulta `/api/products?category=venus&limit=2` devolvió dos Venus desde MongoDB. Tras configurar Google en `.env`, `/api/auth/status` informó `enabled: true` y `providers: ["google"]`; el inicio real con Google completó el callback y dejó una sesión activa en `http://localhost:5173`. Facebook sigue sin credenciales. Los valores de `.env` no se registran ni se muestran.
 
 ### GET /api/products/:slug
 
@@ -67,7 +67,7 @@ Después de configurar MONGODB_URI en .env, ejecuta npm run seed:products. El sc
 ## Límites actuales
 
 - La API solo permite leer catálogo y estado.
-- Las rutas de autenticación no se activan hasta que MongoDB y proveedores OAuth estén configurados.
+- Las rutas de autenticación requieren MongoDB y al menos un proveedor OAuth configurado; hoy Google funciona en desarrollo y Facebook está pendiente.
 - No hay rutas de administración ni escritura de pedidos.
 - En el entorno local verificado, MongoDB Atlas está conectado; el modo demo se conserva para equipos sin URI local.
 - El modo de demostración existe solo para desarrollo; producción exige MONGODB_URI.

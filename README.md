@@ -17,7 +17,7 @@ Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/
 - En producción, Express sirve el frontend compilado y la API bajo el mismo origen; `npm start` inicia el servidor.
 - API Express de solo lectura para catálogo y salud del servicio.
 - Esquema Mongoose y script de carga inicial preparados para MongoDB.
-- Flujo de cuentas preparado con Better Auth para Google y Facebook; se activa al configurar Atlas y las credenciales OAuth.
+- Inicio de sesión con Better Auth: Google está configurado y probado localmente; Facebook sigue pendiente. Netlify solo sirve la vista estática.
 
 Los productos y valores del catálogo se transcribieron de las publicaciones compartidas el 25 de noviembre de 2026. El stock se confirma por WhatsApp. Actualiza los datos antes de anunciar la web como catálogo vigente.
 
@@ -80,7 +80,7 @@ Por ahora, usa únicamente funciones y planes sin costo. No habilites facturaci�
 
 ## Próximos hitos
 
-Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTICATION.md) y el [plan de contenidos y SEO local](docs/CONTENT_PLAN.md). Los botones de cuenta aparecen cuando Atlas y al menos un proveedor están configurados. El flujo está preparado, pero todavía no se ha conectado a credenciales reales ni verificado con cuentas de Google o Facebook. No hay escritura de pedidos en la API.
+Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTICATION.md) y el [plan de contenidos y SEO local](docs/CONTENT_PLAN.md). Google OAuth ya pasó un inicio de sesión real en desarrollo usando `http://localhost:5173`; Facebook todavía no está configurado. La vista estática de Netlify no incluye la API ni la sesión. No hay escritura de pedidos en la API.
 
 ## Datos que faltan antes del lanzamiento
 
@@ -88,7 +88,7 @@ Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTI
 - Definir zonas, costos y condiciones de entrega.
 - Confirmar que `@canivoras_tucuman` es la cuenta oficial; compartir Facebook si se decide usarlo.
 - Definir dominio, política de privacidad y condiciones de venta.
-- Configurar credenciales de Google y Meta para OAuth.
+- Configurar Facebook OAuth y revisar publicación, callbacks HTTPS y verificación de proveedores antes de un despliegue full stack.
 
 ## Fuentes técnicas
 

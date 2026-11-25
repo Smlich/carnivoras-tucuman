@@ -23,6 +23,12 @@ La tienda conserva WhatsApp como contacto del pedido. Una cuenta social todavía
 - Google exige correo verificado para abrir sesión. Facebook puede no entregar un correo válido; cuando falta, se guarda un marcador con dominio reservado `.invalid` basado en el ID de la cuenta. Ese marcador no es un contacto y no se usa para enviar mensajes.
 - El registro social no da permisos de administración. La autorización de inventario y pedidos requiere reglas separadas.
 
+## Estado verificado en desarrollo
+
+El 25 de noviembre de 2026, `/api/auth/status` respondió `enabled: true` y `providers: ["google"]`. Se completó un inicio real de sesión con Google desde `http://localhost:5173`; Better Auth procesó el callback y la tienda mostró una sesión activa. Las credenciales permanecen en `.env`, que Git ignora. Facebook aún no está configurado y la vista pública de Netlify sigue siendo estática.
+
+Usa siempre el mismo host en `BETTER_AUTH_URL`, el navegador y el URI de retorno. `localhost` y `127.0.0.1` son orígenes distintos: mezclarlos produjo `state_mismatch` en una prueba; usar `localhost` en los tres lugares lo corrigió.
+
 Better Auth recomienda una URL base explícita y callbacks registrados en Google y Meta ([Google](https://better-auth.com/docs/authentication/google), [Facebook](https://better-auth.com/docs/authentication/facebook)). Su handler Express 5 debe montarse antes del parser JSON ([integración Express](https://better-auth.com/docs/integrations/express)); el adaptador MongoDB puede compartir el cliente y habilitar transacciones ([adaptador MongoDB](https://better-auth.com/docs/adapters/mongo)).
 
 ## Preparar `.env`

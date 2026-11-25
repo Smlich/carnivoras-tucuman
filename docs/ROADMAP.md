@@ -83,15 +83,15 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Entrega:** el cliente puede crear o recuperar su cuenta usando Google o Facebook.
 
-**Estado parcial:** Better Auth está integrado con Atlas y el menú React aparecerá al configurar al menos un proveedor. **Pendiente:** crear las aplicaciones OAuth, guardar IDs y secretos localmente y completar un inicio de sesión real de Google y otro de Facebook.
+**Estado parcial:** Better Auth está integrado con Atlas. Google OAuth está configurado en desarrollo y el inicio real ya se verificó. **Pendiente:** configurar y probar Facebook, y preparar callbacks HTTPS cuando exista el dominio de producción.
 
-**Actualización (25 de noviembre de 2026):** la titular confirmó que completó la verificación en dos pasos (2SV) y llegó al selector de proyectos de Google Cloud. El siguiente paso es seleccionar o crear `Carnívoras Tucumán`; este proyecto de Google Cloud es independiente de Atlas y no requiere facturación. Todavía no se creó una app ni se generaron claves OAuth. Seguiremos usando solo opciones gratuitas y no habilitaremos servicios pagos para esta etapa.
+**Actualización (25 de noviembre de 2026):** se creó el cliente web de Google `CarnivorasT`, se registró el callback `http://localhost:5173/api/auth/callback/google`, se guardaron las credenciales solo en `.env` y se completó un inicio de sesión real en `http://localhost:5173`. La app permanece en modo Testing. Facebook todavía no está configurado. Seguiremos usando opciones gratuitas y no habilitaremos servicios pagos para esta etapa.
 
 **Lección:** recorre [OAuth, sesiones y secretos](LESSON_03_OAUTH_AND_SECRETS.md) antes de configurar proveedores reales. La lectura enseña el flujo sin necesitar compartir credenciales.
 
 **Práctica guiada:** sigue [la configuración de Google y Facebook](LESSON_07_OAUTH_PROVIDER_SETUP.md) para crear credenciales locales, registrar los callbacks exactos y probar las cuentas de desarrollo sin exponer secretos.
 
-**Bloqueo externo:** requiere IDs/secretos OAuth, URLs definitivas y revisión de requisitos de cada proveedor. Los secretos se guardan en variables de entorno y nunca en Git.
+**Bloqueo externo para producción:** requiere completar Facebook, decidir el dominio, registrar callbacks HTTPS y revisar los requisitos de publicación de cada proveedor. Los secretos permanecen en variables de entorno y nunca en Git.
 
 ## Semana 5 — Gestión de venta
 

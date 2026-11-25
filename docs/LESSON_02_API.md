@@ -37,7 +37,7 @@ El contrato del catálogo también se prueba en [la lección de pruebas del cat�
 
 El 25 de noviembre de 2026, Express respondió `data.status: ok`, `data.database: connected` y `data.catalogMode: mongodb` en `/api/health`. La consulta `/api/products?category=venus&limit=2` devolvió dos plantas y `meta.source: mongodb`. Así se puede seguir el dato de punta a punta: el navegador pide un recurso, Express valida los filtros y Mongoose lee los documentos de Atlas.
 
-En ese mismo entorno, `/api/auth/status` devolvió `enabled: false` y `providers: []`. Esto separa dos estados: Atlas ya persiste el catálogo, pero el acceso social sigue desactivado porque aún faltan las credenciales de Google y Facebook. La presencia de las variables se comprobó sin imprimir sus valores; las credenciales se mantienen en `.env` y el endpoint solo revela si los proveedores están activos.
+**Actualización del mismo día:** al guardar las credenciales locales de Google, `/api/auth/status` pasó a `enabled: true` con `providers: ["google"]`. Un inicio de sesión real completó el callback y creó una sesión en desarrollo. Facebook todavía no está configurado. El endpoint solo revela los nombres de proveedores activos; nunca devuelve IDs ni secretos.
 
 ## Lecturas oficiales
 

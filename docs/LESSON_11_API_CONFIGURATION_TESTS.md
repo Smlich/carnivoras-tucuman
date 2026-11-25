@@ -48,7 +48,7 @@ El script ejecuta `node --test`; Node descubre los archivos `*.test.js`. GitHub 
 
 ## Qué queda sin demostrar
 
-Para comprobar el flujo completo todavía hace falta configurar aplicaciones OAuth de desarrollo, registrar los callbacks y usar cuentas de prueba permitidas por Google y Meta. Después hay que confirmar la sesión en Atlas, volver a iniciar sesión, cerrar sesión y comprobar errores reales de callback. Las pruebas actuales no demuestran permisos comerciales, checkout, pagos ni administración de inventario.
+Google OAuth ya está configurado en desarrollo y se completó un inicio real de sesión con el callback local. Esa verificación manual no forma parte de la suite automatizada. Falta configurar y probar Facebook, comprobar de nuevo la persistencia y el cierre de sesión, y validar errores de callback. Las pruebas actuales no demuestran permisos comerciales, checkout, pagos ni administración de inventario.
 
 ## Preguntas de repaso
 

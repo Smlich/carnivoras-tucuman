@@ -13,7 +13,7 @@ Esta lección crea credenciales de desarrollo. No publica la aplicación ni habi
 - `.env` debe estar en la raíz del repo. Nunca escribas credenciales dentro de `src`, variables `VITE_*`, capturas públicas o GitHub.
 - No compartas el contenido de `.env` por chat. Para pedir ayuda, comparte el nombre de la variable y el mensaje saneado, nunca su valor.
 
-**Estado de acceso (25 de noviembre de 2026):** la titular confirmó que completó la verificación en dos pasos (2SV) y ya puede abrir Google Auth Platform. El paso actual es elegir el proyecto de Google Cloud `Carnívoras Tucumán`; si no aparece, crea uno con ese nombre. Este proyecto es independiente de MongoDB Atlas y no requiere habilitar facturación. Todavía no se creó un cliente OAuth ni se generaron credenciales. No envíes códigos ni contraseñas por chat. Consulta el [requisito de MFA de Google Cloud](https://cloud.google.com/docs/authentication/external/mfa-requirement).
+**Estado de acceso (25 de noviembre de 2026):** se creó el cliente web `CarnivorasT` en Google Cloud, se registró el callback local exacto, y las credenciales quedaron solo en el `.env` local, ignorado por Git. `/api/auth/status` confirmó Google habilitado y un inicio de sesión real completó el flujo en `http://localhost:5173`. La app sigue en Testing y Facebook está pendiente. No incluyas IDs, secretos, códigos ni contraseñas en el repositorio o el chat. Consulta el [requisito de MFA de Google Cloud](https://cloud.google.com/docs/authentication/external/mfa-requirement).
 
 El callback local actual es:
 
@@ -23,6 +23,8 @@ http://localhost:5173/api/auth/callback/facebook
 ```
 
 Better Auth construye estas direcciones desde `BETTER_AUTH_URL` y `basePath`. Si cambia el host, el puerto o la ruta, actualiza la URL en `.env` y en los dos paneles. El URI debe coincidir exactamente, incluso en esquema, host, ruta y barra final.
+
+**Nota de depuración:** no mezcles `127.0.0.1` y `localhost`. En la primera prueba se abrió Vite con `127.0.0.1` mientras `BETTER_AUTH_URL` y el callback usaban `localhost`; la cookie de estado no volvió al mismo host y Better Auth respondió `state_mismatch`. Abrir el sitio como `http://localhost:5173` resolvió el error.
 
 ## 1. Crear el cliente web de Google
 
