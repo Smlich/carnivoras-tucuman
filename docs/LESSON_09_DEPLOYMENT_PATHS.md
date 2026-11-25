@@ -28,6 +28,8 @@ La vista de prueba está en [Carnívoras Tucumán en Netlify](https://carnivoras
 
 La primera vinculación de Netlify a GitHub ya se completó. Si Netlify pierde acceso al repositorio, revisa la instalación de la aplicación Netlify dentro de la cuenta/organización de GitHub; no cargues credenciales en el repositorio. Para publicar manualmente una revisión solo si se rompe la integración, construye `dist` y usa la carga de deploys de Netlify.
 
+La insignia flotante **Powered by Netlify** está desactivada en la configuración de este proyecto para que no tape texto del pie. Netlify la inyecta fuera del código de la página, así que no se corrige con CSS: revisa **Project configuration → General → Powered by Netlify badge** si vuelve a aparecer. [Documentación oficial](https://docs.netlify.com/manage/projects/powered-by-netlify-badge/).
+
 Netlify crea deploys de prueba por rama o pull request cuando el repositorio queda conectado. Trata la URL de prueba como pública: no la anuncies como catálogo vigente hasta verificar precios, stock, entrega y derechos de las fotos.
 
 ## 2. Hostinger: aplicación MERN final
