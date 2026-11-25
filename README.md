@@ -74,6 +74,10 @@ Usa [el caso de estudio](docs/PORTFOLIO_CASE_STUDY.md) para presentar la arquite
 
 La vista previa estática se publica desde `main` mediante la integración de GitHub con [Netlify](https://carnivorastucuman.netlify.app/), con catálogo local, fotos reales y la guía `/cuidados.html`. No representa la API MERN ni verifica OAuth. Hostinger queda aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica el despliegue de cada etapa.
 
+### Presupuesto de esta etapa
+
+Por ahora, usa únicamente funciones y planes sin costo. No habilites facturación, agregues una tarjeta, contrates un dominio, inicies una prueba que pueda convertirse en pago ni actives complementos pagos para terminar el prototipo. Si un proveedor presenta un requisito de pago o se supera un límite gratuito, detente y revisamos una alternativa. La publicación full stack en Hostinger queda para una etapa futura con presupuesto.
+
 ## Próximos hitos
 
 Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTICATION.md) y el [plan de contenidos y SEO local](docs/CONTENT_PLAN.md). Los botones de cuenta aparecen cuando Atlas y al menos un proveedor están configurados. El flujo está preparado, pero todavía no se ha conectado a credenciales reales ni verificado con cuentas de Google o Facebook. No hay escritura de pedidos en la API.

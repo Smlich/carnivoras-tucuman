@@ -63,3 +63,11 @@
 **Motivo:** dar crédito al origen del vivero y del desarrollo, además de presentar el alias de programación sin confundirlo con la marca comercial principal.
 
 **Consecuencia:** los sellos son secundarios, accesibles mediante texto alternativo y apilados en pantallas de hasta 600 px. El monograma angular con tema helado usa una interpretación original de fantasía; no reutiliza arte ni logotipos de franquicias existentes.
+
+## ADR-009 — Mantener gratuita la etapa de aprendizaje
+
+**Decisión:** durante el prototipo se usan solo funciones y planes sin costo. No se activa facturación, se agrega una tarjeta, se inicia una prueba con conversión a pago ni se contrata un servicio.
+
+**Motivo:** el negocio todavía no destina presupuesto al hosting final y el objetivo es aprender y publicar la vista de prueba sin asumir cargos.
+
+**Consecuencia:** Netlify conserva el catálogo estático de revisión y Atlas usa su clúster gratuito; la API y Better Auth se ejecutan en desarrollo mientras no haya hosting full stack. Si se alcanza un límite o un proveedor exige pago, se pausa esa opción y se evalúa una alternativa gratuita. Hostinger queda para una etapa futura con presupuesto.
