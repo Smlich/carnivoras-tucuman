@@ -16,6 +16,7 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 
 - **Entrega incremental:** el frontend funciona primero con catálogo local; después se agregó Express y una API de lectura. Si MongoDB no está configurado en desarrollo, el mismo API usa el catálogo demo.
 - **Fotos y confianza:** las tarjetas usan archivos reales recibidos del vivero. No se sustituyen por imágenes generadas. Los precios y el inventario se presentan como referencia y se confirman por WhatsApp.
+- **Rendimiento sin perder trazabilidad:** los originales se conservan; Sharp genera variantes adaptables de 480 y 960 píxeles y `CatalogImage` entrega una por imagen con `<picture>` y `srcset`. PNG se sirve como WebP, JPEG permanece JPEG y los logos se optimizan sin pérdida. La suma de la variante mayor de cada asset bajó de 11.1 MiB a 2.1 MiB (80.7% menos); es una comparación agregada de archivos, no una medición del tiempo de carga real.
 - **Carrito sin promesa de compra:** el navegador recuerda la selección y genera una consulta; no cobra, reserva stock ni crea pedidos en servidor. El precio debe recalcularse en el backend antes de incorporar pagos.
 - **Separación de secretos:** React no recibe credenciales OAuth ni la URI de Atlas. Express valida el entorno y Better Auth gestiona las sesiones cuando la base y los proveedores estén configurados.
 - **Datos verificables:** Zod valida filtros de API, Mongoose define restricciones del producto y el seed hace upsert por slug sin borrar otros documentos.

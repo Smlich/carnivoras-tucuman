@@ -1,4 +1,5 @@
 import { store } from '../config/store';
+import CatalogImage from './CatalogImage';
 
 export default function HeroSection() {
   return (
@@ -21,9 +22,11 @@ export default function HeroSection() {
 
       <div className="hero__visual">
         <div className="hero__photo-frame">
-          <img
+          <CatalogImage
             src="/images/catalog/combo-three-plants.png"
             alt="Fotografía real del combo de tres plantas carnívoras pequeñas de Carnívoras Tucumán."
+            pictureClassName="hero__picture"
+            sizes="(max-width: 860px) 90vw, 42vw"
             fetchPriority="high"
           />
           <div className="hero__photo-caption">

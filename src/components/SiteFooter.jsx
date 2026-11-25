@@ -1,4 +1,5 @@
 import { store } from '../config/store';
+import CatalogImage from './CatalogImage';
 
 export default function SiteFooter() {
   const socialLinks = [
@@ -10,7 +11,7 @@ export default function SiteFooter() {
     <footer className="site-footer">
       <div className="page-shell site-footer__main">
         <a className="footer-brand" href="#inicio" aria-label={store.name + ' — volver al inicio'}>
-          <img src="/images/catalog/logo-dark.png" alt="" />
+          <CatalogImage src="/images/catalog/logo-dark.png" alt="" className="footer-brand__logo" sizes="49px" />
           <span><strong>Carnívoras</strong><small>Tucumán · Argentina</small></span>
         </a>
         <p className="site-footer__line">Un rincón extraordinario de la naturaleza, cultivado con paciencia.</p>

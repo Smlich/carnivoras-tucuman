@@ -1,5 +1,6 @@
 import { store } from '../config/store';
 import AccountMenu from './AccountMenu';
+import CatalogImage from './CatalogImage';
 
 function BagIcon() {
   return (
@@ -15,7 +16,7 @@ export default function SiteHeader({ itemCount, onOpenCart }) {
     <header className="site-header">
       <div className="site-header__inner page-shell">
         <a className="brand" href="#inicio" aria-label={store.name + ' — inicio'}>
-          <img src="/images/catalog/logo-light.png" alt="" className="brand__logo" />
+          <CatalogImage src="/images/catalog/logo-light.png" alt="" className="brand__logo" sizes="52px" />
           <span className="brand__text">
             <strong>Carnívoras</strong>
             <span>Tucumán</span>

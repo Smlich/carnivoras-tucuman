@@ -76,6 +76,8 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado parcial de accesibilidad:** el diálogo del carrito gestiona el foco de teclado, limita la tabulación a su contenido y lo devuelve al control de apertura al cerrarse. La revisión integral de accesibilidad sigue pendiente.
 
+**Estado parcial de rendimiento:** el catálogo genera variantes adaptables de imágenes y conserva los originales; recorre la [lección de optimización de imágenes](LESSON_05_IMAGE_OPTIMIZATION.md) y completa la medición de red en DevTools.
+
 **Entrega:** versión de portafolio desplegada, instrucciones reproducibles, [plan mensual de contenidos](CONTENT_PLAN.md) adaptado a las redes oficiales y lista de mejoras priorizada.
 
 ## Rutina de cada sesión

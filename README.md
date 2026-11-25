@@ -50,10 +50,13 @@ Para generar la versión de producción, ejecuta `npm run build`; la carpeta `di
 - `server/src`: API Express, configuración, esquema Mongo, lectura del catálogo y autenticación.
 - `docs`: arquitectura, decisiones, cronograma y registro de aprendizaje.
 - `public/images/catalog`: archivos originales compartidos por el negocio.
+- `public/images/catalog/optimized`: variantes optimizadas para la web; conserva intactos los originales.
+
+Para regenerar variantes después de agregar o actualizar fotos autorizadas, ejecuta `npm run images:optimize`. El script prepara versiones adaptables para móvil y escritorio; usa WebP para los PNG y JPEG para las fotos que ya venían en JPEG. Cada `<picture>` mantiene también la foto original como respaldo, sin alterar los archivos fuente. Aprende el flujo en [la lección de optimización](docs/LESSON_05_IMAGE_OPTIMIZATION.md).
 
 ## Ruta de aprendizaje
 
-Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md) y [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
+Recorre [el flujo del pedido](docs/LESSON_01_ORDER_FLOW.md), [la API](docs/LESSON_02_API.md), [MongoDB Atlas](docs/LESSON_04_MONGODB_ATLAS.md), [OAuth y los secretos](docs/LESSON_03_OAUTH_AND_SECRETS.md) y [optimización de imágenes](docs/LESSON_05_IMAGE_OPTIMIZATION.md). Usa `docs/LEARNING_LOG_TEMPLATE.md` para anotar tus explicaciones, decisiones y preguntas de repaso.
 
 ## Portafolio
 

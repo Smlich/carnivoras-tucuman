@@ -13,6 +13,7 @@
     "dev:all": "concurrently -k -n web,api -c green,blue \"vite --host 127.0.0.1\" \"node --watch server/src/index.js\"",
     "start:server": "node server/src/index.js",
     "seed:products": "node server/src/scripts/seed-products.js",
+    "images:optimize": "node scripts/optimize-catalog-images.mjs",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1"
   },
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^6.3.0",
     "concurrently": "^10.0.7",
+    "sharp": "^0.35.5",
     "vite": "^8.3.8"
   }
 }

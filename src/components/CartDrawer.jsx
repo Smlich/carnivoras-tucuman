@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { formatPrice } from '../utils/format-price';
 import { createWhatsAppUrl } from '../utils/whatsapp';
+import CatalogImage from './CatalogImage';
 
 export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, onClear }) {
   const drawerRef = useRef(null);
@@ -78,7 +79,15 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
             <ul className="cart-items">
               {items.map((item) => (
                 <li className="cart-item" key={item.id}>
-                  <img src={item.image} alt="" loading="lazy" />
+                  <CatalogImage
+                    src={item.image}
+                    alt=""
+                    className="cart-item__image"
+                    pictureClassName="cart-item__picture"
+                    sizes="80px"
+                    loading="lazy"
+                    decoding="async"
+                  />
                   <div className="cart-item__info">
                     <strong>{item.name}</strong>
                     <span>{formatPrice(item.price)} cada uno</span>

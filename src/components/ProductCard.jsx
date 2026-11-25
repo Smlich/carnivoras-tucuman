@@ -1,13 +1,16 @@
 import { formatPrice } from '../utils/format-price';
+import CatalogImage from './CatalogImage';
 
 export default function ProductCard({ product, onAdd }) {
   return (
     <article className="product-card">
       <div className="product-card__image-wrap">
-        <img
+        <CatalogImage
           className="product-card__image"
           src={product.image}
           alt={product.imageAlt}
+          pictureClassName="product-card__picture"
+          sizes="(max-width: 520px) 45vw, (max-width: 920px) 30vw, 24vw"
           loading="lazy"
           decoding="async"
         />
