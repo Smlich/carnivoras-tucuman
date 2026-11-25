@@ -22,6 +22,8 @@ Atlas ofrece clústeres Free para aprendizaje y prototipos. Consulta la disponib
 
 El usuario de base de datos es distinto del usuario con el que inicias sesión en el panel de Atlas.
 
+Cuando la conexión ya funcione, vuelve a **Security → Database Access** y conserva solo usuarios que estén en uso. Si pierdes una contraseña, restablece la del usuario de aplicación, actualiza `.env` y confirma que la aplicación conecta antes de retirar cualquier cuenta temporal. Mantén `readWrite` limitado a esta base y al clúster necesario; no crees usuarios administrativos para la app.
+
 ## 3. Permitir la conexión de desarrollo
 
 1. En **Security → Network Access**, añade la IP pública actual de tu computadora.
