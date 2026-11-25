@@ -17,7 +17,7 @@ Los productos y valores del catálogo se transcribieron de las publicaciones com
 
 ## Ejecutar localmente
 
-Requisitos: Node.js 20.19+ o 22.12+ y npm.
+Requisitos: Node.js 22.12+ en la serie 22, o las series 24.x y 26.x, con npm. Descarga una versión LTS desde [nodejs.org](https://nodejs.org/en/download). En Windows, deja activa la opción para agregar Node al `PATH`; después abre una terminal nueva y confirma con `node --version` y `npm --version`.
 
 1. Abre una terminal en esta carpeta.
 2. Ejecuta `npm ci` para instalar las versiones bloqueadas en `package-lock.json`.

@@ -11,7 +11,7 @@ Entender cómo GitHub obtiene el código, instala exactamente las dependencias b
 3. `permissions: contents: read` limita el token automático del flujo a leer el repositorio; este build no necesita escribir en GitHub.
 4. `jobs.build` ejecuta un trabajo aislado en una máquina administrada por GitHub con Linux.
 5. `actions/checkout` descarga la revisión que GitHub debe compilar.
-6. `actions/setup-node` instala Node.js 22, que cumple el requisito definido en `package.json`, y reutiliza la caché de npm basada en `package-lock.json`.
+6. `actions/setup-node` instala cada versión LTS admitida (22, 24 y 26) según la matriz, y reutiliza la caché de npm basada en `package-lock.json`.
 7. `npm ci` instala las versiones bloqueadas y falla si el manifiesto y el lockfile no coinciden.
 8. `npm run build` compila el frontend para producción. Si el comando falla, el pull request mostrará el paso rojo y su log.
 
@@ -21,7 +21,7 @@ El workflow actual verifica la instalación y el build. Todavía no existen prue
 
 1. Abre `.github/workflows/ci.yml` y señala qué evento ejecutaría el flujo ante un pull request.
 2. Explica por qué el job usa `npm ci` en lugar de cambiar automáticamente las versiones instaladas.
-3. Comprueba el rango de Node.js en `package.json` y relaciónalo con `node-version: 22`.
+3. Comprueba las series LTS admitidas en `package.json` y relaciónalas con `matrix.node-version`.
 4. Cuando el repositorio esté publicado, crea una rama para un cambio pequeño de documentación y abre un pull request. Mira **Actions → Production build** y localiza cada comando en su log.
 5. Si el build falla, identifica el primer paso rojo y relaciona el mensaje con el cambio; corrige el problema en la misma rama y actualiza el pull request.
 
