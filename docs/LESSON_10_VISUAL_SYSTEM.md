@@ -63,6 +63,10 @@ La tienda y `/cuidados.html` se revisaron en anchos CSS de 280, 320, 360, 390, 4
 
 Esa interacción encontró un caso real: el aviso flotante de confirmación tenía `z-index: 55` y se pintaba encima del carrito (`z-index: 50`), tapando parte del botón de consulta. En `src/styles.css`, el aviso ahora usa `z-index: 45`; el diálogo queda por delante y el aviso ya no intercepta ni cubre la acción. La región `contact-card__ornament` puede salir parcialmente de la pantalla en móvil, pero la tarjeta la recorta intencionalmente con `overflow: hidden`.
 
+En una revisión de la vista pública del 25 de noviembre de 2026 amplié las pruebas a proporciones representativas: 240×320, 280×568, 320×480, 390×844, 568×320, 812×375, 768×1024, 1024×600, 1366×768 y 1920×480. La portada y `/cuidados.html` no tuvieron desplazamiento horizontal; los encabezados quedaron dentro de sus cajas, los centros de los controles visibles no estaban cubiertos y las imágenes cargaron. Con el carrito abierto, el botón de WhatsApp permaneció completamente visible y clickeable en 280×568, 320×480, 390×844, 568×320 y 768×1024.
+
+La revisión de 240 px sí encontró que los nombres largos de Venus salían de sus tarjetas con la cuadrícula de dos columnas. Añadí una sola columna hasta 315 px y repetí la comprobación: los títulos entraron y la página siguió sin desbordarse. Esta lista sirve como muestreo de anchos y alturas reales; no implica que se haya revisado cada combinación de dispositivo posible.
+
 Para repetir la revisión, abre DevTools, activa la emulación de dispositivo y cambia el ancho del viewport, no el zoom del navegador. Revisa ambas páginas, el título, la franja superior, las tarjetas, el pie y los estados abiertos del carrito y la cuenta. Compara `document.documentElement.scrollWidth` con `document.documentElement.clientWidth`; `window.innerWidth` también incluye el espacio de la barra de desplazamiento en escritorio. Confirma visualmente los elementos interactivos: la igualdad de los anchos por sí sola no detecta texto recortado dentro de un componente.
 
 ## Práctica para repetir

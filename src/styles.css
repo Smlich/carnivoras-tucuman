@@ -612,6 +612,10 @@ h1, h2 { font-family: var(--heading); font-weight: 400; letter-spacing: .025em; 
   .account-menu__trigger, .cart-trigger { padding-inline: 6px; }
 }
 
+@media (max-width: 315px) {
+  .product-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
