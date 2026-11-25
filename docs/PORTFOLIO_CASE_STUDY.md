@@ -34,7 +34,7 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 | Interfaz | React, Vite, JSX y CSS | Funciona localmente; build de producción exitoso. |
 | API | Node.js, Express 5, Zod y Helmet | API de salud y catálogo responde en desarrollo. |
 | Datos | MongoDB Atlas, Mongoose | Clúster Free conectado en AWS São Paulo; ocho productos sembrados; la API confirma `meta.source: mongodb`. |
-| Autenticación | Better Auth, Google y Facebook | Adaptador conectado a Atlas; la consola de Google exige activar 2SV antes de crear las apps. No hay credenciales ni sesiones OAuth reales verificadas. |
+| Autenticación | Better Auth, Google y Facebook | Adaptador conectado a Atlas; acceso a Google Auth Platform habilitado y selección del proyecto `Carnívoras Tucumán` en curso. Aún no hay credenciales ni sesiones OAuth reales verificadas. |
 | Pedido | localStorage y enlace WhatsApp | Genera una consulta; no registra una orden ni procesa pagos. |
 | Calidad | documentación, ADR, plan de aprendizaje, Node test runner y CI en GitHub Actions | Suite automatizada para configuración, perfil de Facebook, estado OAuth y contratos de lectura del catálogo demo; CI ejecuta pruebas y build. Faltan integración de consultas MongoDB, sesiones OAuth reales, pruebas de compra y auditoría integral. |
 

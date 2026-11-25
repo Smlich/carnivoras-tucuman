@@ -13,7 +13,7 @@ Esta lección crea credenciales de desarrollo. No publica la aplicación ni habi
 - `.env` debe estar en la raíz del repo. Nunca escribas credenciales dentro de `src`, variables `VITE_*`, capturas públicas o GitHub.
 - No compartas el contenido de `.env` por chat. Para pedir ayuda, comparte el nombre de la variable y el mensaje saneado, nunca su valor.
 
-**Acceso a Google Cloud:** en la sesión de configuración del 25 de noviembre de 2026, Google bloqueó la consola de autenticación hasta que la persona titular active la verificación en dos pasos (2SV) de su cuenta. Si ves ese aviso, completa la activación directamente con tu dispositivo y vuelve a la consola; no envíes códigos ni contraseñas por chat. No se creó una aplicación ni se generaron claves durante ese bloqueo. Consulta el [requisito de MFA de Google Cloud](https://cloud.google.com/docs/authentication/external/mfa-requirement).
+**Estado de acceso (25 de noviembre de 2026):** la titular confirmó que completó la verificación en dos pasos (2SV) y ya puede abrir Google Auth Platform. El paso actual es elegir el proyecto de Google Cloud `Carnívoras Tucumán`; si no aparece, crea uno con ese nombre. Este proyecto es independiente de MongoDB Atlas y no requiere habilitar facturación. Todavía no se creó un cliente OAuth ni se generaron credenciales. No envíes códigos ni contraseñas por chat. Consulta el [requisito de MFA de Google Cloud](https://cloud.google.com/docs/authentication/external/mfa-requirement).
 
 El callback local actual es:
 

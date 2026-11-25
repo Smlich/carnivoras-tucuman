@@ -85,7 +85,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado parcial:** Better Auth está integrado con Atlas y el menú React aparecerá al configurar al menos un proveedor. **Pendiente:** crear las aplicaciones OAuth, guardar IDs y secretos localmente y completar un inicio de sesión real de Google y otro de Facebook.
 
-**Bloqueo actual (25 de noviembre de 2026):** Google Cloud no deja abrir la consola de autenticación de la cuenta elegida hasta que se active la verificación en dos pasos (2SV). La persona titular debe completar esa configuración desde el navegador; no se creó ninguna app ni se generaron claves OAuth. No compartas códigos ni contraseñas por chat. Seguiremos usando solo opciones gratuitas y no habilitaremos facturación ni servicios pagos para esta etapa.
+**Actualización (25 de noviembre de 2026):** la titular confirmó que completó la verificación en dos pasos (2SV) y llegó al selector de proyectos de Google Cloud. El siguiente paso es seleccionar o crear `Carnívoras Tucumán`; este proyecto de Google Cloud es independiente de Atlas y no requiere facturación. Todavía no se creó una app ni se generaron claves OAuth. Seguiremos usando solo opciones gratuitas y no habilitaremos servicios pagos para esta etapa.
 
 **Lección:** recorre [OAuth, sesiones y secretos](LESSON_03_OAUTH_AND_SECRETS.md) antes de configurar proveedores reales. La lectura enseña el flujo sin necesitar compartir credenciales.
 
