@@ -56,6 +56,25 @@ Registra una línea por publicación, sin nombres ni datos personales de quienes
 
 Después de cuatro semanas, conserva los temas que generaron visitas, guardados, respuestas o consultas útiles. Compara el resultado con el objetivo del negocio, no solo con los “me gusta”.
 
+## Etiquetar enlaces de redes
+
+Cuando exista un dominio público y una herramienta de medición aprobada, agrega UTM solo a los enlaces que salen de Instagram o Facebook hacia la web. Usa nombres cortos, en minúscula y consistentes para que los informes no dividan una misma campaña en variantes distintas:
+
+- `utm_source`: `instagram` o `facebook`.
+- `utm_medium`: `organic_social` para publicaciones sin pauta.
+- `utm_campaign`: nombre del período o campaña, por ejemplo `primer_mes_YYYY_MM`.
+- `utm_content`: pieza concreta, por ejemplo `semana1_combo` o `semana2_carrusel`.
+
+Ejemplo de una historia de Instagram dirigida al catálogo:
+
+```text
+https://www.ejemplo.com/?utm_source=instagram&utm_medium=organic_social&utm_campaign=primer_mes_YYYY_MM&utm_content=semana1_combo#catalogo
+```
+
+No uses UTM en enlaces internos; cuando se defina la URL canónica, mantenla limpia y sin parámetros. No incluyas nombres, teléfonos, mensajes, datos de pedidos ni otra información de clientes en una URL. Los parámetros identifican la campaña; para verlos en un informe hace falta configurar una herramienta de analítica. Antes de añadir esa herramienta, define la política de privacidad y revisa qué datos recopila.
+
+Usa la [documentación oficial del generador de URL de Google Analytics](https://support.google.com/analytics/answer/10917952) para revisar los campos y mantener la nomenclatura consistente. Si todavía no hay analítica aprobada, registra únicamente las métricas agregadas disponibles en Instagram, Facebook y el canal de consultas.
+
 ## Descubrimiento local
 
 Evalúa una ficha de Google Business Profile solo si el negocio cumple sus reglas de elegibilidad: Google pide que los negocios elegibles tengan contacto presencial con clientes durante el horario indicado. Antes de crearla, confirma si hay retiro o atención presencial y qué dirección puede publicarse. Mantén nombre, teléfono, horarios y enlaces iguales en la web y perfiles. Consulta la [elegibilidad oficial](https://support.google.com/business/answer/13763036) y la guía de Google para [establecer los datos del negocio](https://developers.google.com/search/docs/appearance/establish-business-details).
