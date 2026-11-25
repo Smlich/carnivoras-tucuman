@@ -6,10 +6,10 @@ Los nombres, formatos y valores siguientes se transcribieron de las publicacione
 | --- | --- | ---: |
 | Combo inicial de tres carnívoras distintas | Venus + Drosera + Sarracenia, pequeñas | $13.000 |
 | Sarracenia pequeña | Maceta n.º 6 | $4.000 |
-| Drosera capensis | Precio por unidad | $5.000 |
+| Drosera capensis | Maceta n.º 6 · precio por unidad | $5.000 |
 | Promo de dos Droseras capensis | Dos plantas | $7.000 |
 | Venus atrapamoscas pequeña | Maceta n.º 6 | $6.000 |
-| Venus atrapamoscas mediana | Maceta n.º 8 | $10.000 |
+| Venus atrapamoscas mediana | Maceta n.º 6 | $10.000 |
 | Venus Red Piranha | Maceta n.º 8 + Drosera de regalo | $25.000 |
 | Venus Bohemian Garnet | Maceta n.º 8 + Drosera de regalo | $25.000 |
 
