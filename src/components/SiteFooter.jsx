@@ -22,6 +22,11 @@ export default function SiteFooter() {
           {socialLinks.map((item) => <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>)}
         </div>
       </div>
+      <section className="page-shell site-footer__seals" aria-label="Sellos de origen y autoría">
+        <img className="site-footer__seal" src="/images/brand/hecho-en-argentina.svg" alt="Hecho en Argentina" width="270" height="102" loading="lazy" />
+        <img className="site-footer__seal" src="/images/brand/codeado-en-argentina.svg" alt="Codeado en Argentina" width="270" height="102" loading="lazy" />
+        <img className="site-footer__seal" src="/images/brand/smlich-soluciones.svg" alt="SMlich Soluciones" width="270" height="102" loading="lazy" />
+      </section>
       <div className="page-shell site-footer__bottom">
         <span>© {new Date().getFullYear()} {store.name}</span>
         <span>Fotos reales del catálogo del vivero.</span>

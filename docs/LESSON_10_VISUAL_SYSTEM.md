@@ -10,6 +10,8 @@ La tienda usa fotos reales de las plantas del negocio. No reemplaces una planta 
 
 La identidad visual mezcla verde botánico y fondos cálidos con una energía inspirada en anime y lettering. Las fuentes con más personalidad aparecen en títulos y acentos cortos; las descripciones, las preguntas frecuentes y los controles usan una fuente fácil de leer.
 
+El pie suma tres sellos SVG: origen argentino, código argentino y la identidad de programación SMlich Soluciones. El último combina un monograma angular y detalles helados originales. Está pensado como una firma secundaria y no reemplaza la marca principal del vivero.
+
 ## Paso 1: declarar los valores de la marca
 
 Abre `src/styles.css` y mira el bloque `:root`. Las variables CSS guardan colores y familias tipográficas una sola vez:
@@ -51,6 +53,7 @@ Los botones primarios, los filtros seleccionados y las etiquetas de producto reu
 2. Abre la tienda y `/cuidados.html` en escritorio y una pantalla angosta.
 3. Confirma que las palabras destacadas no se salen de los títulos, los párrafos siguen siendo cómodos de leer y los controles de teclado muestran el borde de foco.
 4. Si cambias una imagen, compara el resultado con el archivo original y conserva la foto real como fuente.
+5. Ajusta temporalmente el ancho a 320 px y confirma que los tres sellos se apilen, que sus textos se mantengan legibles y que la página no tenga desplazamiento horizontal.
 
 En este entorno, la compilación se verificó con `node node_modules/vite/bin/vite.js build` porque el comando `npm` aún no está disponible en la terminal. La compilación de Vite es la comprobación de que el HTML, CSS y JavaScript se pueden preparar para producción; no reemplaza la revisión visual del navegador.
 
@@ -66,6 +69,7 @@ En este entorno, la compilación se verificó con `node node_modules/vite/bin/vi
 - ¿Por qué dejamos DM Sans para los párrafos aunque Bangers dé más personalidad?
 - ¿Qué ventaja tiene `var(--color-orange)` frente a repetir `#ed5736` en veinte selectores?
 - ¿Cómo confirmas que las fotos del catálogo siguen mostrando plantas reales?
+- ¿Qué información comunica cada sello y por qué SMlich aparece como marca secundaria?
 
 ## Referencias
 

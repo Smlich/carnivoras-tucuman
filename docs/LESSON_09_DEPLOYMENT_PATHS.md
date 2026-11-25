@@ -17,15 +17,16 @@ En esa variante, React usa el catálogo local de `src/data/products.js` y no con
 
 ### Publicar la vista previa
 
-La versión de revisión está disponible en [Carnívoras Tucumán en Netlify](https://carnivorastucuman.netlify.app/). El código está versionado en [GitHub](https://github.com/Smlich/carnivoras-tucuman), pero el proyecto Netlify se creó con una carga manual desde `dist` y aún no está conectado al repositorio. La ruta `/cuidados.html` también está publicada. Esta URL es una vista de prueba: muestra el aviso de confirmación por WhatsApp y no activa API, Atlas ni autenticación social.
+La vista de prueba está en [Carnívoras Tucumán en Netlify](https://carnivorastucuman.netlify.app/) y el código en [GitHub](https://github.com/Smlich/carnivoras-tucuman). Netlify ya está conectado a `Smlich/carnivoras-tucuman`, rama `main`; al subir cambios allí, Netlify ejecuta `npm run build` y publica `dist`. La ruta `/cuidados.html` también se publica. Esta URL de prueba usa catálogo local, muestra el aviso de confirmación por WhatsApp y no activa API, Atlas ni autenticación social.
 
-**Estado observado el 25 de noviembre de 2026:** la URL responde con HTTP 200, pero sigue mostrando los metadatos y estilos de la entrega anterior al rediseño. El código nuevo sí está en GitHub y pasó el build local y CI; el sitio solo podrá reflejarlo después de conectar Netlify o publicar la carpeta `dist`. Al abrir el panel, Netlify pidió iniciar sesión; completa el acceso desde la pestaña abierta y luego se puede continuar con el vínculo.
+### Revisar un deploy nuevo
 
-1. En Netlify, importa el repositorio GitHub existente y conserva el directorio raíz.
-2. Autoriza la integración de Netlify con GitHub y selecciona `Smlich/carnivoras-tucuman`.
-3. Revisa que el build use `npm run build`, la carpeta `dist` y Node 24; `netlify.toml` ya define esos valores.
-4. Espera el resultado del build y abre la URL de despliegue.
-5. Recorre portada, `/cuidados.html`, catálogo, filtros y enlaces. No confirmes ni envíes un pedido durante la revisión.
+1. Comprueba que el cambio esté en la rama `main`.
+2. En Netlify, abre el proyecto `carnivorastucuman` y confirma que el último deploy indique **Published** y el commit esperado.
+3. Abre la URL pública y recorre portada, `/cuidados.html`, catálogo, filtros, redes y pie de página.
+4. Revisa el diseño en pantallas angostas y escritorio. No confirmes ni envíes un pedido durante la revisión.
+
+La primera vinculación de Netlify a GitHub ya se completó. Si Netlify pierde acceso al repositorio, revisa la instalación de la aplicación Netlify dentro de la cuenta/organización de GitHub; no cargues credenciales en el repositorio. Para publicar manualmente una revisión solo si se rompe la integración, construye `dist` y usa la carga de deploys de Netlify.
 
 Netlify crea deploys de prueba por rama o pull request cuando el repositorio queda conectado. Trata la URL de prueba como pública: no la anuncies como catálogo vigente hasta verificar precios, stock, entrega y derechos de las fotos.
 
@@ -75,7 +76,7 @@ CORS_ORIGINS=https://<dominio-final>
 
 ## Lo que este plan no activa
 
-La vista previa de Netlify no es una API MERN ni prueba OAuth; sirve para revisión visual y de contenido. La aplicación completa podrá desplegarse cuando haya presupuesto para el hosting y estén preparados dominio y ambas aplicaciones sociales. El código y CI están en GitHub; el deploy de prueba se actualiza manualmente hasta conectar Netlify con ese repositorio.
+La vista previa de Netlify no es una API MERN ni prueba OAuth; sirve para revisión visual y de contenido. La aplicación completa podrá desplegarse cuando haya presupuesto para el hosting y estén preparados dominio y ambas aplicaciones sociales. El código y CI están en GitHub y Netlify publica la rama `main` automáticamente.
 
 ## Fuentes oficiales
 

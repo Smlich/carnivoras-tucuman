@@ -1,6 +1,6 @@
 # Caso de estudio para portafolio
 
-> Borrador basado en el estado actual. La vista estática está publicada en Netlify, aunque el sitio público todavía muestra una entrega anterior al rediseño. La aplicación MERN de producción y los inicios OAuth aún no están desplegados ni verificados.
+> Borrador basado en el estado actual. La vista estática de Netlify se actualiza desde `main`. La aplicación MERN de producción y los inicios OAuth aún no están desplegados ni verificados.
 
 ## Carnívoras Tucumán — tienda web full stack en evolución
 
@@ -19,6 +19,7 @@ Una tienda en español para explorar productos, buscar por especie, filtrar cate
 - **Rendimiento sin perder trazabilidad:** los originales se conservan; Sharp genera variantes adaptables de 480 y 960 píxeles y `CatalogImage` entrega una por imagen con `<picture>` y `srcset`. PNG se sirve como WebP, JPEG permanece JPEG y los logos se optimizan sin pérdida. La suma de la variante mayor de cada asset bajó de 11.1 MiB a 2.1 MiB (80.7% menos); es una comparación agregada de archivos, no una medición del tiempo de carga real.
 - **Carga de código bajo demanda:** React `lazy` y `Suspense` separan el panel de Better Auth. Solo se solicita cuando hay un proveedor social habilitado y la persona abre el menú de cuenta. En la compilación actual, el chunk inicial es 469.12 kB (139.42 kB gzip) y el panel pesa 33.82 kB (12.58 kB gzip); esas cifras describen archivos, no una medición de rendimiento en el navegador.
 - **Publicación por etapas:** la vista estática de revisión está disponible en [Netlify](https://carnivorastucuman.netlify.app/) sin secretos; Hostinger queda aplazado hasta contar con presupuesto. La aplicación MERN completa aún no está desplegada.
+- **Identidad secundaria:** el pie usa sellos SVG propios de origen argentino, desarrollo argentino y SMlich Soluciones, con diseño accesible y adaptable. La marca del vivero sigue siendo la principal.
 - **Carrito sin promesa de compra:** el navegador recuerda la selección y genera una consulta; no cobra, reserva stock ni crea pedidos en servidor. El precio debe recalcularse en el backend antes de incorporar pagos.
 - **Separación de secretos:** React no recibe credenciales OAuth ni la URI de Atlas. Express valida el entorno y Better Auth gestiona las sesiones cuando la base y los proveedores estén configurados.
 - **Datos verificables:** Zod valida filtros de API, Mongoose define restricciones del producto y el seed hace upsert por slug sin borrar otros documentos.
@@ -59,7 +60,7 @@ Adapta este guion con tus propias palabras después de recorrer [la lección del
 - Probar inicios de sesión reales en Google y Facebook y documentar callbacks correctos.
 - Confirmar precios, stock, entrega y derechos de uso de las fotos con el negocio.
 - Definir privacidad, condiciones de venta, dominio y alojamiento.
-- Conectar el repositorio al deploy para automatizar la publicación de la vista previa.
+- Comprobar que cada cambio en `main` genere un deploy exitoso en Netlify y documentar el historial reciente.
 - Añadir la cobertura automatizada prevista y un ciclo completo de pedido cuando se definan reglas de venta.
 
 ## Enlaces internos

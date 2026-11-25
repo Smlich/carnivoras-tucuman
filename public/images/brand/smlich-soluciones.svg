@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="270" height="102" viewBox="0 0 270 102" role="img" aria-labelledby="title description">
+  <title id="title">SMlich Soluciones</title>
+  <desc id="description">Identidad original de fantasía helada con una corona de hielo y un monograma angular SM.</desc>
+  <defs>
+    <linearGradient id="ice" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4ffff" />
+      <stop offset=".48" stop-color="#80ddff" />
+      <stop offset="1" stop-color="#748fe9" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="266" height="98" rx="22" fill="#101a2b" stroke="#78c8f2" stroke-opacity=".78" stroke-width="2" />
+  <path d="m51 10 8 12 12-9-3 17 13-5-8 15v40L52 94 31 80V40l-8-15 14 5-3-17 12 9z" fill="#16263d" stroke="url(#ice)" stroke-linejoin="round" stroke-width="2" />
+  <path d="m28 27 12 8 12-20 9 20 12-8-5 16H33z" fill="url(#ice)" stroke="#d8f7ff" stroke-linejoin="round" stroke-width="1" />
+  <path d="M61 44H43l-5 6 5 6h16l4 4v3l-5 5H39l-5 8h23l12-10V56l-6-6H47M69 78V44l9 12 9-12v34h-8V63l-1 1-1-1v15" fill="none" stroke="url(#ice)" stroke-linecap="square" stroke-linejoin="miter" stroke-width="4" />
+  <path d="m30 47-4 3 4 3M74 30l3-5M44 84l8 5 8-5" fill="none" stroke="#d2f46a" stroke-linecap="round" stroke-width="1.5" />
+  <text x="101" y="59" fill="#f5fbff" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-weight="700" letter-spacing="-.7"><tspan fill="#89dcff">SM</tspan>lich</text>
+  <path d="M103 68h137" stroke="#78c8f2" stroke-opacity=".55" stroke-width="1" />
+  <text x="104" y="84" fill="#c6d8ea" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="3.1">SOLUCIONES</text>
+</svg>

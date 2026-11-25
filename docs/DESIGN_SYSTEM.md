@@ -40,3 +40,9 @@ El catálogo usa fotos reales provistas por el negocio para que las plantas ofre
 - Mantén el contenido largo en DM Sans y comprueba los estados de foco y hover.
 - Aplica el mismo vocabulario visual a `/cuidados.html` desde `src/care-page.css`.
 - Revisa diseños móviles: no reduzcas texto largo ni escondas información esencial.
+
+## Sellos de pie de página
+
+El pie comparte tres gráficos SVG hechos para el proyecto: “Hecho en Argentina”, “Codeado en Argentina” y el logo “SMlich Soluciones”. Son secundarios frente al logo del vivero y conservan contraste sobre el fondo verde. El sello argentino combina la bandera celeste y blanca; el de programación usa los signos `</>`; SMlich usa un monograma angular de hielo y una corona original. La referencia de fantasía inspira el clima del dibujo, pero el sello no reproduce logotipos, personajes ni emblemas de otras franquicias.
+
+Los archivos viven en `public/images/brand/` y se usan tanto en el pie React como en `/cuidados.html`. Se mantienen como SVG para que el dibujo siga nítido y ligero en móvil y escritorio. En el pie se muestran en tres columnas en pantallas amplias y en una columna hasta 600 px; cada imagen tiene texto alternativo.

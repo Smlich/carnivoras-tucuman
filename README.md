@@ -12,6 +12,7 @@ Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/
 - Pedido enviado a WhatsApp para confirmar precio, disponibilidad y entrega.
 - Diseño adaptable, navegación por teclado y metadatos básicos.
 - Sistema visual juvenil y legible: titulares tipo cómic, acentos lettering y paleta botánica viva documentados en [el sistema visual](docs/DESIGN_SYSTEM.md).
+- Tres sellos originales en el pie: Hecho en Argentina, Codeado en Argentina y SMlich Soluciones; el logo del área de programación es una identidad secundaria.
 - Guía educativa en `/cuidados.html`, con contenido HTML indexable y fuentes botánicas enlazadas.
 - En producción, Express sirve el frontend compilado y la API bajo el mismo origen; `npm start` inicia el servidor.
 - API Express de solo lectura para catálogo y salud del servicio.
@@ -69,7 +70,7 @@ Usa [el caso de estudio](docs/PORTFOLIO_CASE_STUDY.md) para presentar la arquite
 
 ## Publicación por etapas
 
-La vista previa estática responde en [Netlify](https://carnivorastucuman.netlify.app/) con catálogo local y la guía `/cuidados.html`, pero todavía muestra la entrega anterior al rediseño. El último código vive en GitHub; Netlify sigue desconectado y necesita una sesión para vincularse o recibir una publicación manual. No representa la API MERN ni verifica OAuth. Por ahora Hostinger está aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica qué hace falta para cada etapa.
+La vista previa estática se publica desde `main` mediante la integración de GitHub con [Netlify](https://carnivorastucuman.netlify.app/), con catálogo local, fotos reales y la guía `/cuidados.html`. No representa la API MERN ni verifica OAuth. Hostinger queda aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica el despliegue de cada etapa.
 
 ## Próximos hitos
 

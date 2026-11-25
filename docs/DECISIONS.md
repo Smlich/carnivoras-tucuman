@@ -55,3 +55,11 @@
 **Motivo:** darle a la tienda una personalidad joven inspirada en anime y grafiti sin quitar claridad al catálogo ni confianza a la marca.
 
 **Consecuencia:** los estilos se comparten con la guía de cuidados y quedan documentados en [el sistema visual](DESIGN_SYSTEM.md). Las fotos de las plantas siguen siendo las imágenes reales del negocio.
+
+## ADR-008 — Sellos SVG de origen y autoría
+
+**Decisión:** añadir al pie de la tienda y la guía tres SVG propios: “Hecho en Argentina”, “Codeado en Argentina” y el lockup “SMlich Soluciones”.
+
+**Motivo:** dar crédito al origen del vivero y del desarrollo, además de presentar el alias de programación sin confundirlo con la marca comercial principal.
+
+**Consecuencia:** los sellos son secundarios, accesibles mediante texto alternativo y apilados en pantallas de hasta 600 px. El monograma angular con tema helado usa una interpretación original de fantasía; no reutiliza arte ni logotipos de franquicias existentes.
