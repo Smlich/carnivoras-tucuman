@@ -34,6 +34,8 @@ Atlas requiere un usuario de base de datos y una entrada de IP permitida antes d
 4. Pega la URI en `MONGODB_URI` dentro de `.env`. Conserva el formato generado por Atlas; reemplaza el marcador de contraseña. Si la contraseña contiene símbolos reservados, codifícala para URL.
 5. No pegues la URI en esta conversación, capturas públicas, README, código del frontend ni commits.
 
+La base del proyecto se llama `carnivoras_tucuman`; `MONGODB_DATABASE` ya queda indicado en `.env.example`. Para habilitar cuentas sociales, configura también las variables de Better Auth y los proveedores siguiendo [la guía de autenticación](AUTHENTICATION.md).
+
 La URI `mongodb+srv://` es la que Atlas entrega normalmente para la conexión de una aplicación. Consulta [conectar una aplicación a un clúster](https://www.mongodb.com/docs/atlas/driver-connection/) y [conectar con el driver de Node.js](https://www.mongodb.com/docs/drivers/node/current/get-started/).
 
 ## 5. Cargar y comprobar el catálogo
@@ -49,7 +51,7 @@ npm run dev:all
 
 Si ya habías creado `.env`, no vuelvas a copiarlo encima; edítalo para evitar reemplazar tu URI.
 
-Abre `http://127.0.0.1:4000/api/health`. Una conexión correcta debe informar que la base de datos está conectada y que el catálogo usa MongoDB. La API del catálogo responde en `http://127.0.0.1:4000/api/products` y el frontend en `http://127.0.0.1:5173`.
+Abre `http://127.0.0.1:4000/api/health`. Una conexión correcta debe informar que la base de datos está conectada y que el catálogo usa MongoDB. La API del catálogo responde en `http://127.0.0.1:4000/api/products` y el frontend en `http://localhost:5173`.
 
 El script `npm run seed:products` crea o actualiza los ocho productos iniciales y es seguro volver a ejecutarlo para sincronizar esos mismos productos. Las cantidades de stock siguen siendo “consultar disponibilidad”; la carga no inventa inventario.
 

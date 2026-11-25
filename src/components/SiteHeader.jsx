@@ -1,4 +1,5 @@
 import { store } from '../config/store';
+import AccountMenu from './AccountMenu';
 
 function BagIcon() {
   return (
@@ -27,11 +28,14 @@ export default function SiteHeader({ itemCount, onOpenCart }) {
           <a href="#contacto">Contacto</a>
         </nav>
 
-        <button className="cart-trigger" type="button" onClick={onOpenCart} aria-label={'Abrir pedido, ' + itemCount + ' productos'}>
-          <BagIcon />
-          <span className="cart-trigger__label">Mi pedido</span>
-          <span className="cart-trigger__count" aria-live="polite">{itemCount}</span>
-        </button>
+        <div className="site-header__actions">
+          <AccountMenu />
+          <button className="cart-trigger" type="button" onClick={onOpenCart} aria-label={'Abrir pedido, ' + itemCount + ' productos'}>
+            <BagIcon />
+            <span className="cart-trigger__label">Mi pedido</span>
+            <span className="cart-trigger__count" aria-live="polite">{itemCount}</span>
+          </button>
+        </div>
       </div>
     </header>
   );

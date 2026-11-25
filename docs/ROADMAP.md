@@ -51,7 +51,9 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Entrega:** el cliente puede crear o recuperar su cuenta usando Google o Facebook.
 
-**Bloqueo externo:** requiere IDs/secretos OAuth, URLs definitivas y revisión de permisos de cada proveedor. Los secretos se guardan en variables de entorno y nunca en Git.
+**Estado:** Better Auth, MongoDB y las rutas Express están integrados; el menú React aparece cuando hay configuración válida. **Pendiente:** conectar Atlas, crear las aplicaciones OAuth, guardar secretos localmente y completar un inicio de sesión real de cada proveedor.
+
+**Bloqueo externo:** requiere IDs/secretos OAuth, URLs definitivas y revisión de requisitos de cada proveedor. Los secretos se guardan en variables de entorno y nunca en Git.
 
 ## Semana 5 — Gestión de venta
 

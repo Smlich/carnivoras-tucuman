@@ -8,16 +8,19 @@ Navegador
        ├── catálogo, filtros y carrito
        ├── GET /api/products mediante proxy de Vite
        ├── carrito persistido en localStorage
+       └── menú de acceso social cuando el API lo habilita
        └── enlace wa.me con resumen del pedido
 
 Vite
   └── Express
        ├── GET /api/health
        ├── GET /api/products
+       ├── GET /api/auth/status
+       ├── Better Auth → Google/Facebook → cuentas y sesiones en MongoDB
        └── Mongoose → MongoDB o catálogo de demostración durante desarrollo
 ```
 
-El navegador mantiene el carrito de este dispositivo. WhatsApp recibe un borrador del pedido; el negocio confirma stock, precio y entrega manualmente. No se reciben pagos ni se crean cuentas en esta entrega. Si MongoDB no está configurado en desarrollo, la API devuelve el catálogo local con source: demo-catalog; esa respuesta no es persistencia.
+El navegador mantiene el carrito de este dispositivo. WhatsApp recibe un borrador del pedido; el negocio confirma stock, precio y entrega manualmente. No se reciben pagos ni se crean pedidos en el servidor. El flujo social está implementado pero permanece inactivo hasta configurar Atlas y credenciales de OAuth. Si MongoDB no está configurado en desarrollo, la API devuelve el catálogo local con source: demo-catalog; esa respuesta no es persistencia.
 
 ## Arquitectura objetivo: MERN
 

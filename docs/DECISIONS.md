@@ -26,11 +26,11 @@
 
 ## ADR-004 — Acceso Google/Facebook se implementa en el backend
 
-**Decisión:** agregar OAuth real en una etapa posterior; no simular registros en el frontend.
+**Decisión:** usar Better Auth en el backend Express para el flujo OAuth de Google y Facebook; no simular registros en el frontend.
 
-**Motivo:** el servidor debe validar la identidad, mantener los secretos privados y controlar la sesión.
+**Motivo:** el servidor valida la identidad, mantiene los secretos privados y controla la sesión. Una biblioteca especializada evita escribir manualmente los detalles delicados del protocolo.
 
-**Consecuencia:** las cuentas de cliente aún no están activas. El requisito se considera pendiente para el lanzamiento con registro.
+**Consecuencia:** las cuentas y sesiones se almacenan en MongoDB mediante el adaptador oficial de Better Auth. Los botones se ocultan hasta que MongoDB, el secreto de sesión y al menos un proveedor estén configurados.
 
 ## ADR-005 — El catálogo se lee desde Express y MongoDB
 
@@ -39,3 +39,11 @@
 **Motivo:** separar interfaz y datos ahora facilita aprender API REST y añadir persistencia sin exponer la base al navegador.
 
 **Consecuencia:** en desarrollo sin MongoDB, Express sirve el catálogo de demostración y el endpoint de salud lo identifica. En producción, la API requiere MongoDB. No hay rutas para editar productos ni guardar pedidos hasta implementar autorización y reglas de venta.
+
+## ADR-006 — Compartir Atlas entre productos y autenticación
+
+**Decisión:** usar una sola base MongoDB para productos Mongoose y las colecciones de autenticación de Better Auth, con `MONGODB_DATABASE` explícito.
+
+**Motivo:** conservar MERN, evitar una segunda base y mantener las cuentas, identidades OAuth y sesiones en el servidor.
+
+**Consecuencia:** Better Auth usa el driver nativo de MongoDB a través del mismo cliente conectado por Mongoose. Los tokens OAuth se cifran antes de guardarse; el inicio de sesión nunca habilita permisos administrativos por sí solo.

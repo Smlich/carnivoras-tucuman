@@ -105,6 +105,8 @@ img { display: block; max-width: 100%; }
 
 .site-header__inner { display: flex; align-items: center; justify-content: space-between; min-height: 82px; gap: 24px; }
 
+.site-header__actions { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+
 .brand, .footer-brand { display: inline-flex; align-items: center; text-decoration: none; }
 
 .brand { gap: 10px; min-width: 215px; }
@@ -139,6 +141,52 @@ img { display: block; max-width: 100%; }
 }
 
 .cart-trigger:hover { border-color: #9ba995; background: #ecefe7; }
+
+.account-menu { position: relative; }
+
+.account-menu__trigger {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid #d3dbd0;
+  border-radius: 999px;
+  color: var(--color-ink);
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  list-style: none;
+}
+
+.account-menu__trigger::-webkit-details-marker { display: none; }
+.account-menu__trigger:hover, .account-menu[open] .account-menu__trigger { border-color: #9ba995; background: #ecefe7; }
+.account-menu__trigger:focus-visible, .account-menu__provider:focus-visible, .account-menu__secondary:focus-visible { outline: 3px solid rgba(83, 118, 76, .3); outline-offset: 2px; }
+.account-icon { width: 18px; height: 18px; }
+
+.account-menu__panel {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(276px, calc(100vw - 28px));
+  padding: 20px;
+  border: 1px solid #e2e6dd;
+  border-radius: 8px;
+  background: #fffefa;
+  box-shadow: 0 18px 42px rgba(26, 52, 36, .16);
+}
+
+.account-menu__eyebrow { margin: 0 0 7px; color: #788875; font-size: 9px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+.account-menu__description, .account-menu__status { margin: 0 0 15px; color: #68786a; font-size: 11px; line-height: 1.6; }
+.account-menu__name { overflow: hidden; margin: 0 0 16px; color: #253d2d; font-family: var(--serif); font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu__providers { display: grid; gap: 8px; }
+.account-menu__provider, .account-menu__secondary { width: 100%; min-height: 40px; padding: 0 12px; border: 1px solid #d7dfd3; border-radius: 5px; color: #263e2f; background: #fff; cursor: pointer; font-size: 11px; font-weight: 600; transition: border-color .18s ease, background .18s ease; }
+.account-menu__provider:hover, .account-menu__secondary:hover { border-color: #9ba995; background: #f1f3ec; }
+.account-menu__provider:disabled, .account-menu__secondary:disabled { cursor: wait; opacity: .65; }
+.account-menu__secondary { color: #68786a; font-weight: 500; }
+.account-menu__error { margin: 12px 0 0; color: #a33d29; font-size: 10px; line-height: 1.5; }
 
 .bag-icon { width: 18px; height: 18px; }
 
@@ -443,6 +491,8 @@ h1, h2 { font-family: var(--serif); font-weight: 500; letter-spacing: -.045em; }
   .main-nav a { font-size: 10px; }
   .cart-trigger { gap: 5px; min-height: 38px; padding-inline: 9px; }
   .cart-trigger__label { display: none; }
+  .account-menu__trigger { min-height: 38px; padding-inline: 9px; }
+  .account-menu__label { display: none; }
   .hero { grid-template-columns: 1fr; gap: 35px; padding-block: 52px 70px; }
   .hero__copy { max-width: 570px; }
   .hero h1 { max-width: 550px; font-size: clamp(46px, 9vw, 68px); }
@@ -483,6 +533,9 @@ h1, h2 { font-family: var(--serif); font-weight: 500; letter-spacing: -.045em; }
   .cart-trigger { min-height: 35px; padding-inline: 7px; }
   .bag-icon { width: 16px; height: 16px; }
   .cart-trigger__count { width: 18px; height: 18px; font-size: 9px; }
+  .account-menu__trigger { min-height: 35px; padding-inline: 7px; }
+  .account-icon { width: 16px; height: 16px; }
+  .site-header__actions { gap: 6px; }
   .hero { padding-top: 42px; }
   .hero h1 { font-size: clamp(42px, 11vw, 54px); }
   .hero__actions { gap: 15px; }

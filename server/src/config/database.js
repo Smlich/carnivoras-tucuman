@@ -10,6 +10,7 @@ export async function connectDatabase() {
   }
 
   await mongoose.connect(env.MONGODB_URI, {
+    dbName: env.MONGODB_DATABASE,
     serverSelectionTimeoutMS: 5000,
   });
 

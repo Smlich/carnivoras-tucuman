@@ -11,6 +11,7 @@ Tienda web de plantas carnívoras de Tucumán. Este repositorio es también una 
 - Diseño adaptable, navegación por teclado y metadatos básicos.
 - API Express de solo lectura para catálogo y salud del servicio.
 - Esquema Mongoose y script de carga inicial preparados para MongoDB.
+- Flujo de cuentas preparado con Better Auth para Google y Facebook; se activa al configurar Atlas y las credenciales OAuth.
 
 Los productos y valores del catálogo se transcribieron de las publicaciones compartidas el 25 de noviembre de 2026. El stock se confirma por WhatsApp. Actualiza los datos antes de anunciar la web como catálogo vigente.
 
@@ -21,7 +22,7 @@ Requisitos: Node.js 20.19+ o 22.12+ y npm.
 1. Abre una terminal en esta carpeta.
 2. Ejecuta `npm install`.
 3. Ejecuta `npm run dev:all` para iniciar web y API en dos procesos.
-4. Abre `http://127.0.0.1:5173`.
+4. Abre `http://localhost:5173`.
 
 También puedes usar `npm run dev` para trabajar solo en el frontend.
 
@@ -46,13 +47,13 @@ Para generar la versión de producción, ejecuta `npm run build`; la carpeta `di
 - `src/hooks/use-cart.js`: estado y persistencia del carrito.
 - `src/utils`: formato de precios y construcción del pedido para WhatsApp.
 - `src/services`: comunicación entre React y la API.
-- `server/src`: API Express, configuración, esquema Mongo y lectura del catálogo.
+- `server/src`: API Express, configuración, esquema Mongo, lectura del catálogo y autenticación.
 - `docs`: arquitectura, decisiones, cronograma y registro de aprendizaje.
 - `public/images/catalog`: archivos originales compartidos por el negocio.
 
 ## Próximos hitos
 
-Lee `docs/ROADMAP.md` y `docs/API.md`. El inicio de sesión con Google y Facebook es un requisito antes de publicar cuentas de clientes: se integrará en una etapa backend cuando existan credenciales OAuth. Todavía no hay registro ni escritura de pedidos en la API.
+Lee `docs/ROADMAP.md`, `docs/API.md` y [la guía de autenticación](docs/AUTHENTICATION.md). Los botones de cuenta aparecen cuando Atlas y al menos un proveedor están configurados. El flujo está preparado, pero todavía no se ha conectado a credenciales reales ni verificado con cuentas de Google o Facebook. No hay escritura de pedidos en la API.
 
 ## Datos que faltan antes del lanzamiento
 
@@ -69,4 +70,6 @@ Lee `docs/ROADMAP.md` y `docs/API.md`. El inicio de sesión con Google y Faceboo
 - [Express: Installing](https://expressjs.com/en/starter/installing/)
 - [MongoDB Node.js Driver](https://www.mongodb.com/docs/drivers/node/current/)
 - [Mongoose](https://mongoosejs.com/docs/)
+- [Better Auth: Express](https://better-auth.com/docs/integrations/express)
+- [Better Auth: MongoDB](https://better-auth.com/docs/adapters/mongo)
 - [Google Search Central: datos estructurados de productos](https://developers.google.com/search/docs/appearance/structured-data/product)

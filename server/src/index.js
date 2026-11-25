@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { app } from './app.js';
+import { createApp } from './app.js';
+import { createAuth } from './auth/create-auth.js';
 import { connectDatabase } from './config/database.js';
 import { env } from './config/env.js';
 
@@ -11,6 +12,18 @@ async function startServer() {
   if (!databaseConnected) {
     console.warn('MongoDB no está configurado. La API usa el catálogo de demostración y no persiste cambios.');
   }
+
+  const authConfig = databaseConnected ? createAuth() : null;
+  if (!authConfig) {
+    console.info('Autenticación social pendiente de MongoDB Atlas y credenciales OAuth.');
+  } else {
+    console.info('Proveedores sociales disponibles:', authConfig.providers.join(', '));
+  }
+
+  const app = createApp({
+    auth: authConfig?.instance,
+    authProviders: authConfig?.providers ?? [],
+  });
 
   server = app.listen(env.PORT, () => {
     console.log('API disponible en http://127.0.0.1:' + env.PORT);

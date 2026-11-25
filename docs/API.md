@@ -35,6 +35,14 @@ Cada elemento de data usa la misma forma que el catálogo de React. source ident
 
 Devuelve un producto publicado o un 404 PRODUCT_NOT_FOUND.
 
+### GET /api/auth/status
+
+Indica si la autenticación está disponible y devuelve los nombres públicos de los proveedores configurados. No expone IDs ni secretos. Si `enabled` es `false`, el menú de registro se oculta.
+
+### Rutas de Better Auth
+
+Cuando Atlas, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` y al menos un proveedor estén configurados, Better Auth atiende el flujo social bajo `/api/auth/*`. Express monta su handler antes del parser JSON, y React usa el cliente oficial de Better Auth para consultar sesión, registrarse/iniciar sesión y cerrar sesión.
+
 ## Validación y errores
 
 Los filtros se validan con Zod. La API responde JSON con un código estable y un mensaje legible; las trazas internas no se envían al navegador en producción. Helmet agrega cabeceras de seguridad y CORS limita los orígenes que se pueden conectar.
@@ -46,6 +54,7 @@ Después de configurar MONGODB_URI en .env, ejecuta npm run seed:products. El sc
 ## Límites actuales
 
 - La API solo permite leer catálogo y estado.
-- No hay endpoints de registro, sesión, administración ni escritura de pedidos.
+- Las rutas de autenticación no se activan hasta que MongoDB y proveedores OAuth estén configurados.
+- No hay rutas de administración ni escritura de pedidos.
 - La base MongoDB aún no está conectada en este entorno.
 - El modo de demostración existe solo para desarrollo; producción exige MONGODB_URI.
