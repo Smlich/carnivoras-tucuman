@@ -39,7 +39,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 - Añadir operaciones de lectura y administración de productos.
 - Registrar pedidos con estado y fecha, sin guardar datos de pago sensibles.
 
-**Estado:** se eligió MongoDB Atlas; el modelo de producto y la carga inicial están preparados, y la guía de conexión quedó documentada. **Pendiente:** crear el clúster y usuario de base de datos, agregar la URI de forma local, cargar el catálogo y comprobar persistencia; el modelo de pedidos se añadirá después de definir identidad y privacidad.
+**Estado:** se eligió MongoDB Atlas; el modelo de producto, la carga inicial y la guía de conexión están preparados. Recorre la [lección práctica de Atlas](LESSON_04_MONGODB_ATLAS.md). **Pendiente:** crear el clúster y usuario de base de datos, agregar la URI de forma local, cargar el catálogo y comprobar persistencia; el modelo de pedidos se añadirá después de definir identidad y privacidad.
 
 ## Semana 4 — Cuentas con Google y Facebook
 
