@@ -4,7 +4,7 @@
 
 Conectar Express a Atlas, explicar qué permite el acceso y comprobar que el catálogo que ves viene de MongoDB. La práctica usa datos de demostración del proyecto; no cargues productos reales hasta revisar precios y disponibilidad.
 
-**Resultado de esta práctica:** el entorno local ya está conectado al clúster Free `CarnivorasTucuman` en São Paulo. El seed creó ocho documentos y Express responde con `database: connected` y `meta.source: mongodb`. Repite los pasos de preparación solo para reconstruir el proyecto en otra máquina.
+**Resultado de esta práctica:** el entorno local ya está conectado al clúster Free `CarnivorasTucuman` en São Paulo. El seed creó ocho documentos y Express responde con `database: connected` y `meta.source: mongodb`. Repite los pasos de preparación solo para reconstruir el proyecto en otra máquina. La prueba de integración local también verifica salud, listado y detalle mediante consultas de solo lectura.
 
 ## Cuatro piezas distintas
 
@@ -42,6 +42,8 @@ Comprueba el recorrido:
 2. `GET http://127.0.0.1:4000/api/products` debe devolver `meta.source: mongodb` y ocho productos.
 3. La web debe seguir cargando las fotos locales del catálogo. La base guarda la ruta de imagen, no una copia de los archivos.
 4. `GET http://127.0.0.1:4000/api/auth/status` puede seguir devolviendo `enabled: false`; Atlas solo no habilita OAuth. Google/Facebook también requieren sus credenciales y el secreto de Better Auth.
+
+Para verificar ese mismo recorrido con una prueba HTTP repetible, ejecuta `npm run test:integration:mongo`. Lee `MONGODB_URI` desde `.env`, consulta el catálogo real y cierra la conexión al terminar; no crea ni actualiza documentos. Si no hay URI, la prueba queda omitida con una explicación. Ejecútala solo cuando quieras usar el Atlas de desarrollo de esta máquina.
 
 ## Cómo leer la conexión en el código
 

@@ -17,7 +17,7 @@ Entender cómo GitHub obtiene el código, instala exactamente las dependencias b
 5. `actions/checkout` descarga la revisión que GitHub debe compilar.
 6. `actions/setup-node` instala cada versión LTS admitida (22, 24 y 26) según la matriz, y reutiliza la caché de npm basada en `package-lock.json`.
 7. `npm ci` instala las versiones bloqueadas y falla si el manifiesto y el lockfile no coinciden.
-8. `npm test` valida configuración, disponibilidad de OAuth y contratos de lectura del catálogo demo, sin credenciales reales ni una conexión a Atlas.
+8. `npm test` valida configuración, disponibilidad de OAuth y contratos de lectura del catálogo demo, sin credenciales reales ni una conexión a Atlas. La comprobación opcional de Atlas usa otro comando local y no forma parte de CI.
 9. `npm run build` compila el frontend para producción. Si una prueba o el build fallan, el pull request mostrará el paso rojo y su log.
 
 El workflow verifica la instalación, las reglas de configuración, las rutas de lectura del catálogo en modo demo y el build. Estas pruebas no demuestran el inicio de sesión de Google o Facebook, no consultan MongoDB y no cubren el carrito o la accesibilidad. Recorre [la lección de pruebas de configuración](LESSON_11_API_CONFIGURATION_TESTS.md) y [la del catálogo](LESSON_12_CATALOG_API_TESTS.md) para entender el alcance.

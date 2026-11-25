@@ -44,7 +44,7 @@ Para generar la versión de producción, ejecuta `npm run build`; la carpeta `di
 
 El workflow de GitHub Actions en `.github/workflows/ci.yml` ejecuta `npm ci`, `npm test` y `npm run build` al abrir o actualizar un pull request, y al subir cambios a `main`. Las pruebas cubren configuración, disponibilidad de OAuth y lectura del catálogo demo; no hacen un inicio de sesión real ni consultan MongoDB.
 
-Ejecuta `npm test` para correr la suite de la API. Las [pruebas de configuración y OAuth](docs/LESSON_11_API_CONFIGURATION_TESTS.md) y las [pruebas del catálogo](docs/LESSON_12_CATALOG_API_TESTS.md) explican qué comprueba la suite y cuáles son sus límites.
+Ejecuta `npm test` para correr la suite de la API con datos demo. Para comprobar manualmente las rutas contra el Atlas configurado en tu `.env`, ejecuta `npm run test:integration:mongo`; esa prueba consulta salud, catálogo y detalle, pero no modifica datos y no corre en GitHub Actions. Las [pruebas de configuración y OAuth](docs/LESSON_11_API_CONFIGURATION_TESTS.md) y las [pruebas del catálogo](docs/LESSON_12_CATALOG_API_TESTS.md) explican los alcances.
 
 ## Estructura
 
