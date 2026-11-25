@@ -2,6 +2,8 @@
 
 Tienda web de plantas carnívoras de Tucumán. Este repositorio es también una ruta de aprendizaje para construir, documentar y evolucionar una aplicación MERN con prácticas profesionales.
 
+Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/carnivoras-tucuman).
+
 ## Primera entrega
 
 - Catálogo en español con fotografías reales enviadas por el negocio.

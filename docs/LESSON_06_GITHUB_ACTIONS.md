@@ -2,6 +2,8 @@
 
 La integración continua comprueba que el código compila; no publica la web. El despliegue por etapas se estudia aparte en [la lección 09](LESSON_09_DEPLOYMENT_PATHS.md).
 
+La primera ejecución de este repositorio terminó correctamente para Node 22, 24 y 26: [CI del commit f04fb7b](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45595845180).
+
 ## Objetivo
 
 Entender cómo GitHub obtiene el código, instala exactamente las dependencias bloqueadas y comprueba que el sitio todavía puede compilarse antes de integrar un cambio.

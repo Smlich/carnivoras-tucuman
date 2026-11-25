@@ -101,7 +101,7 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado parcial de rendimiento:** el catálogo genera variantes adaptables de imágenes y conserva los originales; recorre la [lección de optimización de imágenes](LESSON_05_IMAGE_OPTIMIZATION.md) y completa la medición de red en DevTools.
 
-**Estado parcial de integración continua:** `.github/workflows/ci.yml` instala con `npm ci` y construye el frontend en pull requests y cambios a `main`. El build local pasa; falta revisar la primera ejecución de GitHub Actions y las pruebas automatizadas siguen pendientes.
+**Estado parcial de integración continua:** `.github/workflows/ci.yml` instala con `npm ci` y construye el frontend en pull requests y cambios a `main`. La primera ejecución de GitHub Actions pasó para Node 22, 24 y 26 ([ejecución f04fb7b](https://github.com/Smlich/carnivoras-tucuman/actions/runs/45595845180)); las pruebas automatizadas y la integración de Netlify con el repositorio siguen pendientes.
 
 **Lección:** recorre [integración continua con GitHub Actions](LESSON_06_GITHUB_ACTIONS.md) para relacionar el YAML del workflow con cada paso de compilación.
 
