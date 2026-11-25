@@ -9,6 +9,7 @@ La meta es que las personas encuentren el vivero cuando buscan plantas carnívor
 - Texto real del negocio y de sus especies, evitando contenido genérico.
 - Fotos del catálogo real, conservadas con sus textos originales.
 - Página responsive y enlace de contacto directo.
+- Consejos iniciales de agua, luz, sustrato y reposo con enlaces a guías de la International Carnivorous Plant Society y del U.S. Botanic Garden.
 
 ## Antes de publicar
 
@@ -36,3 +37,7 @@ La primera entrega no agrega marcado Product/Offer: el catálogo no tiene URLs i
 - [Google Search Central: sistemas de ranking](https://developers.google.com/search/docs/appearance/ranking-systems-guide)
 - [Google Search Central: datos estructurados Product](https://developers.google.com/search/docs/appearance/structured-data/product)
 - [Google Search Central: datos para fichas de comerciantes](https://developers.google.com/search/docs/appearance/structured-data/merchant-listing)
+- [ICPS: guía de Dionaea muscipula](https://www.carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Dionaea_muscipula.pdf)
+- [ICPS: guía de Drosera capensis](https://www.carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Drosera_capensis.pdf)
+- [ICPS: guía de Sarracenia purpurea](https://carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Sarracenia_purpurea.pdf)
+- [U.S. Botanic Garden: cultivar plantas carnívoras](https://www.usbg.gov/gardens-plants/cultivating-carnivorous-plants)
