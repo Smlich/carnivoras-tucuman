@@ -1,0 +1,69 @@
+import { useEffect } from 'react';
+import { formatPrice } from '../utils/format-price';
+import { createWhatsAppUrl } from '../utils/whatsapp';
+
+export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, onClear }) {
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') onClose();
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  return (
+    <div className="cart-layer">
+      <button className="cart-layer__scrim" type="button" onClick={onClose} aria-label="Cerrar pedido" />
+      <aside className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+        <div className="cart-drawer__header">
+          <div><p className="eyebrow"><span className="eyebrow__line" /> Tu selección</p><h2 id="cart-title">Mi pedido</h2></div>
+          <button className="icon-button" type="button" onClick={onClose} aria-label="Cerrar pedido">×</button>
+        </div>
+
+        {items.length === 0 ? (
+          <div className="cart-empty">
+            <span className="cart-empty__icon" aria-hidden="true">✳</span>
+            <h3>Tu pedido está vacío</h3>
+            <p>Explorá el catálogo y agregá las plantas que te interesen.</p>
+            <button className="button button--dark" type="button" onClick={onClose}>Volver al catálogo</button>
+          </div>
+        ) : (
+          <>
+            <ul className="cart-items">
+              {items.map((item) => (
+                <li className="cart-item" key={item.id}>
+                  <img src={item.image} alt="" loading="lazy" />
+                  <div className="cart-item__info">
+                    <strong>{item.name}</strong>
+                    <span>{formatPrice(item.price)} cada uno</span>
+                    <div className="quantity-control" aria-label={'Cantidad de ' + item.name}>
+                      <button type="button" onClick={() => onQuantityChange(item.id, item.quantity - 1)} aria-label={'Quitar una unidad de ' + item.name}>−</button>
+                      <span aria-live="polite">{item.quantity}</span>
+                      <button type="button" onClick={() => onQuantityChange(item.id, item.quantity + 1)} aria-label={'Agregar una unidad de ' + item.name}>+</button>
+                    </div>
+                  </div>
+                  <strong className="cart-item__subtotal">{formatPrice(item.price * item.quantity)}</strong>
+                </li>
+              ))}
+            </ul>
+            <div className="cart-summary">
+              <div><span>Total de referencia</span><strong>{formatPrice(total)}</strong></div>
+              <p>El stock, el precio vigente y la entrega se confirman por WhatsApp.</p>
+              <a className="button button--dark button--full" href={createWhatsAppUrl(items)} target="_blank" rel="noreferrer">
+                Enviar consulta por WhatsApp <span aria-hidden="true">↗</span>
+              </a>
+              <button className="clear-cart" type="button" onClick={onClear}>Vaciar pedido</button>
+            </div>
+          </>
+        )}
+      </aside>
+    </div>
+  );
+}
