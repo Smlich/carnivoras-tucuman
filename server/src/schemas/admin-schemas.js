@@ -120,6 +120,8 @@ export const orderItemSchema = z.object({
 
 export const orderCreateSchema = z.object({
   customerName: z.string().trim().max(80).optional().default(''),
+  customerEmail: z.string().trim().max(160).optional().default(''),
+  googleRegistered: z.boolean().optional().default(false),
   notes: z.string().trim().max(300).optional().default(''),
   items: z.array(orderItemSchema).min(1).max(40),
   source: z.string().trim().max(40).optional().default('whatsapp-cart'),

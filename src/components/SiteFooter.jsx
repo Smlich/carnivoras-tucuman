@@ -1,3 +1,4 @@
+import { useAuth } from '../context/AuthContext';
 import { useSiteContent } from '../context/SiteContentContext';
 import CatalogImage from './CatalogImage';
 
@@ -8,10 +9,10 @@ const footerPages = [
   { label: 'Guía de cuidados', href: '/cuidados.html' },
   { label: 'Juegos gratis', href: '/juegos.html' },
   { label: 'Contacto', href: '/contacto.html' },
-  { label: 'Admin', href: '/admin.html' },
 ];
 
 export default function SiteFooter() {
+  const { isAdmin } = useAuth();
   const { settings } = useSiteContent();
 
   const socialLinks = [
@@ -31,6 +32,7 @@ export default function SiteFooter() {
           {footerPages.map((item) => (
             <a key={item.href} href={item.href}>{item.label}</a>
           ))}
+          {isAdmin && <a href="/admin.html">Admin</a>}
           {socialLinks.map((item) => (
             <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>
           ))}

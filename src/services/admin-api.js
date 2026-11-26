@@ -120,6 +120,10 @@ export async function fetchAdminOrders() {
   return requestAdminJson('/api/admin/orders');
 }
 
+export async function fetchAdminUsers() {
+  return requestAdminJson('/api/admin/users');
+}
+
 export async function updateAdminOrder(id, patch) {
   return requestAdminJson('/api/admin/orders/' + encodeURIComponent(id), { method: 'PATCH', body: patch });
 }

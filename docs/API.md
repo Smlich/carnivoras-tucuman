@@ -10,17 +10,19 @@ La misma interfaz de API (`/api/*`) funciona tanto en **Netlify live** (`netlify
 - `GET /api/gallery` — fotografías activas del álbum del vivero.
 - `GET /api/media/:key` — sirve imágenes subidas por el administrador con caché inmutable.
 - `GET /api/visits` / `POST /api/visits` (`X-Counter-Request: 1`) — contador compartido de sesiones.
-- `POST /api/orders` — registra consultas armadas en «Mi pedido» antes de abrir WhatsApp.
+- `GET /api/auth/status`, `GET /api/auth/get-session`, `GET /api/auth/google/start`, `GET /api/auth/callback/google`, `POST /api/auth/sign-out` — flujo OAuth 2.0 + PKCE con Google para clientes en Netlify Functions (en el servidor MERN lo atiende Better Auth bajo `/api/auth/*`).
+- `POST /api/orders` — registra consultas armadas en «Mi pedido» antes de abrir WhatsApp, adjuntando `customerName` y estado verificado en servidor (`googleRegistered`, `customerEmail`).
 - `GET /api/games` y `GET /api/games/:slug` — juegos desbloqueados por Google OAuth (`role: 'player'`) o sesión de Administrador (`role: 'admin'`, `isAdmin: true`, incluyendo `adminEmbedUrl` y `adminProps`).
 
 ## Endpoints de Administración (`/api/admin/*`)
 
-Todas las mutaciones exigen sesión verificada (`ct_admin_session` cookie `HttpOnly` firmada o Google allowlist en MERN) y cabecera `X-Admin-Request: 1`:
+Todas las mutaciones exigen sesión verificada (`ct_admin_session` cookie `HttpOnly` firmada o Google allowlist via `ADMIN_EMAIL` / `ADMIN_EMAILS`) y cabecera `X-Admin-Request: 1`:
 
-- `GET /api/admin/auth/session` — estado de sesión admin actual.
+- `GET /api/admin/auth/session` — estado de sesión admin actual (`?meta=1` incluye disponibilidad de configuración para `/admin.html`).
 - `POST /api/admin/auth/login` y `POST /api/admin/auth/logout` — inicio/cierre de sesión con verificación timing-safe PBKDF2/scrypt.
 - `PUT /api/admin/auth/account` — actualiza correo, nombre y contraseña de administrador.
-- `GET /api/admin/overview` — totales de visitas, productos, álbum, juegos y consultas.
+- `GET /api/admin/overview` — totales de visitas, productos, álbum, juegos, clientes registrados con Google y consultas.
+- `GET /api/admin/users` — listado de clientes registrados con Google.
 - `GET/PUT /api/admin/settings` — textos globales, hero, latitud `?`, contador desde agosto 2024, banner de aviso y redes/WhatsApp.
 - `GET/POST /api/admin/products` y `PUT/DELETE /api/admin/products/:slug` — CRUD completo de catálogo y stock.
 - `GET/POST /api/admin/gallery` y `PUT/DELETE /api/admin/gallery/:id` — CRUD de fotografías del vivero.

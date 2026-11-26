@@ -2,7 +2,7 @@ import { fromNodeHeaders } from 'better-auth/node';
 import {
   ADMIN_COOKIE_NAME,
   isAdminConfigured,
-  isAllowedAdminEmail,
+  isAdminGoogleEmail,
   parseAdminEmails,
   parseCookies,
   verifyAdminToken,
@@ -32,21 +32,24 @@ export async function resolveAdminAccess(request, { auth = null, appEnv = env } 
     }
   }
 
-  if (auth && parseAdminEmails(appEnv).length > 0) {
-    try {
-      const sessionData = await auth.api.getSession({ headers: fromNodeHeaders(request.headers) });
-      const userEmail = sessionData?.user?.email;
-      const emailVerified = sessionData?.user?.emailVerified !== false;
-      if (userEmail && emailVerified && isAllowedAdminEmail(userEmail, appEnv)) {
-        return {
-          email: userEmail.toLowerCase(),
-          name: sessionData.user.name || 'Administrador',
-          role: 'admin',
-          method: 'google',
-        };
+  if (auth) {
+    const overrideAccount = await getStoredAdminAccount();
+    if (parseAdminEmails(appEnv).length > 0 || overrideAccount?.email) {
+      try {
+        const sessionData = await auth.api.getSession({ headers: fromNodeHeaders(request.headers) });
+        const userEmail = sessionData?.user?.email;
+        const emailVerified = sessionData?.user?.emailVerified !== false;
+        if (userEmail && emailVerified && isAdminGoogleEmail(userEmail, appEnv, overrideAccount)) {
+          return {
+            email: userEmail.toLowerCase(),
+            name: sessionData.user.name || 'Administrador',
+            role: 'admin',
+            method: 'google',
+          };
+        }
+      } catch {
+        return null;
       }
-    } catch {
-      return null;
     }
   }
 
@@ -68,7 +71,7 @@ export function createRequireAdmin({ auth = null, appEnv = env } = {}) {
       }
 
       const overrideAccount = await getStoredAdminAccount();
-      const googleAdminAllowed = Boolean(auth && parseAdminEmails(appEnv).length > 0);
+      const googleAdminAllowed = Boolean(auth && (parseAdminEmails(appEnv).length > 0 || overrideAccount?.email));
       if (!isAdminConfigured(appEnv, overrideAccount) && !googleAdminAllowed) {
         return response.status(503).json({
           error: {

@@ -1,19 +1,32 @@
 # Inicio de sesión con Google y Facebook
 
-El backend usa Better Auth para gestionar el protocolo OAuth, las cuentas y las sesiones. Express entrega el handler en `/api/auth/*`; React solo muestra el menú cuando el servidor confirma que hay base de datos y proveedor configurados. No se implementan contraseñas ni se guardan credenciales de Google o Meta en el navegador.
+El sitio soporta autenticación OAuth 2.0 en sus dos despliegues:
+
+1. **En Netlify Live (`netlify/functions/api.mjs` + Netlify Blobs):** flujo OAuth 2.0 Authorization Code + PKCE (S256) directo con Google (`/api/auth/google/start`, `/api/auth/callback/google`, `/api/auth/get-session`, `/api/auth/sign-out`) usando cookies `HttpOnly` firmadas (`ct_oauth_state` y `ct_user_session`).
+2. **En el servidor Express MERN (`server/`):** Better Auth en `/api/auth/*` con MongoDB Atlas.
+
+React solo muestra el botón «Ingresar» con Google cuando `/api/auth/status` confirma que las credenciales están configuradas en el servidor. No se guardan contraseñas de clientes ni secretos de Google en el navegador.
+
+## Activar Google Sign-In en Netlify (2 pasos)
+
+1. En **Google Cloud Console** → Credenciales OAuth → URIs de redireccionamiento autorizados: agregá `https://carnivorastucuman.netlify.app/api/auth/callback/google` (y origen JavaScript `https://carnivorastucuman.netlify.app`).
+2. En **Netlify** → Environment variables: cargá `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y (opcional) `ADMIN_EMAILS` con tu Gmail para activar también el modo Admin al entrar con Google; luego ejecutá un redeploy.
 
 ## Flujo de una cuenta
 
 ```text
-React → Better Auth en Express → Google o Facebook
-      ← callback validado ← proveedor
-      → usuario, cuenta y sesión en MongoDB
-      ← cookie de sesión ← navegador
+React → /api/auth/google/start (PKCE) o Better Auth → Google
+      ← callback validado en servidor ← Google
+      → cliente guardado en Blobs (registered-users) o MongoDB
+      ← cookie HttpOnly ct_user_session ← navegador
+      (si el email verificado coincide con ADMIN_EMAIL / ADMIN_EMAILS, también emite ct_admin_session)
 ```
 
-La tienda conserva WhatsApp como contacto del pedido. Una cuenta social todavía no crea pedidos ni confirma inventario.
+La tienda conserva WhatsApp como canal de confirmación del pedido, adjuntando automáticamente el **nombre del cliente** y si **está registrado con Google** (con su correo verificado) o compra sin cuenta.
 
 ## Opciones de seguridad
+
+- Los clientes normales nunca ven enlaces ni textos relacionados con `/admin.html`: la UI de administración se renderiza únicamente tras autenticar una sesión Admin válida.
 
 - Better Auth valida el estado OAuth y procesa los callbacks en el servidor.
 - La URL base es explícita; cada proveedor exige que la URI de retorno coincida exactamente con la configurada en su panel.

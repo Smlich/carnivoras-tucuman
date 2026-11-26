@@ -26,12 +26,11 @@ class AccountMenuErrorBoundary extends Component {
 
 export default function AccountMenu() {
   const { enabled, providers: availableProviders, user } = useAuth();
-  const [panelAccountName, setPanelAccountName] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const detailsRef = useRef(null);
 
   const providers = availableProviders.filter((provider) => providerLabels[provider]);
-  const accountName = panelAccountName ?? user?.name ?? 'Mi cuenta';
+  const accountName = user?.name || 'Ingresar';
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -62,7 +61,7 @@ export default function AccountMenu() {
 
   return (
     <details ref={detailsRef} className="account-menu" onToggle={(event) => setIsOpen(event.currentTarget.open)}>
-      <summary className="account-menu__trigger" aria-label={accountName}>
+      <summary className="account-menu__trigger" aria-label={user?.name ? `Cuenta de ${user.name}` : 'Ingresar o registrarse con Google'}>
         <svg viewBox="0 0 24 24" aria-hidden="true" className="account-icon">
           <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
           <path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -74,7 +73,7 @@ export default function AccountMenu() {
         <div className="account-menu__panel">
           <AccountMenuErrorBoundary>
             <Suspense fallback={<p className="account-menu__status" role="status">Cargando tu cuenta…</p>}>
-              <AccountMenuPanel providers={providers} onAccountNameChange={setPanelAccountName} />
+              <AccountMenuPanel providers={providers} />
             </Suspense>
           </AccountMenuErrorBoundary>
         </div>

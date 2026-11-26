@@ -11,12 +11,28 @@ import { normalizeSearchText } from '../../src/utils/normalize-text.js';
 import {
   buildAdminCookie,
   buildClearAdminCookie,
+  buildClearOAuthStateCookie,
+  buildClearUserCookie,
+  buildOAuthStateCookie,
+  buildUserCookie,
   createAdminToken,
+  createOAuthStateToken,
+  createUserToken,
+  generatePkcePair,
+  getPrimaryAdminEmail,
+  getSessionSigningSecret,
   hashPasswordPbkdf2,
   isAdminConfigured,
+  isAdminGoogleEmail,
+  isGoogleOAuthConfigured,
+  parseAdminEmails,
   parseCookies,
+  safeEqualStrings,
+  sanitizeReturnTo,
   verifyAdminToken,
   verifyBootstrapCredentials,
+  verifyOAuthStateToken,
+  verifyUserToken,
 } from '../../server/src/auth/admin-session.js';
 import {
   adminAccountUpdateSchema,
@@ -47,6 +63,7 @@ const KEYS = {
   gallery: 'gallery-items',
   games: 'games',
   orders: 'orders',
+  users: 'registered-users',
   adminAccount: 'admin-account',
 };
 
@@ -66,6 +83,10 @@ function getAdminEnvConfig() {
     ADMIN_PASSWORD: readRuntimeEnv('ADMIN_PASSWORD') || '',
     ADMIN_PASSWORD_HASH: readRuntimeEnv('ADMIN_PASSWORD_HASH') || '',
     ADMIN_SESSION_SECRET: readRuntimeEnv('ADMIN_SESSION_SECRET') || '',
+    GOOGLE_CLIENT_ID: readRuntimeEnv('GOOGLE_CLIENT_ID') || '',
+    GOOGLE_CLIENT_SECRET: readRuntimeEnv('GOOGLE_CLIENT_SECRET') || '',
+    USER_SESSION_SECRET: readRuntimeEnv('USER_SESSION_SECRET') || '',
+    BETTER_AUTH_SECRET: readRuntimeEnv('BETTER_AUTH_SECRET') || '',
   };
 }
 
@@ -77,16 +98,36 @@ function getMediaStore() {
   return getStore({ name: MEDIA_STORE_NAME, consistency: 'strong' });
 }
 
-function jsonResponse(payload, status = 200, extraHeaders = {}) {
-  return new Response(JSON.stringify(payload), {
-    status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store, max-age=0',
-      'X-Content-Type-Options': 'nosniff',
-      ...extraHeaders,
-    },
+function jsonResponse(payload, status = 200, extraHeaders = {}, cookies = []) {
+  const headers = new Headers({
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store, max-age=0',
+    'X-Content-Type-Options': 'nosniff',
+    ...extraHeaders,
   });
+  for (const cookie of cookies) {
+    if (cookie) headers.append('Set-Cookie', cookie);
+  }
+  return new Response(JSON.stringify(payload), { status, headers });
+}
+
+function redirectResponse(location, cookies = []) {
+  const headers = new Headers({
+    Location: location,
+    'Cache-Control': 'no-store, max-age=0',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  for (const cookie of cookies) {
+    if (cookie) headers.append('Set-Cookie', cookie);
+  }
+  return new Response(null, { status: 302, headers });
+}
+
+function appendQueryParam(relativePath, key, value) {
+  const safePath = sanitizeReturnTo(relativePath, '/');
+  const dummy = new URL(safePath, 'https://local.invalid');
+  dummy.searchParams.set(key, value);
+  return `${dummy.pathname}${dummy.search}`;
 }
 
 function errorResponse(status, code, message, details = undefined) {
@@ -158,6 +199,58 @@ function authenticateAdminCookie(request, envConfig) {
     role: 'admin',
     method: parsed.method || 'password',
   };
+}
+
+function authenticateUserCookie(request, envConfig) {
+  const secret = getSessionSigningSecret(envConfig);
+  if (!secret) return null;
+  const cookies = parseCookies(request.headers.get('cookie') || '');
+  const token = cookies.ct_user_session;
+  if (!token) return null;
+  const parsed = verifyUserToken(token, secret);
+  if (!parsed) return null;
+  return {
+    id: parsed.id || parsed.sub,
+    email: parsed.email,
+    name: parsed.name || 'Cliente',
+    image: parsed.image || '',
+    provider: parsed.provider || 'google',
+    emailVerified: parsed.emailVerified !== false,
+    exp: parsed.exp,
+  };
+}
+
+async function loadRegisteredUsers(store) {
+  const stored = await readJsonBlob(store, KEYS.users, []);
+  return Array.isArray(stored) ? stored : [];
+}
+
+async function upsertRegisteredUser(store, profile) {
+  const users = await loadRegisteredUsers(store);
+  const normalizedEmail = profile.email.trim().toLowerCase();
+  const userId = String(profile.sub || normalizedEmail);
+  const nowIso = new Date().toISOString();
+  const existingIndex = users.findIndex((item) => item.id === userId || item.email === normalizedEmail);
+  const existing = existingIndex >= 0 ? users[existingIndex] : null;
+
+  const record = {
+    id: userId,
+    email: normalizedEmail,
+    name: String(profile.name || profile.given_name || normalizedEmail.split('@')[0] || 'Cliente').trim(),
+    image: typeof profile.picture === 'string' ? profile.picture : (existing?.image || ''),
+    provider: 'google',
+    emailVerified: true,
+    registeredAt: existing?.registeredAt || nowIso,
+    lastLoginAt: nowIso,
+    loginsCount: (existing?.loginsCount || 0) + 1,
+  };
+
+  if (existingIndex >= 0) {
+    users.splice(existingIndex, 1);
+  }
+  users.unshift(record);
+  await store.setJSON(KEYS.users, users.slice(0, 1000));
+  return record;
 }
 
 async function loadMergedSettings(store) {
@@ -246,10 +339,158 @@ export default async function handler(request) {
     }
 
     if (path === '/api/auth/status' && method === 'GET') {
+      const googleEnabled = isGoogleOAuthConfigured(envConfig);
       return jsonResponse({
-        enabled: false,
-        providers: [],
+        enabled: googleEnabled,
+        providers: googleEnabled ? ['google'] : [],
+        authFlow: 'redirect',
       });
+    }
+
+    if (path === '/api/auth/get-session' && method === 'GET') {
+      const user = authenticateUserCookie(request, envConfig);
+      if (!user) return jsonResponse(null);
+      return jsonResponse({
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+          provider: user.provider,
+          emailVerified: user.emailVerified,
+        },
+        session: {
+          expiresAt: new Date(user.exp * 1000).toISOString(),
+        },
+      });
+    }
+
+    if (path === '/api/auth/google/start' && method === 'GET') {
+      if (!isGoogleOAuthConfigured(envConfig)) {
+        return errorResponse(503, 'AUTH_NOT_CONFIGURED', 'El inicio de sesión con Google todavía no está configurado en Netlify.');
+      }
+
+      const signingSecret = getSessionSigningSecret(envConfig);
+      const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo'), '/');
+      const { state, codeVerifier, codeChallenge } = generatePkcePair();
+      const stateToken = createOAuthStateToken({ state, codeVerifier, returnTo }, signingSecret);
+
+      const googleUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+      googleUrl.searchParams.set('client_id', envConfig.GOOGLE_CLIENT_ID.trim());
+      googleUrl.searchParams.set('redirect_uri', `${url.origin}/api/auth/callback/google`);
+      googleUrl.searchParams.set('response_type', 'code');
+      googleUrl.searchParams.set('scope', 'openid email profile');
+      googleUrl.searchParams.set('state', state);
+      googleUrl.searchParams.set('code_challenge', codeChallenge);
+      googleUrl.searchParams.set('code_challenge_method', 'S256');
+      googleUrl.searchParams.set('prompt', 'select_account');
+
+      return redirectResponse(googleUrl.toString(), [
+        buildOAuthStateCookie(stateToken, { secure: https }),
+      ]);
+    }
+
+    if (path === '/api/auth/callback/google' && method === 'GET') {
+      const clearOAuthCookie = buildClearOAuthStateCookie({ secure: https });
+      const cookies = parseCookies(request.headers.get('cookie') || '');
+      const signingSecret = getSessionSigningSecret(envConfig);
+      const statePayload = signingSecret
+        ? verifyOAuthStateToken(cookies.ct_oauth_state, signingSecret)
+        : null;
+      const returnTo = statePayload?.returnTo || '/';
+
+      const oauthError = url.searchParams.get('error');
+      const code = url.searchParams.get('code');
+      const returnedState = url.searchParams.get('state');
+
+      if (
+        !isGoogleOAuthConfigured(envConfig)
+        || oauthError
+        || !code
+        || !returnedState
+        || !statePayload
+        || !safeEqualStrings(returnedState, statePayload.state)
+      ) {
+        return redirectResponse(
+          appendQueryParam(returnTo, 'auth_error', oauthError === 'access_denied' ? 'google_cancelled' : 'google_failed'),
+          [clearOAuthCookie],
+        );
+      }
+
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code,
+          client_id: envConfig.GOOGLE_CLIENT_ID.trim(),
+          client_secret: envConfig.GOOGLE_CLIENT_SECRET.trim(),
+          redirect_uri: `${url.origin}/api/auth/callback/google`,
+          grant_type: 'authorization_code',
+          code_verifier: statePayload.codeVerifier,
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
+
+      if (!tokenResponse.ok) {
+        return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'google_token_failed'), [clearOAuthCookie]);
+      }
+
+      const tokenJson = await tokenResponse.json().catch(() => null);
+      if (!tokenJson?.access_token) {
+        return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'google_token_failed'), [clearOAuthCookie]);
+      }
+
+      const profileResponse = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
+        headers: { Authorization: `Bearer ${tokenJson.access_token}` },
+        signal: AbortSignal.timeout(10_000),
+      });
+
+      if (!profileResponse.ok) {
+        return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'google_profile_failed'), [clearOAuthCookie]);
+      }
+
+      const profile = await profileResponse.json().catch(() => null);
+      if (!profile?.email || profile.email_verified !== true) {
+        return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'google_unverified_email'), [clearOAuthCookie]);
+      }
+
+      const savedUser = await upsertRegisteredUser(store, profile);
+      const userToken = createUserToken(savedUser, signingSecret);
+      const responseCookies = [
+        clearOAuthCookie,
+        buildUserCookie(userToken, { secure: https }),
+      ];
+
+      const accountOverride = await readJsonBlob(store, KEYS.adminAccount, null);
+      const canGrantAdmin = envConfig.ADMIN_SESSION_SECRET
+        && envConfig.ADMIN_SESSION_SECRET.length >= 32
+        && isAdminGoogleEmail(savedUser.email, envConfig, accountOverride);
+
+      if (canGrantAdmin) {
+        const adminToken = createAdminToken(
+          { email: savedUser.email, name: savedUser.name, method: 'google' },
+          envConfig.ADMIN_SESSION_SECRET,
+        );
+        responseCookies.push(buildAdminCookie(adminToken, { secure: https }));
+      } else if (returnTo.startsWith('/admin.html')) {
+        return redirectResponse('/admin.html?auth_error=not_admin', responseCookies);
+      }
+
+      return redirectResponse(returnTo, responseCookies);
+    }
+
+    if (path === '/api/auth/sign-out' && method === 'POST') {
+      if (!isSameOriginRequest(request, url)) {
+        return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
+      }
+
+      const cookies = [buildClearUserCookie({ secure: https })];
+      const adminUser = authenticateAdminCookie(request, envConfig);
+      if (adminUser?.method === 'google') {
+        cookies.push(buildClearAdminCookie({ secure: https }));
+      }
+
+      return jsonResponse({ success: true }, 200, {}, cookies);
     }
 
     if (path === '/api/site-data' && method === 'GET') {
@@ -330,11 +571,16 @@ export default async function handler(request) {
         return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
       }
       const input = orderCreateSchema.parse(await parseJsonBody(request));
+      const sessionUser = authenticateUserCookie(request, envConfig);
+      const googleRegistered = Boolean(sessionUser);
+      const customerEmail = sessionUser?.email || '';
       const totalARS = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const order = {
         id: 'PED-' + Date.now().toString(36).toUpperCase() + '-' + randomBytes(2).toString('hex').toUpperCase(),
         createdAt: new Date().toISOString(),
-        customerName: input.customerName,
+        customerName: input.customerName || sessionUser?.name || '',
+        customerEmail,
+        googleRegistered,
         notes: input.notes,
         items: input.items,
         totalARS,
@@ -348,28 +594,36 @@ export default async function handler(request) {
       return jsonResponse({ data: order }, 201);
     }
 
-    // 3. JUEGOS PROTEGIDOS (EN NETLIFY SE DESBLOQUEAN CON SESIÓN ADMIN)
+    // 3. JUEGOS PROTEGIDOS (GOOGLE OAUTH O SESIÓN DE ADMINISTRADOR)
     if (path === '/api/games' || path.startsWith('/api/games/')) {
       const accountOverride = await readJsonBlob(store, KEYS.adminAccount, null);
-      if (!isAdminConfigured(envConfig, accountOverride)) {
-        return errorResponse(503, 'AUTH_NOT_CONFIGURED', 'El acceso estará disponible al configurar las credenciales.');
-      }
       const adminUser = authenticateAdminCookie(request, envConfig);
-      if (!adminUser) {
-        return errorResponse(401, 'AUTH_REQUIRED', 'Iniciá sesión como administrador para probar o configurar juegos.');
+      const customerUser = !adminUser ? authenticateUserCookie(request, envConfig) : null;
+      const viewer = adminUser
+        ? { isAdmin: true, role: 'admin', playerName: adminUser.name }
+        : customerUser
+          ? { isAdmin: false, role: 'player', playerName: customerUser.name }
+          : null;
+
+      if (!viewer) {
+        const anyAuthConfigured = isGoogleOAuthConfigured(envConfig) || isAdminConfigured(envConfig, accountOverride);
+        if (!anyAuthConfigured) {
+          return errorResponse(503, 'AUTH_NOT_CONFIGURED', 'El acceso estará disponible cuando se configure Google OAuth.');
+        }
+        return errorResponse(401, 'AUTH_REQUIRED', 'Iniciá sesión con Google para entrar a esta sección.');
       }
 
       const gamesList = await loadGames(store);
-      const visibleGames = sanitizeGamesForViewer(gamesList, { isAdmin: true });
+      const visibleGames = sanitizeGamesForViewer(gamesList, { isAdmin: viewer.isAdmin });
 
       if (path === '/api/games' && method === 'GET') {
         return jsonResponse({
           data: visibleGames,
           meta: {
             unlocked: true,
-            playerName: adminUser.name,
-            role: 'admin',
-            isAdmin: true,
+            playerName: viewer.playerName,
+            role: viewer.role,
+            isAdmin: viewer.isAdmin,
             total: visibleGames.length,
           },
         });
@@ -386,7 +640,7 @@ export default async function handler(request) {
         }
         return jsonResponse({
           data: game,
-          meta: { unlocked: true, role: 'admin', isAdmin: true },
+          meta: { unlocked: true, role: viewer.role, isAdmin: viewer.isAdmin },
         });
       }
     }
@@ -394,14 +648,26 @@ export default async function handler(request) {
     // 4. SESIÓN Y CUENTA DE ADMINISTRADOR
     if (path === '/api/admin/auth/session' && method === 'GET') {
       const accountOverride = await readJsonBlob(store, KEYS.adminAccount, null);
-      const configured = isAdminConfigured(envConfig, accountOverride);
+      const googleAllowed = isGoogleOAuthConfigured(envConfig)
+        && (parseAdminEmails(envConfig).length > 0 || Boolean(accountOverride?.email));
+      const configured = isAdminConfigured(envConfig, accountOverride) || googleAllowed;
       const user = configured ? authenticateAdminCookie(request, envConfig) : null;
+
+      if (!user && url.searchParams.get('meta') !== '1') {
+        return jsonResponse({
+          data: {
+            authenticated: false,
+            user: null,
+          },
+        });
+      }
+
       return jsonResponse({
         data: {
           configured,
           authenticated: Boolean(user),
           user,
-          googleAllowed: false,
+          googleAllowed,
           storageMode: 'netlify-blobs',
         },
       });
@@ -435,7 +701,8 @@ export default async function handler(request) {
       return jsonResponse(
         { data: { user: { email: verification.email, name: verification.name, role: 'admin', method: 'password' } } },
         200,
-        { 'Set-Cookie': buildAdminCookie(token, { secure: https }) },
+        {},
+        [buildAdminCookie(token, { secure: https })],
       );
     }
 
@@ -443,11 +710,13 @@ export default async function handler(request) {
       const csrfCheck = requireAdminMutationHeaders(request, url);
       if (csrfCheck) return csrfCheck;
 
-      return jsonResponse(
-        { data: { ok: true } },
-        200,
-        { 'Set-Cookie': buildClearAdminCookie({ secure: https }) },
-      );
+      const cookies = [buildClearAdminCookie({ secure: https })];
+      const adminUser = authenticateAdminCookie(request, envConfig);
+      if (adminUser?.method === 'google') {
+        cookies.push(buildClearUserCookie({ secure: https }));
+      }
+
+      return jsonResponse({ data: { ok: true } }, 200, {}, cookies);
     }
 
     // 5. RUTAS PROTEGIDAS DE ADMINISTRACIÓN
@@ -458,7 +727,9 @@ export default async function handler(request) {
       }
 
       const accountOverride = await readJsonBlob(store, KEYS.adminAccount, null);
-      if (!isAdminConfigured(envConfig, accountOverride)) {
+      const googleAllowed = isGoogleOAuthConfigured(envConfig)
+        && (parseAdminEmails(envConfig).length > 0 || Boolean(accountOverride?.email));
+      if (!isAdminConfigured(envConfig, accountOverride) && !googleAllowed) {
         return errorResponse(503, 'ADMIN_NOT_CONFIGURED', 'La cuenta de administración no está configurada.');
       }
 
@@ -469,14 +740,17 @@ export default async function handler(request) {
 
       if (path === '/api/admin/auth/account' && method === 'PUT') {
         const body = adminAccountUpdateSchema.parse(await parseJsonBody(request));
+        const verificationEmail = adminUser.method === 'google'
+          ? (accountOverride?.email || getPrimaryAdminEmail(envConfig))
+          : adminUser.email;
         const verification = verifyBootstrapCredentials({
-          email: adminUser.email,
+          email: verificationEmail,
           password: body.currentPassword,
           envConfig,
           overrideAccount: accountOverride,
         });
 
-        if (!verification.valid) {
+        if (verification.configured && !verification.valid) {
           return errorResponse(401, 'INVALID_CURRENT_PASSWORD', 'La contraseña actual no coincide.');
         }
 
@@ -489,26 +763,31 @@ export default async function handler(request) {
         };
         await store.setJSON(KEYS.adminAccount, nextOverride);
 
-        const nextToken = createAdminToken({ email: nextOverride.email, name: nextOverride.name }, envConfig.ADMIN_SESSION_SECRET);
+        const nextToken = createAdminToken(
+          { email: nextOverride.email, name: nextOverride.name, method: adminUser.method },
+          envConfig.ADMIN_SESSION_SECRET,
+        );
         return jsonResponse(
           {
             data: {
-              user: { email: nextOverride.email, name: nextOverride.name, role: 'admin', method: 'password' },
+              user: { email: nextOverride.email, name: nextOverride.name, role: 'admin', method: adminUser.method },
               updatedAt: nextOverride.updatedAt,
             },
           },
           200,
-          { 'Set-Cookie': buildAdminCookie(nextToken, { secure: https }) },
+          {},
+          [buildAdminCookie(nextToken, { secure: https })],
         );
       }
 
       if (path === '/api/admin/overview' && method === 'GET') {
-        const [visitsCount, allProducts, allGallery, allGames, allOrders, settings] = await Promise.all([
+        const [visitsCount, allProducts, allGallery, allGames, allOrders, allUsers, settings] = await Promise.all([
           readVisitCount(store),
           loadProducts(store),
           loadGallery(store),
           loadGames(store),
           loadOrders(store),
+          loadRegisteredUsers(store),
           loadMergedSettings(store),
         ]);
 
@@ -521,10 +800,16 @@ export default async function handler(request) {
             gamesTotal: allGames.length,
             ordersTotal: allOrders.length,
             pendingOrders: allOrders.filter((order) => order.status === 'nuevo' || order.status === 'en-proceso').length,
+            usersTotal: allUsers.length,
+            googleOAuthConfigured: isGoogleOAuthConfigured(envConfig),
             showPreviewBanner: settings.showPreviewBanner,
             storageMode: 'netlify-blobs',
           },
         });
+      }
+
+      if (path === '/api/admin/users' && method === 'GET') {
+        return jsonResponse({ data: await loadRegisteredUsers(store) });
       }
 
       if (path === '/api/admin/settings') {

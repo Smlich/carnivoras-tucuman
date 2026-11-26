@@ -8,6 +8,7 @@ import {
   fetchAdminOverview,
   fetchAdminProducts,
   fetchAdminSettings,
+  fetchAdminUsers,
   logoutAdmin,
 } from '../../services/admin-api';
 import CatalogImage from '../CatalogImage';
@@ -27,7 +28,7 @@ const TABS = [
 ];
 
 export default function AdminDashboard() {
-  const { admin, refreshAdminSession } = useAuth();
+  const { admin, user, enabled, providers, refreshAdminSession, signOut } = useAuth();
   const { reloadSiteData } = useSiteContent();
   const [activeTab, setActiveTab] = useState('overview');
   const [status, setStatus] = useState(null);
@@ -39,19 +40,21 @@ export default function AdminDashboard() {
     gallery: [],
     games: [],
     orders: [],
+    users: [],
   });
 
   const loadAll = useCallback(async () => {
     try {
-      const [overview, settings, products, gallery, games, orders] = await Promise.all([
+      const [overview, settings, products, gallery, games, orders, users] = await Promise.all([
         fetchAdminOverview(),
         fetchAdminSettings(),
         fetchAdminProducts(),
         fetchAdminGallery(),
         fetchAdminGames(),
         fetchAdminOrders(),
+        fetchAdminUsers().catch(() => []),
       ]);
-      setData({ overview, settings, products, gallery, games, orders });
+      setData({ overview, settings, products, gallery, games, orders, users: Array.isArray(users) ? users : [] });
       await reloadSiteData();
     } catch (error) {
       setStatus({ type: 'error', text: error.message });
@@ -67,14 +70,15 @@ export default function AdminDashboard() {
   async function handleLogout() {
     try {
       await logoutAdmin();
-      if (admin?.method === 'google') {
-        const { authClient } = await import('../../services/auth-client');
-        await authClient.signOut().catch(() => {});
+      if (admin?.method === 'google' || user) {
+        await signOut().catch(() => {});
       }
     } finally {
       await refreshAdminSession();
     }
   }
+
+  const googleActive = Boolean(data.overview?.googleOAuthConfigured || (enabled && providers.includes('google')));
 
   return (
     <div className="admin-shell">
@@ -148,6 +152,24 @@ export default function AdminDashboard() {
                     <strong>{data.overview?.galleryTotal ?? 0} fotos · {data.overview?.gamesTotal ?? 0} juegos</strong>
                     <small>Almacenamiento: {data.overview?.storageMode || 'activo'}</small>
                   </article>
+                  <article className="admin-kpi">
+                    <span>Clientes con Google</span>
+                    <strong>{data.overview?.usersTotal ?? data.users.length}</strong>
+                    <small>{googleActive ? 'Registro con Google activo' : 'Falta activar credenciales OAuth'}</small>
+                  </article>
+                </div>
+
+                <div className="admin-panel admin-oauth-status">
+                  <h2>Registro de clientes con Google</h2>
+                  {googleActive ? (
+                    <p>
+                      El inicio de sesión con Google está <strong>activo</strong>. Los clientes pueden registrarse desde el botón «Ingresar» o en «Juegos gratis», y sus pedidos por WhatsApp informan su nombre y cuenta verificada.
+                    </p>
+                  ) : (
+                    <p>
+                      Todavía faltan las variables <code>GOOGLE_CLIENT_ID</code> y <code>GOOGLE_CLIENT_SECRET</code> en Netlify (y autorizar el URI <code>{`${window.location.origin}/api/auth/callback/google`}</code> en Google Cloud Console). Si también cargás tu Gmail en <code>ADMIN_EMAILS</code>, entrar con Google te activará el modo Admin automáticamente.
+                    </p>
+                  )}
                 </div>
 
                 <div className="admin-panel admin-overview__shortcuts">
@@ -190,6 +212,7 @@ export default function AdminDashboard() {
               <AdminOrdersAccountTab
                 adminUser={admin}
                 orders={data.orders}
+                users={data.users}
                 onChanged={loadAll}
                 onAccountChanged={refreshAdminSession}
                 onStatus={setStatus}

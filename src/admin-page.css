@@ -232,9 +232,17 @@
 
 .admin-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
   gap: 16px;
   margin-bottom: 22px;
+}
+
+.admin-oauth-status {
+  margin-bottom: 22px;
+}
+
+.admin-oauth-status p:last-child {
+  margin-bottom: 0;
 }
 
 .admin-kpi {
@@ -392,6 +400,19 @@
 .admin-tag--muted {
   color: var(--ink-muted);
   background: #eaece6;
+}
+
+.admin-tag--google {
+  color: #0e4a1f;
+  background: #e9f9eb;
+  border-color: #9bd19b;
+}
+
+.admin-order-card__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
 }
 
 .admin-form {

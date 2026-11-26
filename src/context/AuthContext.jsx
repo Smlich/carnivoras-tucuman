@@ -8,6 +8,7 @@ const fallbackValue = {
   isAdminLoading: false,
   enabled: false,
   providers: [],
+  authFlow: 'better-auth',
   user: null,
   session: null,
   admin: null,
@@ -17,9 +18,19 @@ const fallbackValue = {
   adminStorageMode: 'static',
   refreshSession: async () => null,
   refreshAdminSession: async () => null,
+  signInWithProvider: async () => {},
+  signOut: async () => {},
 };
 
 const AuthContext = createContext(fallbackValue);
+
+function normalizeReturnPath(targetPath) {
+  if (typeof targetPath === 'string' && targetPath.startsWith('/') && !targetPath.startsWith('//')) {
+    return targetPath;
+  }
+  const current = `${window.location.pathname || '/'}${window.location.search || ''}`;
+  return current.startsWith('/') && !current.startsWith('//') ? current : '/';
+}
 
 async function fetchSession(signal) {
   const response = await fetch('/api/auth/get-session', {
@@ -33,8 +44,9 @@ async function fetchSession(signal) {
   return payload?.user ? payload : null;
 }
 
-async function fetchAdminSession(signal) {
-  const response = await fetch('/api/admin/auth/session', {
+async function fetchAdminSession(signal, includeAdminMeta = false) {
+  const url = includeAdminMeta ? '/api/admin/auth/session?meta=1' : '/api/admin/auth/session';
+  const response = await fetch(url, {
     cache: 'no-store',
     credentials: 'include',
     signal,
@@ -45,8 +57,13 @@ async function fetchAdminSession(signal) {
   return payload?.data ?? null;
 }
 
-export function AuthProvider({ children }) {
-  const [status, setStatus] = useState({ isLoading: !isStaticPreview, enabled: false, providers: [] });
+export function AuthProvider({ children, includeAdminMeta = false }) {
+  const [status, setStatus] = useState({
+    isLoading: !isStaticPreview,
+    enabled: false,
+    providers: [],
+    authFlow: 'better-auth',
+  });
   const [session, setSession] = useState(null);
   const [adminState, setAdminState] = useState({
     isAdminLoading: !isStaticPreview,
@@ -56,6 +73,7 @@ export function AuthProvider({ children }) {
     adminStorageMode: isStaticPreview ? 'static' : 'unknown',
   });
   const enabledRef = useRef(false);
+  const authFlowRef = useRef('better-auth');
 
   const applyAdminSession = useCallback((adminData) => {
     setAdminState({
@@ -76,7 +94,7 @@ export function AuthProvider({ children }) {
 
     async function loadAdmin() {
       try {
-        const adminData = await fetchAdminSession(controller.signal);
+        const adminData = await fetchAdminSession(controller.signal, includeAdminMeta);
         if (isActive) applyAdminSession(adminData);
       } catch (error) {
         if (isActive && error.name !== 'AbortError') {
@@ -95,7 +113,9 @@ export function AuthProvider({ children }) {
 
           const enabled = Boolean(result.enabled);
           const providers = enabled && Array.isArray(result.providers) ? result.providers : [];
+          const authFlow = result.authFlow === 'redirect' ? 'redirect' : 'better-auth';
           enabledRef.current = enabled;
+          authFlowRef.current = authFlow;
 
           let currentSession = null;
           if (enabled) {
@@ -108,12 +128,12 @@ export function AuthProvider({ children }) {
 
           if (!isActive) return;
           setSession(currentSession);
-          setStatus({ isLoading: false, enabled, providers });
+          setStatus({ isLoading: false, enabled, providers, authFlow });
           return;
         } catch (error) {
           if (!isActive || error.name === 'AbortError') return;
           if (attempt === 3) {
-            setStatus({ isLoading: false, enabled: false, providers: [] });
+            setStatus({ isLoading: false, enabled: false, providers: [], authFlow: 'better-auth' });
             return;
           }
           await new Promise((resolve) => {
@@ -131,19 +151,19 @@ export function AuthProvider({ children }) {
       controller.abort();
       window.clearTimeout(retryTimer);
     };
-  }, [applyAdminSession]);
+  }, [applyAdminSession, includeAdminMeta]);
 
   const refreshAdminSession = useCallback(async () => {
     if (isStaticPreview) return null;
     try {
-      const adminData = await fetchAdminSession();
+      const adminData = await fetchAdminSession(undefined, includeAdminMeta);
       applyAdminSession(adminData);
       return adminData;
     } catch {
       applyAdminSession(null);
       return null;
     }
-  }, [applyAdminSession]);
+  }, [applyAdminSession, includeAdminMeta]);
 
   const refreshSession = useCallback(async () => {
     let currentSession = null;
@@ -159,12 +179,58 @@ export function AuthProvider({ children }) {
     return currentSession;
   }, [refreshAdminSession]);
 
+  const signInWithProvider = useCallback(async (provider = 'google', returnTo) => {
+    const safeReturnTo = normalizeReturnPath(returnTo);
+
+    if (authFlowRef.current === 'redirect') {
+      if (provider !== 'google') {
+        throw new Error('Proveedor no disponible.');
+      }
+      window.location.assign('/api/auth/google/start?returnTo=' + encodeURIComponent(safeReturnTo));
+      return;
+    }
+
+    const { authClient } = await import('../services/auth-client');
+    const result = await authClient.signIn.social({
+      provider,
+      callbackURL: window.location.origin + safeReturnTo,
+    });
+    if (result?.error) {
+      throw new Error('Inicio de sesión rechazado.');
+    }
+  }, []);
+
+  const signOut = useCallback(async () => {
+    if (authFlowRef.current === 'redirect') {
+      const response = await fetch('/api/auth/sign-out', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      });
+      if (!response.ok) {
+        throw new Error('No pudimos cerrar la sesión.');
+      }
+      setSession(null);
+      await refreshAdminSession();
+      return;
+    }
+
+    const { authClient } = await import('../services/auth-client');
+    const result = await authClient.signOut();
+    if (result?.error) {
+      throw new Error('Cierre de sesión rechazado.');
+    }
+    await refreshSession();
+  }, [refreshAdminSession, refreshSession]);
+
   const value = useMemo(() => ({
     isStaticPreview,
     isLoading: status.isLoading,
     isAdminLoading: adminState.isAdminLoading,
     enabled: status.enabled,
     providers: status.providers,
+    authFlow: status.authFlow,
     user: session?.user ?? null,
     session,
     admin: adminState.admin,
@@ -174,7 +240,9 @@ export function AuthProvider({ children }) {
     adminStorageMode: adminState.adminStorageMode,
     refreshSession,
     refreshAdminSession,
-  }), [adminState, refreshAdminSession, refreshSession, session, status]);
+    signInWithProvider,
+    signOut,
+  }), [adminState, refreshAdminSession, refreshSession, session, signInWithProvider, signOut, status]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

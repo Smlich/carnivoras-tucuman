@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import mongoose from 'mongoose';
 import { Router } from 'express';
 import { z } from 'zod';
 import {
@@ -135,6 +136,8 @@ function mapDbOrder(doc) {
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
     customerName: doc.customerName || '',
+    customerEmail: doc.customerEmail || '',
+    googleRegistered: Boolean(doc.googleRegistered),
     notes: doc.notes || '',
     items: doc.items || [],
     totalARS: doc.totalARS,
@@ -142,6 +145,30 @@ function mapDbOrder(doc) {
     adminNotes: doc.adminNotes || '',
     source: doc.source || 'whatsapp-cart',
   };
+}
+
+async function loadRegisteredGoogleUsers() {
+  if (!isDatabaseConnected() || !mongoose.connection?.db) return [];
+  try {
+    const docs = await mongoose.connection.db
+      .collection('user')
+      .find({})
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .limit(250)
+      .toArray();
+    return docs.map((doc) => ({
+      id: String(doc.id || doc._id || doc.email || ''),
+      email: String(doc.email || '').toLowerCase(),
+      name: String(doc.name || 'Cliente'),
+      image: typeof doc.image === 'string' ? doc.image : '',
+      provider: 'google',
+      emailVerified: doc.emailVerified !== false,
+      registeredAt: doc.createdAt || null,
+      lastLoginAt: doc.updatedAt || doc.createdAt || null,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 async function ensureProductsSeeded() {
@@ -189,9 +216,18 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
   router.get('/auth/session', async (request, response) => {
     response.set('Cache-Control', 'no-store');
     const overrideAccount = await getStoredAdminAccount();
-    const googleAllowed = Boolean(auth && parseAdminEmails(appEnv).length > 0);
+    const googleAllowed = Boolean(auth && (parseAdminEmails(appEnv).length > 0 || overrideAccount?.email));
     const configured = isAdminConfigured(appEnv, overrideAccount) || googleAllowed;
     const user = configured ? await resolveAdminAccess(request, { auth, appEnv }) : null;
+
+    if (!user && request.query.meta !== '1') {
+      return response.status(200).json({
+        data: {
+          authenticated: false,
+          user: null,
+        },
+      });
+    }
 
     return response.status(200).json({
       data: {
@@ -316,13 +352,15 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
           gamesTotal: defaultAdminGames.length,
           ordersTotal: 0,
           pendingOrders: 0,
+          usersTotal: 0,
+          googleOAuthConfigured: Boolean(auth),
           showPreviewBanner: defaultSiteSettings.showPreviewBanner,
           storageMode: 'demo-read-only',
         },
       });
     }
 
-    const [metricDoc, productCount, activeProductCount, galleryCount, gameCount, ordersCount, pendingCount, settingsDoc] = await Promise.all([
+    const [metricDoc, productCount, activeProductCount, galleryCount, gameCount, ordersCount, pendingCount, settingsDoc, registeredUsers] = await Promise.all([
       SiteMetric.findOne({ key: 'visits' }).lean(),
       Product.countDocuments(),
       Product.countDocuments({ isActive: true }),
@@ -331,6 +369,7 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
       OrderInquiry.countDocuments(),
       OrderInquiry.countDocuments({ status: { $in: ['nuevo', 'en-proceso'] } }),
       SiteSettings.findOne({ key: 'main' }).lean(),
+      loadRegisteredGoogleUsers(),
     ]);
 
     const effProductsTotal = productCount > 0 ? productCount : defaultAdminProducts.length;
@@ -348,6 +387,8 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
         gamesTotal: effGamesTotal,
         ordersTotal: ordersCount,
         pendingOrders: pendingCount,
+        usersTotal: registeredUsers.length,
+        googleOAuthConfigured: Boolean(auth),
         showPreviewBanner: mergedSettings.showPreviewBanner,
         storageMode: 'mongodb',
       },
@@ -498,6 +539,11 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
     const deleted = await Game.findOneAndDelete({ slug }).lean();
     if (!deleted) return response.status(404).json({ error: { code: 'GAME_NOT_FOUND', message: 'No encontramos ese juego.' } });
     return response.status(200).json({ data: { deletedSlug: slug } });
+  });
+
+  router.get('/users', async (request, response) => {
+    const users = await loadRegisteredGoogleUsers();
+    return response.status(200).json({ data: users });
   });
 
   router.get('/orders', async (request, response) => {

@@ -37,3 +37,43 @@ if (toggleButton && navMenu) {
     if (event.matches) setOpen(false);
   });
 }
+
+(async function hydrateAdminShortcutsWhenAuthenticated() {
+  try {
+    const response = await fetch('/api/admin/auth/session', {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+    if (!response.ok) return;
+    const payload = await response.json().catch(() => null);
+    if (!payload?.data?.authenticated) return;
+
+    if (navMenu && !navMenu.querySelector('.main-nav__admin-mobile')) {
+      const mobileAdminLink = document.createElement('a');
+      mobileAdminLink.className = 'main-nav__admin-mobile';
+      mobileAdminLink.href = '/admin.html';
+      mobileAdminLink.textContent = 'Panel Admin';
+      navMenu.appendChild(mobileAdminLink);
+    }
+
+    const headerActions = document.querySelector('.site-header__actions');
+    if (headerActions && !headerActions.querySelector('.admin-pill-link')) {
+      const adminPill = document.createElement('a');
+      adminPill.className = 'admin-pill-link';
+      adminPill.href = '/admin.html';
+      adminPill.setAttribute('aria-label', 'Abrir panel de administración');
+      adminPill.textContent = 'Admin';
+      headerActions.insertBefore(adminPill, toggleButton || headerActions.firstChild);
+    }
+
+    const footerLinks = document.querySelector('.site-footer__links');
+    if (footerLinks && !footerLinks.querySelector('a[href="/admin.html"]')) {
+      const footerAdminLink = document.createElement('a');
+      footerAdminLink.href = '/admin.html';
+      footerAdminLink.textContent = 'Admin';
+      footerLinks.appendChild(footerAdminLink);
+    }
+  } catch {
+    // Silencioso para visitantes sin sesión de administrador.
+  }
+})();

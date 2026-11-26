@@ -3,14 +3,26 @@ import test from 'node:test';
 import {
   buildAdminCookie,
   buildClearAdminCookie,
+  buildClearOAuthStateCookie,
+  buildClearUserCookie,
+  buildOAuthStateCookie,
+  buildUserCookie,
   createAdminToken,
+  createOAuthStateToken,
+  createUserToken,
+  generatePkcePair,
   hashPasswordPbkdf2,
   isAdminConfigured,
+  isAdminGoogleEmail,
   isAllowedAdminEmail,
+  isGoogleOAuthConfigured,
   parseCookies,
+  sanitizeReturnTo,
   verifyAdminToken,
   verifyBootstrapCredentials,
+  verifyOAuthStateToken,
   verifyPasswordHash,
+  verifyUserToken,
 } from '../src/auth/admin-session.js';
 import { validateAndDecodeImageBase64 } from '../src/schemas/admin-schemas.js';
 
@@ -105,4 +117,76 @@ test('validateAndDecodeImageBase64 verifica cabeceras reales de PNG', () => {
     () => validateAndDecodeImageBase64(Buffer.from('no-es-imagen').toString('base64'), 'image/png'),
     /imagen PNG, JPEG o WebP válida/,
   );
+});
+
+test('sesiones de cliente Google, estado OAuth con PKCE y sanitización de retorno', () => {
+  const secret = 'client-session-signing-secret-over-32-chars';
+  const userToken = createUserToken({
+    id: 'google-sub-123',
+    email: 'Cliente@Gmail.com',
+    name: 'Sofía Pérez',
+    image: 'https://lh3.googleusercontent.com/a/photo',
+  }, secret, 600);
+
+  const verifiedUser = verifyUserToken(userToken, secret);
+  assert.equal(verifiedUser.id, 'google-sub-123');
+  assert.equal(verifiedUser.email, 'cliente@gmail.com');
+  assert.equal(verifiedUser.name, 'Sofía Pérez');
+  assert.equal(verifiedUser.role, 'customer');
+  assert.equal(verifyAdminToken(userToken, secret), null);
+
+  const pkce = generatePkcePair();
+  assert.ok(pkce.state.length >= 24);
+  assert.ok(pkce.codeVerifier.length >= 32);
+  assert.ok(pkce.codeChallenge.length >= 32);
+
+  const stateToken = createOAuthStateToken({
+    state: pkce.state,
+    codeVerifier: pkce.codeVerifier,
+    returnTo: '/juegos.html?modo=1',
+  }, secret, 300);
+  const verifiedState = verifyOAuthStateToken(stateToken, secret);
+  assert.equal(verifiedState.state, pkce.state);
+  assert.equal(verifiedState.codeVerifier, pkce.codeVerifier);
+  assert.equal(verifiedState.returnTo, '/juegos.html?modo=1');
+
+  assert.equal(sanitizeReturnTo('/catalogo.html'), '/catalogo.html');
+  assert.equal(sanitizeReturnTo('//evil.example/phish'), '/');
+  assert.equal(sanitizeReturnTo('https://evil.example'), '/');
+
+  assert.match(buildUserCookie(userToken, { secure: true }), /ct_user_session=/);
+  assert.match(buildClearUserCookie({ secure: true }), /Max-Age=0/);
+  assert.match(buildOAuthStateCookie(stateToken, { secure: true }), /ct_oauth_state=/);
+  assert.match(buildClearOAuthStateCookie({ secure: true }), /Max-Age=0/);
+});
+
+test('isGoogleOAuthConfigured y isAdminGoogleEmail validan credenciales y elevación admin', () => {
+  assert.equal(isGoogleOAuthConfigured({
+    GOOGLE_CLIENT_ID: 'client-id',
+    GOOGLE_CLIENT_SECRET: 'client-secret',
+    ADMIN_SESSION_SECRET: 'signing-secret-with-at-least-32-chars',
+  }), true);
+
+  assert.equal(isGoogleOAuthConfigured({
+    GOOGLE_CLIENT_ID: 'client-id',
+    ADMIN_SESSION_SECRET: 'signing-secret-with-at-least-32-chars',
+  }), false);
+
+  assert.equal(isAdminGoogleEmail(
+    'Dueno@Gmail.com',
+    { ADMIN_EMAILS: 'dueno@gmail.com' },
+    null,
+  ), true);
+
+  assert.equal(isAdminGoogleEmail(
+    'nuevo-admin@gmail.com',
+    { ADMIN_EMAIL: 'viejo@carnivorastucuman.com' },
+    { email: 'nuevo-admin@gmail.com' },
+  ), true);
+
+  assert.equal(isAdminGoogleEmail(
+    'visitante@gmail.com',
+    { ADMIN_EMAILS: 'dueno@gmail.com' },
+    null,
+  ), false);
 });

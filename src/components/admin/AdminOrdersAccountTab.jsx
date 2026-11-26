@@ -49,10 +49,15 @@ function OrderRow({ order, onChanged, onStatus }) {
   return (
     <article className="admin-order-card">
       <div className="admin-order-card__top">
-        <div>
+        <div className="admin-order-card__meta">
           <strong>{order.id}</strong>
           <span>{order.customerName ? ` · ${order.customerName}` : ''}</span>
           <small> · {new Date(order.createdAt).toLocaleString('es-AR')}</small>
+          <span className={'admin-tag ' + (order.googleRegistered ? 'admin-tag--google' : 'admin-tag--muted')}>
+            {order.googleRegistered
+              ? `Registrado con Google${order.customerEmail ? ` (${order.customerEmail})` : ''}`
+              : 'Sin cuenta de Google'}
+          </span>
         </div>
         <strong>{formatPrice(order.totalARS)}</strong>
       </div>
@@ -80,7 +85,7 @@ function OrderRow({ order, onChanged, onStatus }) {
   );
 }
 
-export default function AdminOrdersAccountTab({ adminUser, orders, onChanged, onAccountChanged, onStatus }) {
+export default function AdminOrdersAccountTab({ adminUser, orders, users = [], onChanged, onAccountChanged, onStatus }) {
   const [email, setEmail] = useState(adminUser?.email || '');
   const [name, setName] = useState(adminUser?.name || 'Administrador');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -117,20 +122,48 @@ export default function AdminOrdersAccountTab({ adminUser, orders, onChanged, on
 
   return (
     <div className="admin-split">
-      <section className="admin-panel">
-        <h2>Consultas y pedidos recibidos ({orders.length})</h2>
-        <p>Cada consulta enviada desde «Mi pedido → WhatsApp» queda registrada acá para hacer seguimiento.</p>
+      <div className="admin-settings-stack">
+        <section className="admin-panel">
+          <h2>Consultas y pedidos recibidos ({orders.length})</h2>
+          <p>Cada consulta enviada desde «Mi pedido → WhatsApp» queda registrada acá con nombre y estado de Google.</p>
 
-        {orders.length === 0 ? (
-          <p className="admin-empty">Todavía no hay consultas registradas.</p>
-        ) : (
-          <div className="admin-orders-list">
-            {orders.map((order) => (
-              <OrderRow key={order.id} order={order} onChanged={onChanged} onStatus={onStatus} />
-            ))}
-          </div>
-        )}
-      </section>
+          {orders.length === 0 ? (
+            <p className="admin-empty">Todavía no hay consultas registradas.</p>
+          ) : (
+            <div className="admin-orders-list">
+              {orders.map((order) => (
+                <OrderRow key={order.id} order={order} onChanged={onChanged} onStatus={onStatus} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="admin-panel">
+          <h2>Clientes registrados con Google ({users.length})</h2>
+          <p>Personas que ingresaron con su cuenta de Google en el sitio o desde la zona de juegos.</p>
+
+          {users.length === 0 ? (
+            <p className="admin-empty">Todavía no hay clientes registrados con Google.</p>
+          ) : (
+            <div className="admin-list">
+              {users.map((customer) => (
+                <article className="admin-item-row" key={customer.id || customer.email}>
+                  <div className="admin-item-row__info">
+                    <div className="admin-item-row__title">
+                      <strong>{customer.name || 'Cliente'}</strong>
+                      <span className="admin-tag admin-tag--google">Google</span>
+                    </div>
+                    <small>{customer.email}</small>
+                    {customer.lastLoginAt && (
+                      <small>Último acceso: {new Date(customer.lastLoginAt).toLocaleString('es-AR')}</small>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
 
       <section className="admin-panel">
         <h2>Cuenta y Seguridad</h2>

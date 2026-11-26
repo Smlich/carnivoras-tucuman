@@ -129,7 +129,7 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
 }
 
 export default function GamesSection({ showHeading = true }) {
-  const { isStaticPreview, isLoading, isAdminLoading, enabled, providers, user, isAdmin, admin } = useAuth();
+  const { isStaticPreview, isLoading, isAdminLoading, enabled, providers, user, isAdmin, admin, signInWithProvider } = useAuth();
   const { gamesPreview } = useSiteContent();
   const [unlocked, setUnlocked] = useState({ status: 'idle', games: [], playerName: '', role: 'player', isAdmin: false });
   const [playingSlug, setPlayingSlug] = useState(null);
@@ -165,12 +165,7 @@ export default function GamesSection({ showHeading = true }) {
     setIsSigningIn(true);
 
     try {
-      const { authClient } = await import('../services/auth-client');
-      const result = await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: window.location.origin + '/juegos.html',
-      });
-      if (result?.error) throw new Error('Inicio de sesión rechazado.');
+      await signInWithProvider('google', '/juegos.html');
     } catch {
       setSignInError('No pudimos iniciar sesión con Google. Volvé a intentarlo.');
       setIsSigningIn(false);
@@ -223,9 +218,8 @@ export default function GamesSection({ showHeading = true }) {
         </div>
         <div className="games-section__cta">
           <p className="games-section__note">
-            Gratis para clientes al iniciar sesión con Google cuando OAuth esté conectado en el backend. Si sos administrador del vivero, podés desbloquear el modo de pruebas iniciando sesión en el panel.
+            Los juegos son gratuitos para clientes registrados con Google. Muy pronto habilitaremos el ingreso con Google para desbloquear esta sección.
           </p>
-          <a className="text-link" href="/admin.html">Entrar como administrador <span aria-hidden="true">→</span></a>
         </div>
       </>
     );

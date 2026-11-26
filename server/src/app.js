@@ -123,7 +123,7 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   app.use('/api/games', gamesLimiter, createGamesRouter({ auth, appEnv }));
   app.use('/api/visits', visitsLimiter, createVisitsRouter());
   app.use('/api/admin', adminLimiter, createAdminRouter({ auth, appEnv }));
-  app.use('/api', productsLimiter, createPublicSiteRouter({ isProduction }));
+  app.use('/api', productsLimiter, createPublicSiteRouter({ isProduction, auth }));
 
   if (isProduction) {
     for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin']) {

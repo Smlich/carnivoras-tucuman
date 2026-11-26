@@ -3,13 +3,27 @@ import { useAuth } from '../../context/AuthContext';
 import { loginAdmin } from '../../services/admin-api';
 import CatalogImage from '../CatalogImage';
 
+function getInitialAuthError() {
+  const code = new URLSearchParams(window.location.search).get('auth_error');
+  if (code === 'not_admin') {
+    return 'Esa cuenta de Google no está autorizada como administrador. Iniciá sesión con tu cuenta de administrador o agregá ese correo en ADMIN_EMAILS.';
+  }
+  if (code === 'google_cancelled') {
+    return 'Se canceló el inicio de sesión con Google.';
+  }
+  if (code) {
+    return 'No pudimos completar el inicio de sesión con Google.';
+  }
+  return '';
+}
+
 export default function AdminLogin() {
-  const { adminConfigured, adminGoogleAllowed, enabled, providers, refreshAdminSession } = useAuth();
+  const { adminConfigured, adminGoogleAllowed, enabled, providers, refreshAdminSession, signInWithProvider } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(getInitialAuthError);
 
   const googleAvailable = adminGoogleAllowed && enabled && providers.includes('google');
 
@@ -34,12 +48,7 @@ export default function AdminLogin() {
     setIsSubmitting(true);
 
     try {
-      const { authClient } = await import('../../services/auth-client');
-      const result = await authClient.signIn.social({
-        provider: 'google',
-        callbackURL: window.location.origin + '/admin.html',
-      });
-      if (result?.error) throw new Error('Acceso rechazado.');
+      await signInWithProvider('google', '/admin.html');
     } catch {
       setErrorMessage('No pudimos conectar con Google.');
       setIsSubmitting(false);
@@ -116,7 +125,7 @@ export default function AdminLogin() {
 
         {googleAvailable && (
           <div className="admin-login-divider">
-            <span>O si usás el backend MERN</span>
+            <span>O ingresá con tu cuenta Google autorizada</span>
             <button
               type="button"
               className="admin-btn-secondary admin-btn-secondary--full"

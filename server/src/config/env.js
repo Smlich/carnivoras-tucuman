@@ -48,6 +48,7 @@ const environmentSchema = z.object({
   ADMIN_PASSWORD: optionalText(z.string()),
   ADMIN_PASSWORD_HASH: optionalText(z.string()),
   ADMIN_SESSION_SECRET: optionalText(z.string().min(32, 'ADMIN_SESSION_SECRET debe tener al menos 32 caracteres.')),
+  USER_SESSION_SECRET: optionalText(z.string().min(32, 'USER_SESSION_SECRET debe tener al menos 32 caracteres.')),
 }).superRefine((values, context) => {
   const providerPairs = [
     ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'Google'],

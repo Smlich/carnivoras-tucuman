@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useSiteContent } from '../context/SiteContentContext';
 import { formatPrice } from '../utils/format-price';
 import { createWhatsAppUrl } from '../utils/whatsapp';
@@ -6,10 +7,25 @@ import CatalogImage from './CatalogImage';
 
 export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, onClear }) {
   const { settings } = useSiteContent();
+  const { user, enabled, providers, signInWithProvider } = useAuth();
   const [customerName, setCustomerName] = useState('');
+  const [nameError, setNameError] = useState('');
   const drawerRef = useRef(null);
+  const nameInputRef = useRef(null);
+  const hasEditedNameRef = useRef(false);
   const emptyStateActionRef = useRef(null);
   const previousItemCount = useRef(items.length);
+
+  const isGoogleRegistered = Boolean(user);
+  const googleEmail = user?.email || '';
+  const googleAvailable = enabled && providers.includes('google');
+
+  useEffect(() => {
+    if (user?.name && !hasEditedNameRef.current) {
+      setCustomerName(user.name);
+      setNameError('');
+    }
+  }, [user?.name]);
 
   useEffect(() => {
     const itemCountChangedToEmpty = previousItemCount.current > 0 && items.length === 0;
@@ -72,15 +88,18 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  function logOrderInquiry() {
+  function logOrderInquiry(trimmedName) {
     if (import.meta.env.VITE_STATIC_PREVIEW === 'true' || items.length === 0) return;
 
     fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       keepalive: true,
       body: JSON.stringify({
-        customerName: customerName.trim(),
+        customerName: trimmedName,
+        customerEmail: googleEmail,
+        googleRegistered: isGoogleRegistered,
         items: items.map((item) => ({
           id: item.id,
           name: item.name,
@@ -90,6 +109,24 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
         source: 'whatsapp-cart',
       }),
     }).catch(() => {});
+  }
+
+  const trimmedName = customerName.trim();
+  const whatsappUrl = createWhatsAppUrl(items, settings, {
+    name: trimmedName,
+    googleRegistered: isGoogleRegistered,
+    email: googleEmail,
+  });
+
+  function handleWhatsAppCheckout(event) {
+    if (trimmedName.length < 2) {
+      event.preventDefault();
+      setNameError('Ingresá tu nombre para enviar el pedido por WhatsApp.');
+      nameInputRef.current?.focus();
+      return;
+    }
+    setNameError('');
+    logOrderInquiry(trimmedName);
   }
 
   return (
@@ -136,24 +173,52 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
               ))}
             </ul>
             <div className="cart-summary">
+              <div className={'cart-google-status' + (isGoogleRegistered ? ' is-registered' : '')}>
+                <div>
+                  <span>Estado de cuenta Google</span>
+                  <strong>{isGoogleRegistered ? 'Registrado con Google' : 'Sin cuenta de Google'}</strong>
+                  <small>
+                    {isGoogleRegistered
+                      ? (googleEmail || 'Cuenta verificada para tu pedido')
+                      : 'Se informará automáticamente en tu mensaje de WhatsApp.'}
+                  </small>
+                </div>
+                {!isGoogleRegistered && googleAvailable && (
+                  <button
+                    type="button"
+                    className="cart-google-status__btn"
+                    onClick={() => signInWithProvider('google', `${window.location.pathname || '/'}${window.location.search || ''}`).catch(() => {})}
+                  >
+                    Ingresar con Google
+                  </button>
+                )}
+              </div>
               <label className="cart-customer-field">
-                <span>Tu nombre (opcional, para agilizar la consulta)</span>
+                <span>Tu nombre y apellido *</span>
                 <input
+                  ref={nameInputRef}
                   type="text"
                   maxLength={80}
+                  required
+                  aria-invalid={nameError ? 'true' : undefined}
                   value={customerName}
-                  onChange={(event) => setCustomerName(event.target.value)}
-                  placeholder="Ej. María o Facundo"
+                  onChange={(event) => {
+                    hasEditedNameRef.current = true;
+                    setCustomerName(event.target.value);
+                    if (nameError && event.target.value.trim().length >= 2) setNameError('');
+                  }}
+                  placeholder="Ej. María González o Facundo"
                 />
+                {nameError && <small className="cart-field-error" role="alert">{nameError}</small>}
               </label>
               <div><span>Total de referencia</span><strong>{formatPrice(total)}</strong></div>
-              <p>El stock, el precio vigente y la entrega se confirman por WhatsApp.</p>
+              <p>Se envía a WhatsApp tu nombre, el estado de tu cuenta Google y el detalle para confirmar stock y entrega.</p>
               <a
                 className="button button--dark button--full"
-                href={createWhatsAppUrl(items, settings, customerName.trim())}
+                href={whatsappUrl}
                 target="_blank"
-                rel="noreferrer"
-                onClick={logOrderInquiry}
+                rel="noopener noreferrer"
+                onClick={handleWhatsAppCheckout}
               >
                 Enviar consulta por WhatsApp <span aria-hidden="true">↗</span>
               </a>

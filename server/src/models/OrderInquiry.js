@@ -15,6 +15,8 @@ const orderInquirySchema = new mongoose.Schema({
     trim: true,
   },
   customerName: { type: String, default: '', trim: true, maxlength: 80 },
+  customerEmail: { type: String, default: '', trim: true, maxlength: 160 },
+  googleRegistered: { type: Boolean, default: false },
   notes: { type: String, default: '', trim: true, maxlength: 300 },
   items: { type: [orderItemSubSchema], required: true },
   totalARS: { type: Number, required: true, min: 0 },

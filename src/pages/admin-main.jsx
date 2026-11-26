@@ -23,7 +23,7 @@ function AdminGate() {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
+    <AuthProvider includeAdminMeta>
       <SiteContentProvider>
         <AdminGate />
       </SiteContentProvider>

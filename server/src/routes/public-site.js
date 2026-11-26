@@ -1,4 +1,5 @@
 import { randomBytes } from 'node:crypto';
+import { fromNodeHeaders } from 'better-auth/node';
 import { Router } from 'express';
 import { z } from 'zod';
 import {
@@ -51,7 +52,7 @@ function mapDbGalleryToClient(document) {
   };
 }
 
-export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'production' } = {}) {
+export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'production', auth = null } = {}) {
   const router = Router();
 
   router.get('/site-data', async (request, response) => {
@@ -149,9 +150,24 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
     const orderId = 'PED-' + Date.now().toString(36).toUpperCase() + '-' + randomBytes(2).toString('hex').toUpperCase();
     const totalARS = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+    let sessionUser = null;
+    if (auth) {
+      try {
+        const sessionData = await auth.api.getSession({ headers: fromNodeHeaders(request.headers) });
+        sessionUser = sessionData?.user || null;
+      } catch {
+        sessionUser = null;
+      }
+    }
+
+    const googleRegistered = Boolean(sessionUser);
+    const customerEmail = sessionUser?.email ? String(sessionUser.email).trim().toLowerCase() : '';
+
     const orderPayload = {
       orderId,
-      customerName: input.customerName,
+      customerName: input.customerName || String(sessionUser?.name || '').trim(),
+      customerEmail,
+      googleRegistered,
       notes: input.notes,
       items: input.items,
       totalARS,
@@ -167,6 +183,8 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
           id: saved.orderId,
           createdAt: saved.createdAt,
           customerName: saved.customerName,
+          customerEmail: saved.customerEmail || '',
+          googleRegistered: Boolean(saved.googleRegistered),
           notes: saved.notes,
           items: saved.items,
           totalARS: saved.totalARS,

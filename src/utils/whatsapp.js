@@ -1,15 +1,36 @@
 import { store } from '../config/store';
 import { formatPrice } from './format-price';
 
-export function createOrderMessage(items, storeSettings = store, customerName = '') {
+function normalizeCustomerInfo(customer) {
+  if (typeof customer === 'string') {
+    return {
+      name: customer.trim(),
+      googleRegistered: false,
+      email: '',
+    };
+  }
+  return {
+    name: String(customer?.name || '').trim(),
+    googleRegistered: Boolean(customer?.googleRegistered),
+    email: String(customer?.email || '').trim(),
+  };
+}
+
+export function formatGoogleStatusLabel({ googleRegistered = false, email = '' } = {}) {
+  if (!googleRegistered) return 'No registrado (sin cuenta de Google)';
+  return email ? `Registrado con Google (${email})` : 'Registrado con Google';
+}
+
+export function createOrderMessage(items, storeSettings = store, customer = {}) {
   const businessName = storeSettings?.storeName || storeSettings?.name || store.name;
+  const info = normalizeCustomerInfo(customer);
   const lines = items.map((item) => {
     const lineTotal = item.price * item.quantity;
     return '• ' + item.name + ' × ' + item.quantity + ' — ' + formatPrice(lineTotal);
   });
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const greeting = customerName
-    ? `Hola, soy ${customerName} y quiero consultar este pedido en ${businessName}:`
+  const greeting = info.name
+    ? `Hola, soy ${info.name} y quiero consultar este pedido en ${businessName}:`
     : `Hola, quiero consultar este pedido en ${businessName}:`;
 
   return [
@@ -18,13 +39,18 @@ export function createOrderMessage(items, storeSettings = store, customerName = 
     ...lines,
     '',
     'Total de referencia: ' + formatPrice(total),
+    '',
+    'Datos del cliente:',
+    '• Nombre: ' + (info.name || 'No indicado'),
+    '• Cuenta de Google: ' + formatGoogleStatusLabel(info),
+    '',
     '¿Podrían confirmar disponibilidad, precio vigente y entrega? Gracias.',
   ].join('\n');
 }
 
-export function createWhatsAppUrl(items, storeSettings = store, customerName = '') {
+export function createWhatsAppUrl(items, storeSettings = store, customer = {}) {
   const whatsappNumber = storeSettings?.whatsappNumber || store.whatsappNumber;
-  const message = encodeURIComponent(createOrderMessage(items, storeSettings, customerName));
+  const message = encodeURIComponent(createOrderMessage(items, storeSettings, customer));
   return 'https://wa.me/' + whatsappNumber + '?text=' + message;
 }
 

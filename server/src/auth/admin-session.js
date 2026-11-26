@@ -9,6 +9,10 @@ import {
 
 export const ADMIN_COOKIE_NAME = 'ct_admin_session';
 export const ADMIN_SESSION_TTL_SECONDS = 12 * 60 * 60;
+export const USER_COOKIE_NAME = 'ct_user_session';
+export const USER_SESSION_TTL_SECONDS = 7 * 24 * 60 * 60;
+export const OAUTH_STATE_COOKIE_NAME = 'ct_oauth_state';
+export const OAUTH_STATE_TTL_SECONDS = 10 * 60;
 const PBKDF2_ITERATIONS = 210_000;
 const PBKDF2_KEY_LENGTH = 32;
 
@@ -47,6 +51,47 @@ export function isAllowedAdminEmail(email, envConfig = {}) {
   const target = normalizeEmail(email);
   if (!target) return false;
   return parseAdminEmails(envConfig).some((allowed) => safeEqualStrings(allowed, target));
+}
+
+export function isAdminGoogleEmail(email, envConfig = {}, overrideAccount = null) {
+  const target = normalizeEmail(email);
+  if (!target) return false;
+  if (overrideAccount?.email && safeEqualStrings(normalizeEmail(overrideAccount.email), target)) {
+    return true;
+  }
+  return isAllowedAdminEmail(target, envConfig);
+}
+
+export function getSessionSigningSecret(envConfig = {}) {
+  for (const key of ['USER_SESSION_SECRET', 'BETTER_AUTH_SECRET', 'ADMIN_SESSION_SECRET']) {
+    const candidate = String(envConfig?.[key] ?? '').trim();
+    if (candidate.length >= 32) return candidate;
+  }
+  return '';
+}
+
+export function isGoogleOAuthConfigured(envConfig = {}) {
+  return Boolean(
+    String(envConfig?.GOOGLE_CLIENT_ID ?? '').trim()
+    && String(envConfig?.GOOGLE_CLIENT_SECRET ?? '').trim()
+    && getSessionSigningSecret(envConfig),
+  );
+}
+
+export function sanitizeReturnTo(value, fallback = '/') {
+  const text = String(value ?? '').trim();
+  if (!text || text.length > 200 || !text.startsWith('/') || text.startsWith('//') || text.startsWith('/\\')) {
+    return fallback;
+  }
+  if (/[\r\n]/.test(text)) return fallback;
+  return text;
+}
+
+export function generatePkcePair() {
+  const state = randomBytes(24).toString('base64url');
+  const codeVerifier = randomBytes(32).toString('base64url');
+  const codeChallenge = createHash('sha256').update(codeVerifier).digest('base64url');
+  return { state, codeVerifier, codeChallenge };
 }
 
 export function hashPasswordPbkdf2(password, saltHex = randomBytes(16).toString('hex'), iterations = PBKDF2_ITERATIONS) {
@@ -163,28 +208,16 @@ function signTokenPayload(encodedPayload, secret) {
   return createHmac('sha256', String(secret)).update(encodedPayload).digest('base64url');
 }
 
-export function createAdminToken(user, secret, ttlSeconds = ADMIN_SESSION_TTL_SECONDS) {
+function signSignedPayload(payload, secret) {
   if (!secret || String(secret).length < 32) {
-    throw new Error('ADMIN_SESSION_SECRET debe tener al menos 32 caracteres.');
+    throw new Error('La clave secreta de sesión debe tener al menos 32 caracteres.');
   }
-
-  const nowSeconds = Math.floor(Date.now() / 1000);
-  const payload = {
-    sub: normalizeEmail(user.email),
-    email: normalizeEmail(user.email),
-    name: String(user.name || 'Administrador').trim() || 'Administrador',
-    role: 'admin',
-    method: user.method || 'password',
-    iat: nowSeconds,
-    exp: nowSeconds + ttlSeconds,
-  };
-
   const encodedPayload = encodeBase64Url(JSON.stringify(payload));
   const signature = signTokenPayload(encodedPayload, secret);
   return `${encodedPayload}.${signature}`;
 }
 
-export function verifyAdminToken(token, secret) {
+function verifySignedPayload(token, secret) {
   if (!token || !secret || typeof token !== 'string') return null;
 
   const dotIndex = token.indexOf('.');
@@ -203,13 +236,84 @@ export function verifyAdminToken(token, secret) {
   try {
     const parsed = JSON.parse(decodeBase64Url(encodedPayload));
     const nowSeconds = Math.floor(Date.now() / 1000);
-    if (!parsed || parsed.role !== 'admin' || !parsed.email || typeof parsed.exp !== 'number' || parsed.exp <= nowSeconds) {
+    if (!parsed || typeof parsed.exp !== 'number' || parsed.exp <= nowSeconds) {
       return null;
     }
     return parsed;
   } catch {
     return null;
   }
+}
+
+export function createAdminToken(user, secret, ttlSeconds = ADMIN_SESSION_TTL_SECONDS) {
+  if (!secret || String(secret).length < 32) {
+    throw new Error('ADMIN_SESSION_SECRET debe tener al menos 32 caracteres.');
+  }
+
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  return signSignedPayload({
+    sub: normalizeEmail(user.email),
+    email: normalizeEmail(user.email),
+    name: String(user.name || 'Administrador').trim() || 'Administrador',
+    role: 'admin',
+    method: user.method || 'password',
+    iat: nowSeconds,
+    exp: nowSeconds + ttlSeconds,
+  }, secret);
+}
+
+export function verifyAdminToken(token, secret) {
+  const parsed = verifySignedPayload(token, secret);
+  if (!parsed || parsed.role !== 'admin' || !parsed.email) return null;
+  return parsed;
+}
+
+export function createUserToken(user, secret, ttlSeconds = USER_SESSION_TTL_SECONDS) {
+  const email = normalizeEmail(user?.email);
+  if (!email) {
+    throw new Error('El correo del usuario es obligatorio.');
+  }
+
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  return signSignedPayload({
+    sub: String(user?.id || user?.sub || email),
+    id: String(user?.id || user?.sub || email),
+    email,
+    name: String(user?.name || email.split('@')[0] || 'Cliente').trim(),
+    image: typeof user?.image === 'string' ? user.image : '',
+    provider: String(user?.provider || 'google'),
+    emailVerified: user?.emailVerified !== false,
+    role: 'customer',
+    iat: nowSeconds,
+    exp: nowSeconds + ttlSeconds,
+  }, secret);
+}
+
+export function verifyUserToken(token, secret) {
+  const parsed = verifySignedPayload(token, secret);
+  if (!parsed || parsed.role !== 'customer' || !parsed.email) return null;
+  return parsed;
+}
+
+export function createOAuthStateToken({ state, codeVerifier, returnTo = '/' }, secret, ttlSeconds = OAUTH_STATE_TTL_SECONDS) {
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  return signSignedPayload({
+    typ: 'oauth_state',
+    state: String(state || ''),
+    codeVerifier: String(codeVerifier || ''),
+    returnTo: sanitizeReturnTo(returnTo, '/'),
+    iat: nowSeconds,
+    exp: nowSeconds + ttlSeconds,
+  }, secret);
+}
+
+export function verifyOAuthStateToken(token, secret) {
+  const parsed = verifySignedPayload(token, secret);
+  if (!parsed || parsed.typ !== 'oauth_state' || !parsed.state || !parsed.codeVerifier) return null;
+  return {
+    ...parsed,
+    returnTo: sanitizeReturnTo(parsed.returnTo, '/'),
+  };
 }
 
 export function parseCookies(cookieHeader = '') {
@@ -229,9 +333,9 @@ export function parseCookies(cookieHeader = '') {
   return cookies;
 }
 
-export function buildAdminCookie(token, { secure = false, maxAge = ADMIN_SESSION_TTL_SECONDS } = {}) {
+function buildCookieString(name, value, { secure = false, maxAge } = {}) {
   const parts = [
-    `${ADMIN_COOKIE_NAME}=${encodeURIComponent(token)}`,
+    `${name}=${value}`,
     'Path=/',
     'HttpOnly',
     'SameSite=Lax',
@@ -241,14 +345,26 @@ export function buildAdminCookie(token, { secure = false, maxAge = ADMIN_SESSION
   return parts.join('; ');
 }
 
+export function buildAdminCookie(token, { secure = false, maxAge = ADMIN_SESSION_TTL_SECONDS } = {}) {
+  return buildCookieString(ADMIN_COOKIE_NAME, encodeURIComponent(token), { secure, maxAge });
+}
+
 export function buildClearAdminCookie({ secure = false } = {}) {
-  const parts = [
-    `${ADMIN_COOKIE_NAME}=`,
-    'Path=/',
-    'HttpOnly',
-    'SameSite=Lax',
-    'Max-Age=0',
-  ];
-  if (secure) parts.push('Secure');
-  return parts.join('; ');
+  return buildCookieString(ADMIN_COOKIE_NAME, '', { secure, maxAge: 0 });
+}
+
+export function buildUserCookie(token, { secure = false, maxAge = USER_SESSION_TTL_SECONDS } = {}) {
+  return buildCookieString(USER_COOKIE_NAME, encodeURIComponent(token), { secure, maxAge });
+}
+
+export function buildClearUserCookie({ secure = false } = {}) {
+  return buildCookieString(USER_COOKIE_NAME, '', { secure, maxAge: 0 });
+}
+
+export function buildOAuthStateCookie(token, { secure = false, maxAge = OAUTH_STATE_TTL_SECONDS } = {}) {
+  return buildCookieString(OAUTH_STATE_COOKIE_NAME, encodeURIComponent(token), { secure, maxAge });
+}
+
+export function buildClearOAuthStateCookie({ secure = false } = {}) {
+  return buildCookieString(OAUTH_STATE_COOKIE_NAME, '', { secure, maxAge: 0 });
 }
