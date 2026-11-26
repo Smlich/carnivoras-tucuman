@@ -462,6 +462,26 @@ async function readDailyQuota(store) {
   };
 }
 
+async function refundDailyQuota(store, bucket) {
+  const todayKey = getArgentinaDateKey();
+  await updateJsonBlob(store, KEYS.assistantQuota, {}, (current) => {
+    const prevToday = current?.[todayKey] && typeof current[todayKey] === 'object'
+      ? current[todayKey]
+      : null;
+    if (!prevToday) return { response: true };
+    const used = Number.isInteger(prevToday[bucket]) ? prevToday[bucket] : 0;
+    if (used <= 0) return { response: true };
+    const nextToday = {
+      ...prevToday,
+      [bucket]: used - 1,
+    };
+    return {
+      value: { [todayKey]: nextToday },
+      result: true,
+    };
+  });
+}
+
 export function createApiHandler({
   getSiteStore: resolveSiteStore = getSiteStore,
   getMediaStore: resolveMediaStore = getMediaStore,
@@ -476,6 +496,10 @@ export function createApiHandler({
   const checkAssistantLimit = createMemoryLimiter({
     windowMs: rateLimits.assistantWindowMs ?? 10 * 60_000,
     max: rateLimits.assistantMax ?? 8,
+  });
+  const checkScoresLimit = createMemoryLimiter({
+    windowMs: rateLimits.scoresWindowMs ?? 5 * 60_000,
+    max: rateLimits.scoresMax ?? 30,
   });
   const loginMax = rateLimits.loginMax ?? 10;
   const loginWindowMs = rateLimits.loginWindowMs ?? 15 * 60_000;
@@ -527,10 +551,26 @@ export function createApiHandler({
 
       if (path === '/api/auth/status' && method === 'GET') {
         const googleEnabled = isGoogleOAuthConfigured(envConfig);
+        const sessionUser = googleEnabled ? authenticateUserCookie(request, envConfig) : null;
         return jsonResponse({
           enabled: googleEnabled,
           providers: googleEnabled ? ['google'] : [],
           authFlow: 'redirect',
+          session: sessionUser
+            ? {
+              user: {
+                id: sessionUser.id,
+                email: sessionUser.email,
+                name: sessionUser.name,
+                image: sessionUser.image,
+                provider: sessionUser.provider,
+                emailVerified: sessionUser.emailVerified,
+              },
+              session: {
+                expiresAt: new Date(sessionUser.exp * 1000).toISOString(),
+              },
+            }
+            : null,
         });
       }
 
@@ -604,7 +644,7 @@ export function createApiHandler({
           );
         }
 
-        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        const tokenResponse = await fetchImpl('https://oauth2.googleapis.com/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({
@@ -627,7 +667,7 @@ export function createApiHandler({
           return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'google_token_failed'), [clearOAuthCookie]);
         }
 
-        const profileResponse = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
+        const profileResponse = await fetchImpl('https://openidconnect.googleapis.com/v1/userinfo', {
           headers: { Authorization: `Bearer ${tokenJson.access_token}` },
           signal: AbortSignal.timeout(10_000),
         });
@@ -695,6 +735,7 @@ export function createApiHandler({
             products: allProducts.filter((item) => item.isActive !== false),
             gallery: allGallery.filter((item) => item.isActive !== false),
             gamesPreview: sanitizePublicGamesPreview(allGames),
+            assistantEnabled: isGeminiConfigured(envConfig),
           },
         });
       }
@@ -851,17 +892,24 @@ export function createApiHandler({
         }
 
         const activeProducts = (await loadProducts(store)).filter((item) => item.isActive !== false);
-        const result = await diagnoseCarnivorousPlant({
-          apiKey: envConfig.GEMINI_API_KEY.trim(),
-          model: getGeminiModel(envConfig),
-          question: input.question,
-          species: input.species,
-          locationContext: input.locationContext,
-          image: normalizedImage,
-          catalogProducts: activeProducts,
-          fetchImpl,
-        });
-        return jsonResponse({ data: result });
+        try {
+          const result = await diagnoseCarnivorousPlant({
+            apiKey: envConfig.GEMINI_API_KEY.trim(),
+            model: getGeminiModel(envConfig),
+            question: input.question,
+            species: input.species,
+            locationContext: input.locationContext,
+            image: normalizedImage,
+            catalogProducts: activeProducts,
+            fetchImpl,
+          });
+          return jsonResponse({ data: result });
+        } catch (assistantError) {
+          if ((assistantError?.status ?? 500) >= 500) {
+            await refundDailyQuota(store, 'public').catch(() => {});
+          }
+          throw assistantError;
+        }
       }
 
       if (path === '/api/assistant/recommend' && method === 'POST') {
@@ -896,17 +944,24 @@ export function createApiHandler({
         }
 
         const activeProducts = (await loadProducts(store)).filter((item) => item.isActive !== false);
-        const result = await recommendCatalogProducts({
-          apiKey: envConfig.GEMINI_API_KEY.trim(),
-          model: getGeminiModel(envConfig),
-          query: input.query,
-          sunlight: input.sunlight,
-          experience: input.experience,
-          budgetMaxARS: input.budgetMaxARS,
-          catalogProducts: activeProducts,
-          fetchImpl,
-        });
-        return jsonResponse({ data: result });
+        try {
+          const result = await recommendCatalogProducts({
+            apiKey: envConfig.GEMINI_API_KEY.trim(),
+            model: getGeminiModel(envConfig),
+            query: input.query,
+            sunlight: input.sunlight,
+            experience: input.experience,
+            budgetMaxARS: input.budgetMaxARS,
+            catalogProducts: activeProducts,
+            fetchImpl,
+          });
+          return jsonResponse({ data: result });
+        } catch (assistantError) {
+          if ((assistantError?.status ?? 500) >= 500) {
+            await refundDailyQuota(store, 'public').catch(() => {});
+          }
+          throw assistantError;
+        }
       }
 
       // 3. JUEGOS PROTEGIDOS (GOOGLE OAUTH O SESIÓN DE ADMINISTRADOR)
@@ -963,6 +1018,19 @@ export function createApiHandler({
           if (!isSameOriginRequest(request, url)) {
             return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
           }
+          const retryAfter = checkScoresLimit(getClientIp(request));
+          if (retryAfter > 0) {
+            return jsonResponse(
+              {
+                error: {
+                  code: 'RATE_LIMIT_EXCEEDED',
+                  message: 'Demasiados envíos de puntaje en poco tiempo. Esperá unos segundos.',
+                },
+              },
+              429,
+              { 'Retry-After': String(retryAfter) },
+            );
+          }
           const slug = scoresMatch[1];
           const game = visibleGames.find((item) => item.slug === slug);
           if (!game) {
@@ -1002,13 +1070,26 @@ export function createApiHandler({
 
       // 4. SESIÓN Y CUENTA DE ADMINISTRADOR
       if (path === '/api/admin/auth/session' && method === 'GET') {
+        const wantMeta = url.searchParams.get('meta') === '1';
+        if (!wantMeta) {
+          const cookies = parseCookies(request.headers.get('cookie') || '');
+          if (!cookies.ct_admin_session && !cookies.ct_user_session) {
+            return jsonResponse({
+              data: {
+                authenticated: false,
+                user: null,
+              },
+            });
+          }
+        }
+
         const accountOverride = await readJsonBlob(store, KEYS.adminAccount, null);
         const googleAllowed = isGoogleOAuthConfigured(envConfig)
           && (parseAdminEmails(envConfig).length > 0 || Boolean(accountOverride?.email));
         const configured = isAdminConfigured(envConfig, accountOverride) || googleAllowed;
         const user = configured ? resolveNetlifyAdminUser(request, envConfig, accountOverride) : null;
 
-        if (!user && url.searchParams.get('meta') !== '1') {
+        if (!user && !wantMeta) {
           return jsonResponse({
             data: {
               authenticated: false,
@@ -1163,6 +1244,11 @@ export function createApiHandler({
             return errorResponse(400, 'NEW_PASSWORD_REQUIRED', 'Definí una nueva contraseña (mínimo 8 caracteres) para habilitar el acceso local.');
           }
 
+          const adminSigningSecret = envConfig.ADMIN_SESSION_SECRET || getSessionSigningSecret(envConfig);
+          if (!adminSigningSecret || String(adminSigningSecret).length < 32) {
+            return errorResponse(503, 'ADMIN_NOT_CONFIGURED', 'Falta el secreto de sesión para actualizar la cuenta de administrador.');
+          }
+
           const passwordToHash = body.newPassword || body.currentPassword;
           const nextTokenVersion = (Number.isInteger(accountOverride?.tokenVersion) ? accountOverride.tokenVersion : 0) + 1;
           const nextOverride = {
@@ -1176,7 +1262,7 @@ export function createApiHandler({
 
           const nextToken = createAdminToken(
             { email: nextOverride.email, name: nextOverride.name, method: adminUser.method, ver: nextTokenVersion },
-            envConfig.ADMIN_SESSION_SECRET,
+            adminSigningSecret,
           );
           return jsonResponse(
             {
@@ -1465,20 +1551,27 @@ export function createApiHandler({
             return errorResponse(429, 'ASSISTANT_DAILY_LIMIT', 'Se alcanzó el límite diario del Copiloto IA de administración.');
           }
 
-          const result = await generateAdminCopy({
-            apiKey: envConfig.GEMINI_API_KEY.trim(),
-            model: getGeminiModel(envConfig),
-            target: body.target,
-            name: body.name,
-            species: body.species,
-            category: body.category,
-            price: body.price,
-            note: body.note,
-            existingDescription: body.existingDescription,
-            image: resolvedImage,
-            fetchImpl,
-          });
-          return jsonResponse({ data: result });
+          try {
+            const result = await generateAdminCopy({
+              apiKey: envConfig.GEMINI_API_KEY.trim(),
+              model: getGeminiModel(envConfig),
+              target: body.target,
+              name: body.name,
+              species: body.species,
+              category: body.category,
+              price: body.price,
+              note: body.note,
+              existingDescription: body.existingDescription,
+              image: resolvedImage,
+              fetchImpl,
+            });
+            return jsonResponse({ data: result });
+          } catch (assistantError) {
+            if ((assistantError?.status ?? 500) >= 500) {
+              await refundDailyQuota(store, 'admin').catch(() => {});
+            }
+            throw assistantError;
+          }
         }
 
         if (path === '/api/admin/media' && method === 'POST') {

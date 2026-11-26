@@ -58,7 +58,7 @@ for (const file of files) {
         await pipeline.jpeg({ quality: width <= 480 ? 88 : 85, mozjpeg: true }).toFile(outputPath);
       } else {
         await pipeline.webp({
-          quality: isLogo ? 90 : 92,
+          quality: isLogo ? 88 : 84,
           effort: 6,
           lossless: false,
         }).toFile(outputPath);

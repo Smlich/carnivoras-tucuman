@@ -13,8 +13,8 @@ const QUICK_PROMPTS = [
 ];
 
 export default function CatalogRecommender({ products = [], onAdd }) {
-  const { settings } = useSiteContent();
-  const [assistantEnabled, setAssistantEnabled] = useState(null);
+  const { settings, assistantEnabled: siteAssistantEnabled, isLoaded } = useSiteContent();
+  const [assistantEnabled, setAssistantEnabled] = useState(siteAssistantEnabled);
   const [query, setQuery] = useState('');
   const [sunlight, setSunlight] = useState('');
   const [experience, setExperience] = useState('');
@@ -25,6 +25,12 @@ export default function CatalogRecommender({ products = [], onAdd }) {
   const [addedIds, setAddedIds] = useState(() => new Set());
 
   useEffect(() => {
+    if (typeof siteAssistantEnabled === 'boolean') {
+      setAssistantEnabled(siteAssistantEnabled);
+      return undefined;
+    }
+    if (!isLoaded) return undefined;
+
     let active = true;
     fetchAssistantStatus().then((status) => {
       if (active) setAssistantEnabled(status.enabled);
@@ -32,7 +38,7 @@ export default function CatalogRecommender({ products = [], onAdd }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [isLoaded, siteAssistantEnabled]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -190,6 +196,8 @@ export default function CatalogRecommender({ products = [], onAdd }) {
                             src={liveProduct.image}
                             alt={liveProduct.imageAlt || liveProduct.name}
                             className="catalog-ai-rec__img"
+                            width="72"
+                            height="72"
                             sizes="72px"
                             loading="lazy"
                             decoding="async"

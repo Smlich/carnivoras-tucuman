@@ -629,3 +629,79 @@ test('Dionaea Strike restringe configuración a Admin y persiste puntajes de usu
   assert.equal(adminScores.status, 200);
   assert.equal((await adminScores.json()).data.length, 1);
 });
+
+test('fallos >= 500 de Gemini reembolsan cuota, /scores aplica rate limit y /auth/status + /site-data incluyen estado', async () => {
+  const failThenOkEnv = {
+    ...testEnv,
+    GEMINI_API_KEY: 'AIzaSyTestKeyExample987654',
+    GEMINI_DAILY_LIMIT: '1',
+    GOOGLE_CLIENT_ID: 'cid',
+    GOOGLE_CLIENT_SECRET: 'csec',
+  };
+
+  let shouldFailUpstream = true;
+  const mockFetch = async () => {
+    if (shouldFailUpstream) {
+      return { ok: false, status: 502, text: async () => 'upstream bad gateway' };
+    }
+    return {
+      ok: true,
+      json: async () => ({
+        candidates: [{
+          content: {
+            parts: [{
+              text: JSON.stringify({
+                intro: 'Te recomendamos empezar con Venus.',
+                recommendations: [],
+                generalTip: 'Usá agua de lluvia.',
+              }),
+            }],
+          },
+        }],
+      }),
+    };
+  };
+
+  const { call, store } = setup(failThenOkEnv, { assistantMax: 10, scoresMax: 2 }, mockFetch);
+
+  const siteDataRes = await call('/api/site-data');
+  assert.equal(siteDataRes.status, 200);
+  assert.equal((await siteDataRes.json()).data.assistantEnabled, true);
+
+  const failedRec = await call('/api/assistant/recommend', {
+    method: 'POST',
+    body: { query: 'Quiero una carnívora fácil' },
+  });
+  assert.equal(failedRec.status, 502);
+
+  shouldFailUpstream = false;
+  const okAfterRefund = await call('/api/assistant/recommend', {
+    method: 'POST',
+    body: { query: 'Quiero una carnívora fácil' },
+  });
+  assert.equal(okAfterRefund.status, 200);
+
+  const quotaBlob = store.data.get('assistant-daily-quota')?.value || {};
+  const todayBucket = Object.values(quotaBlob)[0];
+  assert.equal(todayBucket.public, 1);
+
+  const playerToken = createUserToken({ id: 'u-2', email: 'jugador@example.com', name: 'Lucas' }, ADMIN_SECRET);
+  const playerHeaders = {
+    cookie: `ct_user_session=${encodeURIComponent(playerToken)}`,
+    origin: ORIGIN,
+    'x-nf-client-connection-ip': '203.0.113.88',
+  };
+
+  const authStatusRes = await call('/api/auth/status', { headers: playerHeaders });
+  assert.equal(authStatusRes.status, 200);
+  const authStatusBody = await authStatusRes.json();
+  assert.equal(authStatusBody.enabled, true);
+  assert.equal(authStatusBody.session.user.email, 'jugador@example.com');
+
+  assert.equal((await call('/api/games/dionaea-strike/scores', { method: 'POST', body: { score: 100 }, headers: playerHeaders })).status, 201);
+  assert.equal((await call('/api/games/dionaea-strike/scores', { method: 'POST', body: { score: 200 }, headers: playerHeaders })).status, 201);
+  const limitedScore = await call('/api/games/dionaea-strike/scores', { method: 'POST', body: { score: 300 }, headers: playerHeaders });
+  assert.equal(limitedScore.status, 429);
+  assert.ok(Number(limitedScore.headers.get('retry-after')) >= 1);
+  assert.equal((await limitedScore.json()).error.code, 'RATE_LIMIT_EXCEEDED');
+});

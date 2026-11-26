@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   AssistantServiceError,
+  callGeminiJson,
   DEFAULT_GEMINI_MODEL,
   diagnoseCarnivorousPlant,
   generateAdminCopy,
@@ -170,4 +171,56 @@ test('generateAdminCopy devuelve título, descripción, alt SEO y captions y san
     }),
     (err) => err instanceof AssistantServiceError && err.status === 429 && !err.message.includes('AIzaSy'),
   );
+});
+
+test('gemini-3.5-flash-lite omite temperature, modelos 2.5 la mantienen y 503 transitorio se reintenta 1 vez', async () => {
+  const seenConfigs = [];
+  let attempts = 0;
+
+  const res35 = await callGeminiJson({
+    apiKey: 'AIzaSySecretKeyNoLeak',
+    model: 'gemini-3.5-flash-lite',
+    systemInstruction: 'System',
+    userText: 'User',
+    retryDelayMs: 0,
+    fetchImpl: async (_url, init) => {
+      attempts += 1;
+      const body = JSON.parse(init.body);
+      seenConfigs.push(body.generationConfig);
+      if (attempts === 1) {
+        return { ok: false, status: 503, text: async () => 'temporarily unavailable' };
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: '{"ok":true}' }] } }],
+        }),
+      };
+    },
+  });
+
+  assert.equal(attempts, 2);
+  assert.equal(res35.ok, true);
+  assert.equal('temperature' in seenConfigs[0], false);
+  assert.equal(seenConfigs[0].maxOutputTokens, 1024);
+
+  let legacyConfig = null;
+  await callGeminiJson({
+    apiKey: 'AIzaSySecretKeyNoLeak',
+    model: 'gemini-2.5-flash',
+    systemInstruction: 'System',
+    userText: 'User',
+    temperature: 0.4,
+    retryDelayMs: 0,
+    fetchImpl: async (_url, init) => {
+      legacyConfig = JSON.parse(init.body).generationConfig;
+      return {
+        ok: true,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: '{"ok":true}' }] } }],
+        }),
+      };
+    },
+  });
+  assert.equal(legacyConfig.temperature, 0.4);
 });

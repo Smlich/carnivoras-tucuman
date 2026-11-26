@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   Check,
@@ -37,10 +37,13 @@ import {
 } from '../game/gameConfig';
 import { GameSimulation } from '../game/simulation';
 import type { GameConfig, GameStatus, HudSnapshot, PetId } from '../game/types';
-import { AdminConfigModal } from './AdminConfigModal';
 import { GameHud } from './GameHud';
 import { PetEmblem, SpeciesEmblem, TitleLogoLockup } from './SpeciesIcons';
-import titleHeroBg from '../assets/images/hero_title_dionaea_biplane_1795699672875.jpg';
+import titleHeroBg from '../assets/images/hero_title_dionaea_biplane_1795699672875.webp';
+
+const AdminConfigModal = lazy(() =>
+  import('./AdminConfigModal').then((module) => ({ default: module.AdminConfigModal })),
+);
 
 export interface GameSessionResult {
   score: number;
@@ -1411,12 +1414,14 @@ export function CarnivoraShmupGame({
 
       {/* ADMIN / CUSTOMIZATION PANEL — Strictly gated behind isAdmin */}
       {isAdmin && showAdmin && (
-        <AdminConfigModal
-          config={config}
-          onSave={handleSaveConfig}
-          onUnlocksChanged={handleUnlocksUpdated}
-          onClose={() => setShowAdmin(false)}
-        />
+        <Suspense fallback={null}>
+          <AdminConfigModal
+            config={config}
+            onSave={handleSaveConfig}
+            onUnlocksChanged={handleUnlocksUpdated}
+            onClose={() => setShowAdmin(false)}
+          />
+        </Suspense>
       )}
     </div>
   );

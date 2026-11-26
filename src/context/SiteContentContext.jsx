@@ -13,6 +13,7 @@ const defaultValue = {
   products: defaultAdminProducts,
   gallery: defaultGalleryItems,
   gamesPreview: defaultAdminGames.filter((game) => game.status !== 'admin-only'),
+  assistantEnabled: null,
   isLoaded: false,
   reloadSiteData: async () => null,
 };
@@ -36,6 +37,7 @@ export function SiteContentProvider({ children }) {
     products: defaultAdminProducts,
     gallery: defaultGalleryItems,
     gamesPreview: defaultValue.gamesPreview,
+    assistantEnabled: null,
     isLoaded: false,
   });
 
@@ -46,6 +48,7 @@ export function SiteContentProvider({ children }) {
       products: Array.isArray(data.products) ? data.products : defaultAdminProducts,
       gallery: Array.isArray(data.gallery) ? data.gallery : defaultGalleryItems,
       gamesPreview: Array.isArray(data.gamesPreview) ? data.gamesPreview : defaultValue.gamesPreview,
+      assistantEnabled: typeof data.assistantEnabled === 'boolean' ? data.assistantEnabled : null,
       isLoaded: true,
     });
   }, []);

@@ -119,10 +119,14 @@ export function AuthProvider({ children, includeAdminMeta = false }) {
 
           let currentSession = null;
           if (enabled) {
-            try {
-              currentSession = await fetchSession(controller.signal);
-            } catch (error) {
-              if (error.name === 'AbortError') return;
+            if ('session' in result) {
+              currentSession = result.session?.user ? result.session : null;
+            } else {
+              try {
+                currentSession = await fetchSession(controller.signal);
+              } catch (error) {
+                if (error.name === 'AbortError') return;
+              }
             }
           }
 

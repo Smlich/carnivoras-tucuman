@@ -82,7 +82,7 @@ export default function SiteHeader({ currentPage = 'inicio', itemCount, onOpenCa
     <header className="site-header" ref={headerRef}>
       <div className="site-header__inner page-shell">
         <a className="brand" href="/" aria-label={settings.storeName + ' — inicio'}>
-          <CatalogImage src="/images/catalog/logo-light.png" alt="" className="brand__logo" sizes="48px" />
+          <CatalogImage src="/images/catalog/logo-light.png" alt="" className="brand__logo" width="48" height="48" sizes="48px" decoding="async" />
           <span className="brand__text">
             {settings.storeName === 'Carnívoras Tucumán' ? (
               <>

@@ -26,7 +26,7 @@ export default function SiteFooter() {
     <footer className="site-footer">
       <div className="page-shell site-footer__main">
         <a className="footer-brand" href="/" aria-label={settings.storeName + ' — volver al inicio'}>
-          <CatalogImage src="/images/catalog/logo-dark.png" alt="" className="footer-brand__logo" sizes="49px" />
+          <CatalogImage src="/images/catalog/logo-dark.png" alt="" className="footer-brand__logo" width="50" height="50" sizes="49px" loading="lazy" decoding="async" />
           <span>
             {settings.storeName === 'Carnívoras Tucumán' ? (
               <><strong>Carnívoras</strong><small>Tucumán · Argentina</small></>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import mainLogoImg from '../assets/images/dionaea_strike_crest_logo_1795699672014.jpg';
+import mainLogoImg from '../assets/images/dionaea_strike_crest_logo_1795699672014.webp';
 import type { PetId, SpeciesId } from '../game/types';
 
 export function VitalityLeafSocket({ state }: { state: 'full' | 'damaged' | 'empty' }) {

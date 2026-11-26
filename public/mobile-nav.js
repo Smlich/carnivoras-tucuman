@@ -104,11 +104,21 @@ if (toggleButton && navMenu) {
   }
 })();
 
+function loadSharedSiteData() {
+  if (!window.__ctSiteDataPromise) {
+    window.__ctSiteDataPromise = fetch('/api/site-data', {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    })
+      .then((response) => (response.ok ? response.json().catch(() => null) : null))
+      .catch(() => null);
+  }
+  return window.__ctSiteDataPromise;
+}
+
 (async function hydrateStaticSiteSettings() {
   try {
-    const response = await fetch('/api/site-data', { headers: { Accept: 'application/json' }, cache: 'no-store' });
-    if (!response.ok) return;
-    const payload = await response.json().catch(() => null);
+    const payload = await loadSharedSiteData();
     const settings = payload?.data?.settings;
     if (!settings || typeof settings !== 'object') return;
 

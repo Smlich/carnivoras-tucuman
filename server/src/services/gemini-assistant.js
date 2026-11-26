@@ -90,6 +90,10 @@ function hydratePublicProduct(product) {
   };
 }
 
+function isGemini35OrNewer(modelName) {
+  return /^gemini-3\.[5-9]/i.test(String(modelName || '').trim());
+}
+
 export async function callGeminiJson({
   apiKey,
   model = DEFAULT_GEMINI_MODEL,
@@ -97,8 +101,9 @@ export async function callGeminiJson({
   userText,
   image = null,
   responseSchema,
-  maxOutputTokens = 650,
+  maxOutputTokens = 1024,
   temperature = 0.35,
+  retryDelayMs = 350,
   fetchImpl = globalThis.fetch,
 }) {
   if (!apiKey || typeof fetchImpl !== 'function') {
@@ -119,38 +124,66 @@ export async function callGeminiJson({
     });
   }
 
-  let response;
-  try {
-    response = await fetchImpl(`${GEMINI_API_BASE}/${encodeURIComponent(safeModel)}:generateContent`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': String(apiKey).trim(),
+  const generationConfig = {
+    responseMimeType: 'application/json',
+    responseSchema,
+    maxOutputTokens,
+    ...(!isGemini35OrNewer(safeModel) && typeof temperature === 'number' ? { temperature } : {}),
+  };
+
+  const requestBody = JSON.stringify({
+    systemInstruction: {
+      parts: [{ text: String(systemInstruction || '') }],
+    },
+    contents: [
+      {
+        role: 'user',
+        parts,
       },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: String(systemInstruction || '') }],
+    ],
+    generationConfig,
+  });
+
+  const retryableStatuses = new Set([500, 502, 503, 504]);
+  let response;
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      response = await fetchImpl(`${GEMINI_API_BASE}/${encodeURIComponent(safeModel)}:generateContent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': String(apiKey).trim(),
         },
-        contents: [
-          {
-            role: 'user',
-            parts,
-          },
-        ],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          responseSchema,
-          maxOutputTokens,
-          temperature,
-        },
-      }),
-      signal: AbortSignal.timeout(22_000),
-    });
-  } catch {
-    throw new AssistantServiceError(502, 'ASSISTANT_ERROR', 'No pudimos conectar con el asistente botánico. Probá nuevamente en unos segundos.');
+        body: requestBody,
+        signal: AbortSignal.timeout(22_000),
+      });
+    } catch (networkError) {
+      if (attempt === 0) {
+        if (retryDelayMs > 0) await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        continue;
+      }
+      console.error('Gemini API network error:', { model: safeModel, message: networkError?.message || 'network failure' });
+      throw new AssistantServiceError(502, 'ASSISTANT_ERROR', 'No pudimos conectar con el asistente botánico. Probá nuevamente en unos segundos.');
+    }
+
+    if (!response.ok && retryableStatuses.has(response.status) && attempt === 0) {
+      if (retryDelayMs > 0) await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+      continue;
+    }
+    break;
   }
 
   if (!response.ok) {
+    let detail = '';
+    try {
+      const errText = await response.text?.();
+      detail = String(errText || '').slice(0, 240);
+    } catch {
+      detail = '';
+    }
+    console.error('Gemini API upstream error:', { status: response.status, model: safeModel, detail });
+
     if (response.status === 429) {
       throw new AssistantServiceError(429, 'ASSISTANT_BUSY', 'El asistente está recibiendo muchas consultas. Esperá un momento o escribinos por WhatsApp.');
     }
@@ -244,7 +277,7 @@ export async function diagnoseCarnivorousPlant({
     userText,
     image,
     responseSchema: CARE_RESPONSE_SCHEMA,
-    maxOutputTokens: 650,
+    maxOutputTokens: 1024,
     temperature: 0.35,
     fetchImpl,
   });
@@ -341,7 +374,7 @@ export async function recommendCatalogProducts({
     systemInstruction,
     userText,
     responseSchema: RECOMMEND_RESPONSE_SCHEMA,
-    maxOutputTokens: 650,
+    maxOutputTokens: 1024,
     temperature: 0.35,
     fetchImpl,
   });
@@ -431,7 +464,7 @@ export async function generateAdminCopy({
     userText,
     image,
     responseSchema: ADMIN_COPY_RESPONSE_SCHEMA,
-    maxOutputTokens: 700,
+    maxOutputTokens: 1024,
     temperature: 0.45,
     fetchImpl,
   });

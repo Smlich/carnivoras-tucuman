@@ -55,6 +55,7 @@
   from = "/terminos"
   to = "/terminos.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/jugar-dionaea"

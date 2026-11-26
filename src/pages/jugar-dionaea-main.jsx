@@ -1,8 +1,13 @@
-import { StrictMode, useCallback, useEffect, useState } from 'react';
+import { StrictMode, Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../games/dionaea-strike/dionaea.css';
 import { AuthProvider, useAuth } from '../context/AuthContext';
-import { CarnivoraShmupGame } from '../games/dionaea-strike/dionaea-embed';
+
+const CarnivoraShmupGame = lazy(() =>
+  import('../games/dionaea-strike/dionaea-embed').then((module) => ({
+    default: module.CarnivoraShmupGame,
+  })),
+);
 
 function GameAccessGate({ children }) {
   const { isStaticPreview, isLoading, isAdminLoading, enabled, providers, user, isAdmin, signInWithProvider } = useAuth();
@@ -149,13 +154,24 @@ function DionaeaPlayerWorkspace() {
         </div>
       )}
 
-      <CarnivoraShmupGame
-        isAdmin={effectiveIsAdmin}
-        initialConfig={serverConfig}
-        onConfigChange={effectiveIsAdmin ? handleAdminConfigSave : undefined}
-        onScoreSubmit={handleScoreSubmit}
-        assetBasePath="/"
-      />
+      <Suspense
+        fallback={(
+          <main className="min-h-dvh grid place-items-center bg-[#08101C] text-slate-100 p-6 text-center">
+            <div className="space-y-2">
+              <p className="text-xs font-mono uppercase tracking-widest text-lime-300">Carnívoras Tucumán</p>
+              <p className="text-lg font-display font-bold">Cargando Dionaea Strike…</p>
+            </div>
+          </main>
+        )}
+      >
+        <CarnivoraShmupGame
+          isAdmin={effectiveIsAdmin}
+          initialConfig={serverConfig}
+          onConfigChange={effectiveIsAdmin ? handleAdminConfigSave : undefined}
+          onScoreSubmit={handleScoreSubmit}
+          assetBasePath="/"
+        />
+      </Suspense>
     </div>
   );
 }

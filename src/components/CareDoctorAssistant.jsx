@@ -62,20 +62,40 @@ export default function CareDoctorAssistant() {
   useEffect(() => {
     let active = true;
 
-    fetchAssistantStatus().then((status) => {
-      if (active) setAssistantEnabled(status.enabled);
-    });
+    async function hydrateAssistant() {
+      if (import.meta.env.VITE_STATIC_PREVIEW === 'true') {
+        if (active) setAssistantEnabled(false);
+        return;
+      }
 
-    if (import.meta.env.VITE_STATIC_PREVIEW !== 'true') {
-      fetch('/api/site-data', { headers: { Accept: 'application/json' }, cache: 'no-store' })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((payload) => {
-          if (active && payload?.data?.settings) {
-            setSettings({ ...store, ...payload.data.settings });
-          }
-        })
-        .catch(() => {});
+      try {
+        if (!window.__ctSiteDataPromise) {
+          window.__ctSiteDataPromise = fetch('/api/site-data', {
+            headers: { Accept: 'application/json' },
+            cache: 'no-store',
+          })
+            .then((res) => (res.ok ? res.json().catch(() => null) : null))
+            .catch(() => null);
+        }
+        const payload = await window.__ctSiteDataPromise;
+        if (!active) return;
+
+        if (payload?.data?.settings) {
+          setSettings({ ...store, ...payload.data.settings });
+        }
+        if (typeof payload?.data?.assistantEnabled === 'boolean') {
+          setAssistantEnabled(payload.data.assistantEnabled);
+          return;
+        }
+      } catch {
+        // Fallback abajo hacia /api/assistant/status.
+      }
+
+      const status = await fetchAssistantStatus();
+      if (active) setAssistantEnabled(status.enabled);
     }
+
+    hydrateAssistant();
 
     return () => {
       active = false;

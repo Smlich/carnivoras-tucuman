@@ -1,9 +1,9 @@
 import type { LandscapeId } from './types';
-import bgPampaDawn from '../assets/images/bg_level1_pampa_dawn_1795680228068.jpg';
-import bgJungleFalls from '../assets/images/bg_level2_jungle_falls_1795680229742.jpg';
-import bgCityNight from '../assets/images/bg_level3_buenos_aires_night_1795680231005.jpg';
-import bgUrbanViaduct from '../assets/images/bg_level4_urban_viaduct_1795680233413.jpg';
-import bgHumahuacaAndes from '../assets/images/bg_level5_humahuaca_andes_1795680234321.jpg';
+import bgPampaDawn from '../assets/images/bg_level1_pampa_dawn_1795680228068.webp';
+import bgJungleFalls from '../assets/images/bg_level2_jungle_falls_1795680229742.webp';
+import bgCityNight from '../assets/images/bg_level3_buenos_aires_night_1795680231005.webp';
+import bgUrbanViaduct from '../assets/images/bg_level4_urban_viaduct_1795680233413.webp';
+import bgHumahuacaAndes from '../assets/images/bg_level5_humahuaca_andes_1795680234321.webp';
 
 export const STAGE_BACKGROUND_URLS: Record<LandscapeId, string> = {
   pampa_dawn: bgPampaDawn,
@@ -50,8 +50,17 @@ function ensureLoaded(landscape: LandscapeId): CachedBackdropImage | null {
  */
 export function preloadStageBackgrounds(): void {
   if (typeof window === 'undefined') return;
-  (Object.keys(STAGE_BACKGROUND_URLS) as LandscapeId[]).forEach((id) => {
-    ensureLoaded(id);
+  ensureLoaded('pampa_dawn');
+
+  const deferred: LandscapeId[] = ['jungle_falls', 'city_night', 'urban_viaduct', 'humahuaca_andes'];
+  const scheduleIdle = typeof window.requestIdleCallback === 'function'
+    ? (cb: () => void) => window.requestIdleCallback(cb, { timeout: 2500 })
+    : (cb: () => void) => window.setTimeout(cb, 1500);
+
+  deferred.forEach((id, index) => {
+    scheduleIdle(() => {
+      window.setTimeout(() => ensureLoaded(id), index * 250);
+    });
   });
 }
 

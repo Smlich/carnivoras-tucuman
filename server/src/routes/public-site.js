@@ -115,6 +115,7 @@ export function createPublicSiteRouter({
           products: defaultAdminProducts,
           gallery: defaultGalleryItems,
           gamesPreview: sanitizePublicGamesPreview(defaultAdminGames),
+          assistantEnabled: isGeminiConfigured(appEnv),
         },
       });
     }
@@ -148,6 +149,7 @@ export function createPublicSiteRouter({
         products,
         gallery,
         gamesPreview: sanitizePublicGamesPreview(gamesList),
+        assistantEnabled: isGeminiConfigured(appEnv),
       },
     });
   });
@@ -310,17 +312,24 @@ export function createPublicSiteRouter({
     }
 
     const catalogProducts = await loadActiveCatalogForAssistant();
-    const result = await diagnoseCarnivorousPlant({
-      apiKey: appEnv.GEMINI_API_KEY.trim(),
-      model: getGeminiModel(appEnv),
-      question: input.question,
-      species: input.species,
-      locationContext: input.locationContext,
-      image: normalizedImage,
-      catalogProducts,
-      fetchImpl,
-    });
-    return response.status(200).json({ data: result });
+    try {
+      const result = await diagnoseCarnivorousPlant({
+        apiKey: appEnv.GEMINI_API_KEY.trim(),
+        model: getGeminiModel(appEnv),
+        question: input.question,
+        species: input.species,
+        locationContext: input.locationContext,
+        image: normalizedImage,
+        catalogProducts,
+        fetchImpl,
+      });
+      return response.status(200).json({ data: result });
+    } catch (error) {
+      if ((error?.status ?? 500) >= 500 && dailyQuotaState.count > 0) {
+        dailyQuotaState.count -= 1;
+      }
+      throw error;
+    }
   });
 
   router.post('/assistant/recommend', async (request, response) => {
@@ -344,17 +353,24 @@ export function createPublicSiteRouter({
     }
 
     const catalogProducts = await loadActiveCatalogForAssistant();
-    const result = await recommendCatalogProducts({
-      apiKey: appEnv.GEMINI_API_KEY.trim(),
-      model: getGeminiModel(appEnv),
-      query: input.query,
-      sunlight: input.sunlight,
-      experience: input.experience,
-      budgetMaxARS: input.budgetMaxARS,
-      catalogProducts,
-      fetchImpl,
-    });
-    return response.status(200).json({ data: result });
+    try {
+      const result = await recommendCatalogProducts({
+        apiKey: appEnv.GEMINI_API_KEY.trim(),
+        model: getGeminiModel(appEnv),
+        query: input.query,
+        sunlight: input.sunlight,
+        experience: input.experience,
+        budgetMaxARS: input.budgetMaxARS,
+        catalogProducts,
+        fetchImpl,
+      });
+      return response.status(200).json({ data: result });
+    } catch (error) {
+      if ((error?.status ?? 500) >= 500 && dailyQuotaState.count > 0) {
+        dailyQuotaState.count -= 1;
+      }
+      throw error;
+    }
   });
 
   return router;

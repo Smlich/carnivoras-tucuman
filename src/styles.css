@@ -565,6 +565,18 @@ h2 em {
   box-shadow: 0 14px 28px rgba(5, 22, 16, .24);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.button--dark:disabled {
+  color: var(--bog-abyss);
+  background: #d5e6a3;
+  opacity: .92;
+}
+
 .button--light {
   color: var(--bog-abyss);
   background: var(--surface);
