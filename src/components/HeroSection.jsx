@@ -74,9 +74,7 @@ export default function HeroSection() {
           </div>
 
           <h1 id="hero-title">
-            {settings.heroTitlePrefix}
-            <em>{settings.heroTitleEmphasis}</em>
-            {settings.heroTitleSuffix}
+            {String(settings.heroTitlePrefix || '').trimEnd()} <em>{String(settings.heroTitleEmphasis || '').trim()}</em> {String(settings.heroTitleSuffix || '').trimStart()}
           </h1>
           <p className="hero__lead">{settings.heroLead}</p>
 

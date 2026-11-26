@@ -78,7 +78,6 @@ summary:focus-visible {
 }
 
 .hero-stage :focus-visible,
-.care-section :focus-visible,
 .games-section :focus-visible,
 .site-footer :focus-visible,
 .gallery-viewer :focus-visible {
@@ -451,11 +450,12 @@ h2 {
 
 h1 em,
 h2 em {
+  margin-inline: .08em;
   color: var(--crimson-text);
   font-family: var(--font-accent);
   font-style: italic;
   font-weight: 600;
-  letter-spacing: -.015em;
+  letter-spacing: 0;
 }
 
 .eyebrow {
@@ -2203,9 +2203,8 @@ h2 em {
     padding: 12px 16px 16px;
     border-top: 1px solid var(--line);
     border-bottom: 1.5px solid var(--line);
-    background: rgba(244, 245, 235, .98);
-    backdrop-filter: blur(16px);
-    box-shadow: 0 18px 36px rgba(5, 22, 16, .16);
+    background: #f8faf0;
+    box-shadow: 0 22px 44px rgba(5, 22, 16, .24);
   }
 
   .main-nav.is-open { display: flex; }
