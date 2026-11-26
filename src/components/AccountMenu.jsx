@@ -1,7 +1,6 @@
-import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Component, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-
-const AccountMenuPanel = lazy(() => import('./AccountMenuPanel.jsx'));
+import AccountMenuPanel from './AccountMenuPanel.jsx';
 
 const providerLabels = {
   google: 'Google',
@@ -72,9 +71,7 @@ export default function AccountMenu() {
       {isOpen && (
         <div className="account-menu__panel">
           <AccountMenuErrorBoundary>
-            <Suspense fallback={<p className="account-menu__status" role="status">Cargando tu cuenta…</p>}>
-              <AccountMenuPanel providers={providers} />
-            </Suspense>
+            <AccountMenuPanel providers={providers} />
           </AccountMenuErrorBoundary>
         </div>
       )}
