@@ -15,7 +15,7 @@ Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/
   - `/contacto.html` (WhatsApp directo e Instagram `@carnivoras_tucuman`)
   - `/privacidad.html` y `/terminos.html` (política de privacidad y condiciones de consulta/entrega)
   - `/admin.html` (panel de administración con `noindex` para catálogo, textos, álbum, juegos, pedidos, cuenta y copiloto IA)
-- Asistente con Gemini API (`GEMINI_API_KEY`, modelo por defecto `gemini-2.5-flash-lite` y cuotas diarias/IP): «Doctor de carnívoras» multimodal en `/cuidados.html`, recomendador inteligente en `/catalogo.html` y copiloto de fichas/redes en `/admin.html`.
+- Asistente con Gemini API (`GEMINI_API_KEY`, modelo por defecto `gemini-3.5-flash-lite` y cuotas diarias/IP): «Doctor de carnívoras» multimodal en `/cuidados.html`, recomendador inteligente en `/catalogo.html` y copiloto de fichas/redes en `/admin.html`.
 - Carrito local en `localStorage` con validación de stock y armado automático del pedido para WhatsApp (incluye nombre y estado de registro con Google).
 - Contador compartido de visitas por sesión de pestaña en `/api/visits`, persistido en Netlify Blobs o MongoDB sin guardar identificadores personales.
 - Backend doble compatible:

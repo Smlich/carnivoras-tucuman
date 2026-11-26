@@ -1,4 +1,4 @@
-export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash-lite';
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash-lite';
 export const DEFAULT_PUBLIC_DAILY_LIMIT = 120;
 export const DEFAULT_ADMIN_DAILY_LIMIT = 80;
 
@@ -169,7 +169,7 @@ export async function callGeminiJson({
 
   const candidateParts = payload?.candidates?.[0]?.content?.parts;
   const rawText = Array.isArray(candidateParts)
-    ? candidateParts.map((part) => (typeof part?.text === 'string' ? part.text : '')).join('\n')
+    ? candidateParts.map((part) => (!part?.thought && typeof part?.text === 'string' ? part.text : '')).join('\n')
     : '';
 
   if (!rawText.trim()) {

@@ -88,7 +88,7 @@ test('diagnoseCarnivorousPlant envía header x-goog-api-key, imagen multimodal y
 
   const result = await diagnoseCarnivorousPlant({
     apiKey: 'AIzaSySecretKeyNoLeak',
-    model: 'gemini-2.5-flash-lite',
+    model: 'gemini-3.5-flash-lite',
     question: 'Tiene hojas negras viejas en la base',
     species: 'Venus atrapamoscas',
     image: { contentType: 'image/jpeg', dataBase64: 'AAAA' },
