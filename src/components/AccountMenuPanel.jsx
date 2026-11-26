@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { authClient } from '../services/auth-client';
+import { useAuth } from '../context/AuthContext';
 
 const providerLabels = {
   google: 'Google',
@@ -8,6 +9,7 @@ const providerLabels = {
 
 export default function AccountMenuPanel({ providers, onAccountNameChange }) {
   const { data: session, isPending, refetch } = authClient.useSession();
+  const { refreshSession } = useAuth();
   const [message, setMessage] = useState('');
   const [progress, setProgress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +46,7 @@ export default function AccountMenuPanel({ providers, onAccountNameChange }) {
       const result = await authClient.signOut();
       if (result.error) throw new Error('Cierre de sesión rechazado.');
       await refetch();
+      await refreshSession();
     } catch {
       setMessage('No pudimos cerrar la sesión. Volvé a intentarlo.');
     } finally {

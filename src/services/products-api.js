@@ -1,5 +1,5 @@
-export async function fetchProducts({ signal } = {}) {
-  const response = await fetch('/api/products', {
+export async function fetchProducts({ limit = 24, signal } = {}) {
+  const response = await fetch('/api/products?limit=' + encodeURIComponent(limit), {
     headers: { Accept: 'application/json' },
     signal,
   });

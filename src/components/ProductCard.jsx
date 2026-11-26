@@ -1,19 +1,28 @@
 import { formatPrice } from '../utils/format-price';
 import CatalogImage from './CatalogImage';
 
-export default function ProductCard({ product, onAdd }) {
+export default function ProductCard({ product, onAdd, onInspect }) {
   return (
     <article className="product-card">
       <div className="product-card__image-wrap">
-        <CatalogImage
-          className="product-card__image"
-          src={product.image}
-          alt={product.imageAlt}
-          pictureClassName="product-card__picture"
-          sizes="(max-width: 520px) 45vw, (max-width: 920px) 30vw, 24vw"
-          loading="lazy"
-          decoding="async"
-        />
+        <button
+          className="product-card__image-trigger"
+          type="button"
+          aria-haspopup="dialog"
+          aria-label={'Ampliar foto de ' + product.name + ' en máxima calidad'}
+          onClick={() => onInspect(product)}
+        >
+          <CatalogImage
+            className="product-card__image"
+            src={product.image}
+            alt={product.imageAlt}
+            pictureClassName="product-card__picture"
+            sizes="(max-width: 520px) 45vw, (max-width: 920px) 30vw, 24vw"
+            loading="lazy"
+            decoding="async"
+          />
+          <span className="product-card__zoom" aria-hidden="true">↗</span>
+        </button>
         <span className="product-card__badge">{product.categoryLabel}</span>
       </div>
       <div className="product-card__body">

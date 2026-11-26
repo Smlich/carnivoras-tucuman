@@ -90,7 +90,7 @@ Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTI
 
 - Confirmar precios y disponibilidad actual.
 - Definir zonas, costos y condiciones de entrega.
-- Confirmar que `@canivoras_tucuman` es la cuenta oficial; compartir Facebook si se decide usarlo.
+- Cuenta oficial de Instagram confirmada: `@carnivoras_tucuman`; compartir Facebook si se decide usarlo.
 - Definir dominio, política de privacidad y condiciones de venta.
 - Configurar Facebook OAuth y revisar publicación, callbacks HTTPS y verificación de proveedores antes de un despliegue full stack.
 

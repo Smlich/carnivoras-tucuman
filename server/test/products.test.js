@@ -79,3 +79,20 @@ test('usa una respuesta de error predecible cuando el producto no existe', async
   assert.equal(response.status, 404);
   assert.equal(result.error.code, 'PRODUCT_NOT_FOUND');
 });
+
+test('busca sin distinguir tildes ni mayúsculas', async (context) => {
+  const origin = await startTestServer(createApp(), context);
+
+  for (const [query, expectedId] of [
+    ['pequena', 'sarracenia-pequena'],
+    ['PEQUEÑA', 'sarracenia-pequena'],
+    ['carnivoras', 'combo-tres-carnivoras'],
+    ['carnívoras', 'combo-tres-carnivoras'],
+  ]) {
+    const response = await fetch(`${origin}/api/products?q=${encodeURIComponent(query)}`);
+    const result = await response.json();
+
+    assert.equal(response.status, 200, query);
+    assert.ok(result.data.some((product) => product.id === expectedId), query);
+  }
+});

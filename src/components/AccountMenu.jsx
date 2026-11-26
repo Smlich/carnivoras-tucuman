@@ -1,4 +1,5 @@
-import { Component, lazy, Suspense, useEffect, useState } from 'react';
+import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const AccountMenuPanel = lazy(() => import('./AccountMenuPanel.jsx'));
 
@@ -24,54 +25,43 @@ class AccountMenuErrorBoundary extends Component {
 }
 
 export default function AccountMenu() {
-  const [providers, setProviders] = useState(null);
-  const [accountName, setAccountName] = useState('Mi cuenta');
+  const { enabled, providers: availableProviders, user } = useAuth();
+  const [panelAccountName, setPanelAccountName] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const detailsRef = useRef(null);
+
+  const providers = availableProviders.filter((provider) => providerLabels[provider]);
+  const accountName = panelAccountName ?? user?.name ?? 'Mi cuenta';
 
   useEffect(() => {
-    if (import.meta.env.VITE_STATIC_PREVIEW === 'true') return undefined;
+    if (!isOpen) return undefined;
 
-    const controller = new AbortController();
-    let isActive = true;
-    let retryTimer;
-
-    async function loadAuthStatus() {
-      for (let attempt = 0; attempt < 4; attempt += 1) {
-        try {
-          const response = await fetch('/api/auth/status', { cache: 'no-store', signal: controller.signal });
-          if (!response.ok) throw new Error('No se pudo consultar el inicio de sesión.');
-          const status = await response.json();
-          if (!isActive) return;
-          setProviders(status.enabled && Array.isArray(status.providers)
-            ? status.providers.filter((provider) => providerLabels[provider])
-            : []);
-          return;
-        } catch (error) {
-          if (!isActive || error.name === 'AbortError') return;
-          if (attempt === 3) {
-            setProviders([]);
-            return;
-          }
-          await new Promise((resolve) => {
-            retryTimer = window.setTimeout(resolve, 400 * (attempt + 1));
-          });
-        }
-      }
+    function closeMenu() {
+      if (detailsRef.current) detailsRef.current.open = false;
     }
 
-    loadAuthStatus();
+    function handlePointerDown(event) {
+      if (detailsRef.current && !detailsRef.current.contains(event.target)) closeMenu();
+    }
 
+    function handleKeyDown(event) {
+      if (event.key !== 'Escape') return;
+      closeMenu();
+      detailsRef.current?.querySelector('summary')?.focus();
+    }
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
     return () => {
-      isActive = false;
-      controller.abort();
-      window.clearTimeout(retryTimer);
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [isOpen]);
 
-  if (!providers?.length) return null;
+  if (!enabled || providers.length === 0) return null;
 
   return (
-    <details className="account-menu" onToggle={(event) => setIsOpen(event.currentTarget.open)}>
+    <details ref={detailsRef} className="account-menu" onToggle={(event) => setIsOpen(event.currentTarget.open)}>
       <summary className="account-menu__trigger" aria-label={accountName}>
         <svg viewBox="0 0 24 24" aria-hidden="true" className="account-icon">
           <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
@@ -84,7 +74,7 @@ export default function AccountMenu() {
         <div className="account-menu__panel">
           <AccountMenuErrorBoundary>
             <Suspense fallback={<p className="account-menu__status" role="status">Cargando tu cuenta…</p>}>
-              <AccountMenuPanel providers={providers} onAccountNameChange={setAccountName} />
+              <AccountMenuPanel providers={providers} onAccountNameChange={setPanelAccountName} />
             </Suspense>
           </AccountMenuErrorBoundary>
         </div>

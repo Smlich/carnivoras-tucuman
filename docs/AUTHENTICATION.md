@@ -73,7 +73,7 @@ Después de configurar Atlas, `.env` y al menos un proveedor:
 4. Abre la web desde el mismo origen configurado en `BETTER_AUTH_URL` y usa el menú de cuenta.
 5. Repite el inicio de sesión con Google y Facebook, y confirma que al volver hay una sesión activa.
 
-Si falta Atlas o la configuración OAuth, la API informa `enabled: false`; en desarrollo el resto de la tienda sigue funcionando. En producción, el servidor exige ambos proveedores para impedir un lanzamiento con el requisito social a medias.
+Si falta Atlas o la configuración OAuth, la API informa `enabled: false`; en desarrollo el resto de la tienda sigue funcionando. En producción, el servidor exige `MONGODB_URI`, `CORS_ORIGINS` (HTTPS públicos, sin `localhost`), `BETTER_AUTH_URL` con HTTPS, `BETTER_AUTH_SECRET` y **al menos un proveedor social** (por ejemplo solo Google mientras Facebook siga pendiente).
 
 ## Preguntas de repaso
 

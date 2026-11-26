@@ -18,6 +18,7 @@ export default function SiteFooter() {
         <div className="site-footer__links">
           <a href="#catalogo">Catálogo</a>
           <a href="#galeria">Álbum</a>
+          <a href="#juegos">Juegos</a>
           <a href="/cuidados.html">Cuidados</a>
           <a href="#contacto">Contacto</a>
           {socialLinks.map((item) => <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>)}
@@ -40,7 +41,7 @@ export default function SiteFooter() {
       <div className="page-shell site-footer__bottom">
         <span>© {new Date().getFullYear()} {store.name}</span>
         <span>Fotografías originales de nuestro vivero.</span>
-        <div className="visit-counter" data-visit-counter aria-live="polite" aria-atomic="true">
+        <div className="visit-counter" data-visit-counter data-visit-endpoint={import.meta.env.VITE_STATIC_PREVIEW === 'true' ? '/.netlify/functions/visit-counter' : '/api/visits'} aria-live="polite" aria-atomic="true">
           <span className="visit-counter__plant" aria-hidden="true">
             <svg viewBox="0 0 32 32" fill="none">
               <path d="M15.8 27c1.2-7.7 1-14.8-.2-21.5M15.7 20c-4.6-4.2-8.5-5.3-12.1-4.9 1.3 5.2 5.1 8.2 11.8 8.7M15.7 15.7c3.8-5.2 7.7-7.5 12.1-7.7-1 5.7-4.7 9.2-11.6 11.3" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" />

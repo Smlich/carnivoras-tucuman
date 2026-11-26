@@ -38,7 +38,7 @@ for (const file of files) {
     throw new Error(`${file} mide ${metadata.width}px de ancho; el catálogo necesita originales de al menos 960px para generar el srcset configurado.`);
   }
   const widths = isLogo
-    ? [512]
+    ? [128]
     : targetWidths.filter((width) => width < metadata.width).concat(Math.min(metadata.width, 960));
   const uniqueWidths = [...new Set(widths)];
   let largestOutputBytes = 0;
@@ -58,9 +58,9 @@ for (const file of files) {
         await pipeline.jpeg({ quality: width <= 480 ? 88 : 85, mozjpeg: true }).toFile(outputPath);
       } else {
         await pipeline.webp({
-          quality: isLogo ? 96 : 92,
+          quality: isLogo ? 90 : 92,
           effort: 6,
-          lossless: isLogo,
+          lossless: false,
         }).toFile(outputPath);
       }
     }
@@ -72,6 +72,11 @@ for (const file of files) {
     const outputBytes = (await stat(outputPath)).size;
     allVariantsTotal += outputBytes;
     largestOutputBytes = Math.max(largestOutputBytes, outputBytes);
+  }
+
+  if (file === 'logo-light.png') {
+    await sharp(sourcePath).resize({ width: 64, height: 64 }).png({ compressionLevel: 9 }).toFile(path.join(outputDirectory, 'favicon-64.png'));
+    await sharp(sourcePath).resize({ width: 180, height: 180 }).png({ compressionLevel: 9 }).toFile(path.join(outputDirectory, 'apple-touch-icon.png'));
   }
 
   originalTotal += sourceBytes;

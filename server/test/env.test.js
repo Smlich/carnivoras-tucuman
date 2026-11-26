@@ -11,6 +11,16 @@ const validOAuthEnvironment = {
   FACEBOOK_CLIENT_SECRET: 'facebook-app-secret',
 };
 
+const googleOnlyProduction = {
+  NODE_ENV: 'production',
+  MONGODB_URI: 'mongodb://127.0.0.1:27017',
+  CORS_ORIGINS: 'https://tienda.example',
+  BETTER_AUTH_URL: 'https://tienda.example',
+  BETTER_AUTH_SECRET: validOAuthEnvironment.BETTER_AUTH_SECRET,
+  GOOGLE_CLIENT_ID: validOAuthEnvironment.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: validOAuthEnvironment.GOOGLE_CLIENT_SECRET,
+};
+
 test('usa los valores de desarrollo seguros cuando no hay variables locales', () => {
   const environment = parseEnvironment({});
 
@@ -43,15 +53,45 @@ test('requiere secreto de sesión y URL al activar un proveedor social', () => {
   );
 });
 
-test('exige MongoDB y ambos proveedores en producción', () => {
-  assert.throws(
-    () => parseEnvironment({ NODE_ENV: 'production' }),
-    /Google y Facebook deben estar configurados/,
-  );
+test('producción acepta una configuración con solo Google', () => {
+  const environment = parseEnvironment(googleOnlyProduction);
+
+  assert.equal(environment.NODE_ENV, 'production');
+  assert.deepEqual(environment.corsOrigins, ['https://tienda.example']);
+});
+
+test('producción exige MongoDB y al menos un proveedor social', () => {
+  const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ...withoutProvider } = googleOnlyProduction;
+  const { MONGODB_URI, ...withoutDatabase } = googleOnlyProduction;
 
   assert.throws(
-    () => parseEnvironment({ NODE_ENV: 'production', ...validOAuthEnvironment }),
+    () => parseEnvironment(withoutProvider),
+    /Configura al menos un proveedor social/,
+  );
+  assert.throws(
+    () => parseEnvironment(withoutDatabase),
     /MONGODB_URI es obligatorio/,
+  );
+});
+
+test('producción exige CORS_ORIGINS explícito y solo con orígenes HTTPS públicos', () => {
+  const { CORS_ORIGINS, ...withoutCors } = googleOnlyProduction;
+
+  assert.throws(() => parseEnvironment(withoutCors), /CORS_ORIGINS es obligatorio/);
+  assert.throws(
+    () => parseEnvironment({ ...googleOnlyProduction, CORS_ORIGINS: 'http://localhost:5173' }),
+    /solo admite orígenes HTTPS públicos/,
+  );
+  assert.throws(
+    () => parseEnvironment({ ...googleOnlyProduction, CORS_ORIGINS: 'https://tienda.example, http://admin.example' }),
+    /solo admite orígenes HTTPS públicos/,
+  );
+});
+
+test('producción exige que BETTER_AUTH_URL use HTTPS', () => {
+  assert.throws(
+    () => parseEnvironment({ ...googleOnlyProduction, BETTER_AUTH_URL: 'http://tienda.example' }),
+    /BETTER_AUTH_URL debe usar HTTPS/,
   );
 });
 

@@ -1,10 +1,31 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
+const defaultDevCorsOrigins = ['http://127.0.0.1:5173', 'http://localhost:5173'];
+
 const optionalText = (schema = z.string().trim().min(1)) => z.preprocess(
   (value) => typeof value === 'string' && value.trim() === '' ? undefined : value,
   schema.optional(),
 );
+
+function splitOrigins(value) {
+  return value
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+}
+
+function isPublicHttpsOrigin(origin) {
+  try {
+    const url = new URL(origin);
+    return url.protocol === 'https:'
+      && url.origin === origin
+      && url.hostname !== 'localhost'
+      && url.hostname !== '127.0.0.1';
+  } catch {
+    return false;
+  }
+}
 
 const environmentSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -20,7 +41,7 @@ const environmentSchema = z.object({
   GOOGLE_CLIENT_SECRET: optionalText(),
   FACEBOOK_CLIENT_ID: optionalText(),
   FACEBOOK_CLIENT_SECRET: optionalText(),
-  CORS_ORIGINS: z.string().default('http://127.0.0.1:5173,http://localhost:5173'),
+  CORS_ORIGINS: optionalText(z.string()),
 }).superRefine((values, context) => {
   const providerPairs = [
     ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'Google'],
@@ -54,19 +75,43 @@ const environmentSchema = z.object({
     });
   }
 
-  if (values.NODE_ENV === 'production' && (!values.GOOGLE_CLIENT_ID || !values.FACEBOOK_CLIENT_ID)) {
+  if (values.NODE_ENV !== 'production') return;
+
+  if (!hasProvider) {
     context.addIssue({
       code: 'custom',
       path: ['GOOGLE_CLIENT_ID'],
-      message: 'Google y Facebook deben estar configurados antes de iniciar producción.',
+      message: 'Configura al menos un proveedor social (Google o Facebook) antes de iniciar producción.',
     });
   }
 
-  if (values.NODE_ENV === 'production' && !values.MONGODB_URI) {
+  if (!values.MONGODB_URI) {
     context.addIssue({
       code: 'custom',
       path: ['MONGODB_URI'],
       message: 'MONGODB_URI es obligatorio cuando NODE_ENV=production.',
+    });
+  }
+
+  if (values.BETTER_AUTH_URL && !values.BETTER_AUTH_URL.startsWith('https://')) {
+    context.addIssue({
+      code: 'custom',
+      path: ['BETTER_AUTH_URL'],
+      message: 'En producción BETTER_AUTH_URL debe usar HTTPS.',
+    });
+  }
+
+  if (!values.CORS_ORIGINS) {
+    context.addIssue({
+      code: 'custom',
+      path: ['CORS_ORIGINS'],
+      message: 'CORS_ORIGINS es obligatorio en producción: lista los orígenes HTTPS permitidos.',
+    });
+  } else if (!splitOrigins(values.CORS_ORIGINS).every(isPublicHttpsOrigin)) {
+    context.addIssue({
+      code: 'custom',
+      path: ['CORS_ORIGINS'],
+      message: 'En producción CORS_ORIGINS solo admite orígenes HTTPS públicos, sin localhost ni rutas.',
     });
   }
 });
@@ -81,12 +126,14 @@ export function parseEnvironment(source) {
     throw new Error('Configuración del servidor inválida: ' + issues);
   }
 
+  const { CORS_ORIGINS: corsOrigins, ...rest } = parsedEnvironment.data;
+
   return {
-    ...parsedEnvironment.data,
-    corsOrigins: parsedEnvironment.data.CORS_ORIGINS
-      .split(',')
-      .map((origin) => origin.trim())
-      .filter(Boolean),
+    ...rest,
+    CORS_ORIGINS: corsOrigins,
+    corsOrigins: corsOrigins
+      ? splitOrigins(corsOrigins)
+      : (rest.NODE_ENV === 'production' ? [] : defaultDevCorsOrigins),
   };
 }
 

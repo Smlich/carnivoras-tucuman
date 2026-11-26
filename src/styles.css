@@ -393,7 +393,7 @@ h1, h2 { font-family: var(--heading); font-weight: 400; letter-spacing: .025em; 
 
 .gallery-card__caption { display: grid; gap: 3px; padding: 10px 2px 0; }
 
-.gallery-card__caption span { overflow: hidden; color: #637368; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.gallery-card__caption span { color: #637368; font-size: 10px; font-weight: 700; letter-spacing: .1em; line-height: 1.35; overflow-wrap: break-word; text-transform: uppercase; }
 
 .gallery-card__caption strong { color: #284333; font-size: 12px; font-weight: 600; line-height: 1.4; }
 
@@ -896,4 +896,44 @@ h2 em, .care-guide__section > h2 em { color: #b94b34; }
 @media (prefers-reduced-motion: reduce) {
   .botanical-ornament--hero, .botanical-ornament--care, .botanical-bloom--hero, .care-guide__ornament, .care-guide__bloom { animation: none; }
   .hero__photo-frame, .product-card, .gallery-card__open, .care-principle, .care-species-card { transform: none; }
+}
+
+/* Foto del catálogo ampliable: el botón cubre la imagen y abre el visor con el original. */
+.product-card__image-trigger { position: absolute; z-index: 1; inset: 0; display: block; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
+.product-card__image-trigger:focus-visible { outline-offset: -5px; }
+.product-card__badge { z-index: 2; pointer-events: none; }
+.product-card__zoom { position: absolute; z-index: 2; right: 10px; bottom: 10px; display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(255, 255, 255, .65); border-radius: 50%; color: white; background: rgba(20, 43, 33, .76); font-size: 16px; opacity: 0; transform: translateY(4px); transition: opacity .22s ease, transform .22s ease; pointer-events: none; }
+.product-card__image-trigger:hover .product-card__zoom, .product-card__image-trigger:focus-visible .product-card__zoom { opacity: 1; transform: translateY(0); }
+@media (hover: none) { .product-card__zoom { opacity: 1; transform: none; } }
+
+.catalog-viewer .gallery-viewer__caption { max-width: 640px; }
+.catalog-viewer__species { margin: 0 0 8px; color: #e1ecd8; font-size: 12px; font-style: italic; }
+.catalog-viewer__quality { margin-top: 8px; color: var(--color-lime); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.catalog-viewer__actions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 14px 22px; margin-top: 14px; }
+.catalog-viewer__price { color: var(--color-lime); font-family: var(--heading); font-size: 30px; font-weight: 400; letter-spacing: .03em; }
+.catalog-viewer__added { min-height: 18px; margin: 10px 0 0; color: #c4d2bf; font-size: 11px; }
+
+/* Zona de juegos gratis (acceso con Google). */
+.games-section { background: linear-gradient(135deg, #f3f0e2 0%, #eef2df 60%, #f5e9f0 100%); }
+.games-section__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.game-card { display: flex; flex-direction: column; gap: 10px; padding: 24px; border: 1px solid rgba(51, 94, 55, .16); border-radius: 20px; background: var(--color-white); box-shadow: 0 14px 34px rgba(31, 62, 39, .08); }
+.game-card.is-locked { background: linear-gradient(180deg, #fffef9, #f3f1e6); }
+.game-card__header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.game-card__badge { padding: 6px 12px; border-radius: 999px; color: var(--color-forest-deep); background: var(--color-lime); font-size: 11px; font-weight: 700; }
+.game-card__status { color: #8d582d; font-size: 11px; font-weight: 600; }
+.game-card h3 { margin: 4px 0 0; font-family: var(--sans); font-size: 21px; font-weight: 700; line-height: 1.2; }
+.game-card p { margin: 0; color: var(--color-muted); font-size: 13px; line-height: 1.65; }
+.game-card__platform { font-size: 11px; }
+.game-card .button { align-self: flex-start; margin-top: 6px; }
+.game-card__stage { width: 100%; overflow: hidden; margin-top: 12px; border-radius: 12px; background: #0b2119; }
+.game-card__stage iframe { display: block; width: 100%; height: 100%; border: 0; }
+.games-section__cta { display: grid; justify-items: start; gap: 12px; margin-top: 24px; }
+.games-section__cta p, .games-section__note { margin: 20px 0 0; color: var(--color-muted); font-size: 13px; line-height: 1.65; }
+.games-section__cta p { margin: 0; }
+.games-section__welcome { margin: 0 0 20px; color: var(--color-forest); font-size: 15px; font-weight: 600; }
+.games-section__error { margin: 12px 0 0; color: #a33d29; font-size: 12px; line-height: 1.5; }
+
+@media (max-width: 760px) {
+  .main-nav a[href="#juegos"] { display: none; }
+  .games-section__cta .button { width: 100%; }
 }

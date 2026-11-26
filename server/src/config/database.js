@@ -1,6 +1,21 @@
 import mongoose from 'mongoose';
 import { env } from './env.js';
 
+let listenersAttached = false;
+
+function attachConnectionListeners() {
+  if (listenersAttached) return;
+  listenersAttached = true;
+
+  mongoose.connection.on('error', (error) => {
+    console.error('Error en la conexión con MongoDB:', error.message);
+  });
+
+  mongoose.connection.on('disconnected', () => {
+    console.warn('MongoDB se desconectó.');
+  });
+}
+
 export async function connectDatabase() {
   if (!env.MONGODB_URI) {
     if (env.NODE_ENV === 'production') {
@@ -8,6 +23,8 @@ export async function connectDatabase() {
     }
     return false;
   }
+
+  attachConnectionListeners();
 
   await mongoose.connect(env.MONGODB_URI, {
     dbName: env.MONGODB_DATABASE,

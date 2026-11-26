@@ -5,6 +5,7 @@ import { connectDatabase } from './config/database.js';
 import { env } from './config/env.js';
 
 let server;
+let isShuttingDown = false;
 
 async function startServer() {
   const databaseConnected = await connectDatabase();
@@ -31,12 +32,12 @@ async function startServer() {
     }
   } else {
     console.info('Proveedores sociales disponibles:', authConfig.providers.join(', '));
-    const missingProductionProviders = [
+    const optionalMissingProviders = [
       !hasGoogleCredentials && 'Google',
       !hasFacebookCredentials && 'Facebook',
     ].filter(Boolean);
-    if (missingProductionProviders.length > 0) {
-      console.info('Para producción también faltan credenciales de:', missingProductionProviders.join(', '));
+    if (optionalMissingProviders.length > 0) {
+      console.info('Proveedores sociales opcionales sin configurar:', optionalMissingProviders.join(', '));
     }
   }
 
@@ -50,17 +51,47 @@ async function startServer() {
   });
 }
 
-async function stopServer(signal) {
+async function stopServer(signal, exitCode = 0) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
   console.log('Recibí ' + signal + '; cerrando conexiones.');
-  if (server) {
-    await new Promise((resolve) => server.close(resolve));
+
+  const forceExitTimer = setTimeout(() => {
+    console.error('El cierre tardó demasiado; forzando salida.');
+    process.exit(1);
+  }, 10_000);
+  forceExitTimer.unref();
+
+  try {
+    if (server) {
+      server.closeIdleConnections?.();
+      await new Promise((resolve) => server.close(resolve));
+    }
+    await mongoose.disconnect();
+  } catch (error) {
+    console.error('Error al cerrar el servidor:', error.message);
+    process.exit(1);
+  } finally {
+    clearTimeout(forceExitTimer);
   }
-  await mongoose.disconnect();
-  process.exit(0);
+
+  process.exit(exitCode);
 }
 
 process.on('SIGINT', () => stopServer('SIGINT'));
 process.on('SIGTERM', () => stopServer('SIGTERM'));
+
+process.on('unhandledRejection', (reason) => {
+  const message = reason instanceof Error ? reason.message : String(reason);
+  console.error('Promesa rechazada sin manejar:', message);
+  stopServer('unhandledRejection', 1);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Excepción no capturada:', error.message);
+  stopServer('uncaughtException', 1);
+});
 
 startServer().catch((error) => {
   console.error('No se pudo iniciar la API:', error.message);

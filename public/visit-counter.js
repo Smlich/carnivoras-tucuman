@@ -1,5 +1,6 @@
 const storageKey = 'carnivoras-tucuman:visit-count:v1';
 const counterSelector = '[data-visit-counter]';
+const netlifyEndpoint = '/.netlify/functions/visit-counter';
 
 function formatCount(count) {
   return new Intl.NumberFormat('es-AR').format(count);
@@ -30,6 +31,34 @@ function saveCount(count) {
   }
 }
 
+// La portada indica su endpoint (data-visit-endpoint). La guía estática no: allí se deduce por el dominio.
+function getEndpoints(element) {
+  const configured = element.dataset.visitEndpoint;
+  if (configured) return [configured];
+  if (window.location.hostname.endsWith('.netlify.app')) return [netlifyEndpoint];
+  return ['/api/visits', netlifyEndpoint];
+}
+
+async function requestCount(element) {
+  const endpoints = getEndpoints(element);
+
+  for (let index = 0; index < endpoints.length; index += 1) {
+    const response = await fetch(endpoints[index], {
+      method: 'POST',
+      headers: { 'X-Counter-Request': '1' },
+      cache: 'no-store',
+    });
+
+    // Solo se prueba el siguiente endpoint cuando el actual no existe en este hosting.
+    if (response.status === 404 && index < endpoints.length - 1) continue;
+    if (!response.ok) throw new Error('The shared visit counter is unavailable.');
+
+    return response.json();
+  }
+
+  throw new Error('The shared visit counter is unavailable.');
+}
+
 async function loadSharedCount(element) {
   const savedCount = getSavedCount();
   if (savedCount !== null) {
@@ -38,15 +67,7 @@ async function loadSharedCount(element) {
   }
 
   try {
-    const response = await fetch('/.netlify/functions/visit-counter', {
-      method: 'POST',
-      headers: { 'X-Counter-Request': '1' },
-      cache: 'no-store',
-    });
-
-    if (!response.ok) throw new Error('The shared visit counter is unavailable.');
-
-    const result = await response.json();
+    const result = await requestCount(element);
     if (!Number.isSafeInteger(result.count) || result.count < 0) throw new Error('The visit counter returned an invalid count.');
 
     saveCount(result.count);

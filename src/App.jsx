@@ -1,27 +1,37 @@
-import { useCallback, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { AuthProvider } from './context/AuthContext';
 import AnnouncementBar from './components/AnnouncementBar';
 import PreviewBanner from './components/PreviewBanner';
 import CareSection from './components/CareSection';
 import CartDrawer from './components/CartDrawer';
 import ContactSection from './components/ContactSection';
 import GallerySection from './components/GallerySection';
+import GamesSection from './components/GamesSection';
 import HeroSection from './components/HeroSection';
 import ProductCatalog from './components/ProductCatalog';
 import SiteFooter from './components/SiteFooter';
 import SiteHeader from './components/SiteHeader';
 import { useCart } from './hooks/use-cart';
+import { useCatalog } from './hooks/use-catalog';
 
-export default function App() {
+function Storefront() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [announcement, setAnnouncement] = useState('');
-  const cart = useCart();
+  const announcementTimerRef = useRef(null);
+  const catalog = useCatalog();
+  const cart = useCart(catalog.products);
 
-  const closeCart = useCallback(() => setIsCartOpen(false), []);
+  useEffect(() => () => window.clearTimeout(announcementTimerRef.current), []);
+
+  function closeCart() {
+    setIsCartOpen(false);
+  }
 
   function handleAdd(product) {
     cart.addItem(product);
     setAnnouncement(product.name + ' se agregó a tu pedido.');
-    window.setTimeout(() => setAnnouncement(''), 2600);
+    window.clearTimeout(announcementTimerRef.current);
+    announcementTimerRef.current = window.setTimeout(() => setAnnouncement(''), 2600);
   }
 
   return (
@@ -32,9 +42,10 @@ export default function App() {
       <SiteHeader itemCount={cart.count} onOpenCart={() => setIsCartOpen(true)} />
       <main id="contenido" tabIndex={-1}>
         <HeroSection />
-        <ProductCatalog onAdd={handleAdd} />
+        <ProductCatalog products={catalog.products} onAdd={handleAdd} />
         <GallerySection />
         <CareSection />
+        <GamesSection />
         <ContactSection />
       </main>
       <SiteFooter />
@@ -47,5 +58,13 @@ export default function App() {
         onClear={cart.clearCart}
       />
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Storefront />
+    </AuthProvider>
   );
 }

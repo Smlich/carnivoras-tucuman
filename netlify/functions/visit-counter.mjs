@@ -52,6 +52,19 @@ export default async function handler(request) {
     return new Response(null, { status: 405, headers: { Allow: 'GET, POST' } });
   }
 
+  const requestOrigin = request.headers.get('origin');
+  if (requestOrigin) {
+    let isSameOrigin = false;
+    try {
+      isSameOrigin = new URL(requestOrigin).origin === new URL(request.url).origin;
+    } catch {
+      isSameOrigin = false;
+    }
+
+    // Evita que otros sitios consuman la cuota gratuita de Netlify Blobs.
+    if (!isSameOrigin) return jsonResponse({ error: 'forbidden_origin' }, 403);
+  }
+
   if (request.headers.get('x-counter-request') !== '1') {
     return jsonResponse({ error: 'invalid_request' }, 400);
   }
