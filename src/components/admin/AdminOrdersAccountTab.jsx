@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   deleteAdminOrder,
   updateAdminAccount,
@@ -18,6 +18,11 @@ function OrderRow({ order, onChanged, onStatus }) {
   const [status, setStatus] = useState(order.status || 'nuevo');
   const [adminNotes, setAdminNotes] = useState(order.adminNotes || '');
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setStatus(order.status || 'nuevo');
+    setAdminNotes(order.adminNotes || '');
+  }, [order.adminNotes, order.status]);
 
   async function savePatch() {
     setBusy(true);
@@ -66,6 +71,7 @@ function OrderRow({ order, onChanged, onStatus }) {
           <li key={item.id}>{item.name} × {item.quantity} ({formatPrice(item.price * item.quantity)})</li>
         ))}
       </ul>
+      {order.notes && <p className="admin-order-card__notes">Nota del cliente: {order.notes}</p>}
       <div className="admin-order-card__controls">
         <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label={'Estado de ' + order.id}>
           {ORDER_STATUSES.map((opt) => (
@@ -86,12 +92,18 @@ function OrderRow({ order, onChanged, onStatus }) {
 }
 
 export default function AdminOrdersAccountTab({ adminUser, orders, users = [], onChanged, onAccountChanged, onStatus }) {
+  const [statusFilter, setStatusFilter] = useState('todos');
   const [email, setEmail] = useState(adminUser?.email || '');
   const [name, setName] = useState(adminUser?.name || 'Administrador');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [savingAccount, setSavingAccount] = useState(false);
+
+  useEffect(() => {
+    setEmail(adminUser?.email || '');
+    setName(adminUser?.name || 'Administrador');
+  }, [adminUser?.email, adminUser?.name]);
 
   async function handleAccountSubmit(event) {
     event.preventDefault();
@@ -120,6 +132,10 @@ export default function AdminOrdersAccountTab({ adminUser, orders, users = [], o
     }
   }
 
+  const filteredOrders = statusFilter === 'todos'
+    ? orders
+    : orders.filter((order) => (order.status || 'nuevo') === statusFilter);
+
   return (
     <div className="admin-split">
       <div className="admin-settings-stack">
@@ -127,11 +143,40 @@ export default function AdminOrdersAccountTab({ adminUser, orders, users = [], o
           <h2>Consultas y pedidos recibidos ({orders.length})</h2>
           <p>Cada consulta enviada desde «Mi pedido → WhatsApp» queda registrada acá con nombre y estado de Google.</p>
 
+          {orders.length > 0 && (
+            <div className="admin-order-filters" role="group" aria-label="Filtrar consultas por estado">
+              <button
+                type="button"
+                className={'admin-filter-chip' + (statusFilter === 'todos' ? ' is-active' : '')}
+                aria-pressed={statusFilter === 'todos'}
+                onClick={() => setStatusFilter('todos')}
+              >
+                Todos ({orders.length})
+              </button>
+              {ORDER_STATUSES.map((opt) => {
+                const count = orders.filter((order) => (order.status || 'nuevo') === opt.id).length;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={'admin-filter-chip' + (statusFilter === opt.id ? ' is-active' : '')}
+                    aria-pressed={statusFilter === opt.id}
+                    onClick={() => setStatusFilter(opt.id)}
+                  >
+                    {opt.label} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {orders.length === 0 ? (
             <p className="admin-empty">Todavía no hay consultas registradas.</p>
+          ) : filteredOrders.length === 0 ? (
+            <p className="admin-empty">No hay consultas en ese estado.</p>
           ) : (
             <div className="admin-orders-list">
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <OrderRow key={order.id} order={order} onChanged={onChanged} onStatus={onStatus} />
               ))}
             </div>
@@ -179,8 +224,17 @@ export default function AdminOrdersAccountTab({ adminUser, orders, users = [], o
             <input type="text" required value={name} onChange={(e) => setName(e.target.value)} />
           </label>
           <label className="admin-field">
-            <span>Contraseña actual (para confirmar)</span>
-            <input type="password" required value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+            <span>
+              {adminUser?.method === 'google'
+                ? 'Contraseña actual (si ya tenías clave local)'
+                : 'Contraseña actual (para confirmar)'}
+            </span>
+            <input
+              type="password"
+              required={adminUser?.method !== 'google'}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
           </label>
           <label className="admin-field">
             <span>Nueva contraseña (opcional, mínimo 8 caracteres)</span>

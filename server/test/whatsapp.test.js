@@ -50,4 +50,12 @@ test('createOrderMessage incluye nombre y registro Google del cliente para Whats
   const decoded = decodeURIComponent(legacyUrl.split('?text=')[1]);
   assert.match(decoded, /• Nombre: Lucía/);
   assert.match(decoded, /• Cuenta de Google: No registrado \(sin cuenta de Google\)/);
+  assert.doesNotMatch(decoded, /• Nota:/);
+
+  const notedMessage = createOrderMessage(sampleItems, sampleSettings, {
+    name: 'Lucía',
+    googleRegistered: false,
+    notes: 'Barrio Norte, después de las 17 h',
+  });
+  assert.match(notedMessage, /• Nota: Barrio Norte, después de las 17 h/);
 });

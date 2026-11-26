@@ -4,21 +4,23 @@ Tienda web de plantas carnívoras de Tucumán. Este repositorio es también una 
 
 Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/carnivoras-tucuman).
 
-## Primera entrega
+## Estado actual del sitio
 
-- Catálogo en español con fotografías reales enviadas por el negocio.
-- Búsqueda y filtros básicos.
-- Carrito local que recuerda el pedido en este dispositivo.
-- Pedido enviado a WhatsApp para confirmar precio, disponibilidad y entrega.
-- Contador compartido de visitas por sesión de pestaña, persistido en Netlify Blobs; no guarda identificadores personales.
-- Diseño adaptable, navegación por teclado y metadatos básicos.
-- Sistema visual juvenil y legible: titulares tipo cómic, acentos lettering y paleta botánica viva documentados en [el sistema visual](docs/DESIGN_SYSTEM.md).
-- Tres sellos originales en el pie: Hecho en Argentina, Codeado en Argentina y SMlich Soluciones IT; el logo del área de programación es una identidad secundaria.
-- Guía educativa en `/cuidados.html`, con contenido HTML indexable y fuentes botánicas enlazadas.
-- En producción, Express sirve el frontend compilado y la API bajo el mismo origen; `npm start` inicia el servidor.
-- API Express de solo lectura para catálogo y salud del servicio.
-- Esquema Mongoose y script de carga inicial preparados para MongoDB.
-- Inicio de sesión con Better Auth: Google está configurado y probado localmente; Facebook sigue pendiente. Netlify sirve el frontend estático y la función acotada del contador; la API MERN y OAuth siguen locales.
+- Sitio multipágina en español con fotografías reales del vivero:
+  - `/` (portada con destacadas, contador de precios congelados y directorio)
+  - `/catalogo.html` (búsqueda, filtros por categoría y visor de fotos)
+  - `/vivero.html` (álbum de 24 fotografías reales con visor ampliado)
+  - `/cuidados.html` (guía ilustrada e indexable con fuentes botánicas)
+  - `/juegos.html` (zona de juegos gratis protegida por Google OAuth y modo administrador)
+  - `/contacto.html` (WhatsApp directo e Instagram `@carnivoras_tucuman`)
+  - `/privacidad.html` y `/terminos.html` (política de privacidad y condiciones de consulta/entrega)
+  - `/admin.html` (panel de administración con `noindex` para catálogo, textos, álbum, juegos, pedidos y cuenta)
+- Carrito local en `localStorage` con validación de stock y armado automático del pedido para WhatsApp (incluye nombre y estado de registro con Google).
+- Contador compartido de visitas por sesión de pestaña en `/api/visits`, persistido en Netlify Blobs o MongoDB sin guardar identificadores personales.
+- Backend doble compatible:
+  - **En Netlify**: función `netlify/functions/api.mjs` (`/api/*`) respaldada por Netlify Blobs, Google OAuth con PKCE, panel admin, registro de consultas con verificación de precios en servidor, cabeceras de seguridad (`public/_headers`) y `public/404.html`.
+  - **Local / MERN full stack**: servidor Express (`server/src`) + MongoDB Atlas + Better Auth (`npm start`).
+- Inicio de sesión con Google OAuth activo en desarrollo y Netlify; Facebook OAuth sigue pendiente.
 
 Los productos y valores del catálogo se transcribieron de las publicaciones compartidas el 25 de noviembre de 2026. El stock se confirma por WhatsApp. Actualiza los datos antes de anunciar la web como catálogo vigente.
 
@@ -56,8 +58,9 @@ Ejecuta `npm test` para correr la suite de la API con datos demo. Para comprobar
 - `src/utils`: formato de precios y construcción del pedido para WhatsApp.
 - `src/services`: comunicación entre React y la API.
 - `server/src`: API Express, configuración, esquema Mongo, lectura del catálogo y autenticación.
-- `netlify/functions`: endpoint de contador compartido con persistencia en Netlify Blobs.
-- `public/visit-counter.js`: conecta el pie a la función y limita el incremento a una sesión por pestaña.
+- `netlify/functions`: API unificada (`api.mjs`) sobre Netlify Blobs para catálogo, visitas, pedidos, admin y Google OAuth.
+- `public/visit-counter.js`: conecta el pie a `/api/visits` y limita el incremento a una sesión por pestaña.
+- `public/_headers` y `public/404.html`: cabeceras de seguridad/caché y página 404 para Netlify.
 - `docs`: arquitectura, decisiones, sistema visual, cronograma, [álbum fotográfico](docs/GALLERY.md), [lección para entender su implementación](docs/LESSON_14_PHOTO_GALLERY.md) y registro de aprendizaje.
 - `public/images/catalog`: archivos originales compartidos por el negocio.
 - `public/images/catalog/optimized`: variantes optimizadas para la web; conserva intactos los originales.
@@ -76,7 +79,7 @@ Usa [el caso de estudio](docs/PORTFOLIO_CASE_STUDY.md) para presentar la arquite
 
 ## Publicación por etapas
 
-La vista de prueba se publica desde `main` mediante la integración de GitHub con [Netlify](https://carnivorastucuman.netlify.app/), con catálogo local, fotos reales, la guía `/cuidados.html` y una función persistente para el contador. No representa la API MERN ni verifica OAuth. Hostinger queda aplazado hasta contar con presupuesto. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica el despliegue de cada etapa.
+El sitio se publica desde `main` mediante la integración de GitHub con [Netlify](https://carnivorastucuman.netlify.app/), incluyendo las páginas públicas, `/admin.html`, Google OAuth y la función `netlify/functions/api.mjs` sobre Netlify Blobs. Hostinger queda aplazado hasta contar con presupuesto si en el futuro se migra el servidor Express + MongoDB Atlas. La guía [Netlify de prueba y Hostinger final](docs/LESSON_09_DEPLOYMENT_PATHS.md) explica el despliegue de cada etapa.
 
 ### Presupuesto de esta etapa
 
@@ -84,15 +87,16 @@ Por ahora, usa únicamente funciones y planes sin costo. No habilites facturaci�
 
 ## Próximos hitos
 
-Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTICATION.md), [la lección del contador en Netlify](docs/LESSON_15_NETLIFY_COUNTER.md) y el [plan de contenidos y SEO local](docs/CONTENT_PLAN.md). Google OAuth ya pasó un inicio de sesión real en desarrollo usando `http://localhost:5173`; Facebook todavía no está configurado. Netlify no incluye la API MERN ni la sesión OAuth. No hay escritura de pedidos en la API.
+Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTICATION.md), [la lección del contador en Netlify](docs/LESSON_15_NETLIFY_COUNTER.md) y el [plan de contenidos y SEO local](docs/CONTENT_PLAN.md). Facebook OAuth todavía no está configurado por verificación pendiente en Meta.
 
 ## Datos que faltan antes del lanzamiento
 
-- Confirmar precios y disponibilidad actual.
-- Definir zonas, costos y condiciones de entrega.
+- Confirmar precios y disponibilidad actual (`stockStatus`).
+- Definir zonas, costos y condiciones de entrega en `/terminos.html`.
+- Completar datos legales del titular en `/privacidad.html`.
+- Decidir si se publica un juego jugable en `/juegos.html` o se oculta esa sección del menú.
 - Cuenta oficial de Instagram confirmada: `@carnivoras_tucuman`; compartir Facebook si se decide usarlo.
-- Definir dominio, política de privacidad y condiciones de venta.
-- Configurar Facebook OAuth y revisar publicación, callbacks HTTPS y verificación de proveedores antes de un despliegue full stack.
+- Definir dominio propio, actualizar URLs canónicas/sitemap y configurar Facebook OAuth cuando corresponda.
 
 ## Fuentes técnicas
 

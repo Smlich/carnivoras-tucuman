@@ -40,17 +40,20 @@ function readImageDimensions(src) {
 
 export default function AdminGalleryTab({ gallery, onChanged, onStatus }) {
   const [editingId, setEditingId] = useState(null);
+  const [slugTouched, setSlugTouched] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_GALLERY, sortOrder: gallery.length });
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   function startNew() {
     setEditingId(null);
+    setSlugTouched(false);
     setForm({ ...EMPTY_GALLERY, sortOrder: gallery.length });
   }
 
   function startEdit(item) {
     setEditingId(item.id);
+    setSlugTouched(true);
     setForm({ ...item });
   }
 
@@ -156,7 +159,7 @@ export default function AdminGalleryTab({ gallery, onChanged, onStatus }) {
                 type="text"
                 required
                 value={form.title}
-                onChange={(e) => setForm((c) => ({ ...c, title: e.target.value, id: editingId ? c.id : slugify(e.target.value) }))}
+                onChange={(e) => setForm((c) => ({ ...c, title: e.target.value, id: editingId || slugTouched ? c.id : slugify(e.target.value) }))}
               />
             </label>
             <label className="admin-field">
@@ -167,7 +170,10 @@ export default function AdminGalleryTab({ gallery, onChanged, onStatus }) {
                 disabled={Boolean(editingId)}
                 pattern="[a-z0-9-]+"
                 value={form.id}
-                onChange={(e) => setForm((c) => ({ ...c, id: slugify(e.target.value) }))}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  setForm((c) => ({ ...c, id: slugify(e.target.value) }));
+                }}
               />
             </label>
           </div>

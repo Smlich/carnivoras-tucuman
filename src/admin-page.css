@@ -621,6 +621,54 @@
   font-size: 13px;
 }
 
+.admin-order-card__notes {
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--mist);
+  color: var(--ink);
+  font-size: 12.5px;
+}
+
+.admin-empty {
+  color: var(--ink-muted);
+  font-size: 13.5px;
+}
+
+.admin-order-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.admin-filter-chip {
+  min-height: 32px;
+  padding: 4px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-muted);
+  background: var(--paper);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-filter-chip.is-active {
+  border-color: var(--bog-abyss);
+  color: var(--bog-abyss);
+  background: var(--lime);
+}
+
+.admin-tab:focus-visible,
+.admin-btn-secondary:focus-visible,
+.admin-btn-danger:focus-visible,
+.admin-filter-chip:focus-visible,
+.admin-upload-btn:focus-within {
+  outline: 2px solid var(--bog-abyss);
+  outline-offset: 2px;
+}
+
 @media (max-width: 980px) {
   .admin-split { grid-template-columns: 1fr; }
   .admin-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

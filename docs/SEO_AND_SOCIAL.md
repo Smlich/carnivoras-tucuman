@@ -4,10 +4,11 @@ La meta es que las personas encuentren el vivero cuando buscan plantas carnívor
 
 ## Base ya incluida
 
-- Título y descripción en español para la tienda.
-- URL canónica de cada página, metadatos Open Graph y tarjetas de X con texto alternativo para las fotografías reales.
-- `robots.txt` permite el rastreo público y apunta al sitemap XML de la vista actual de Netlify; el sitemap enumera la tienda y la guía de cuidados.
-- Marcado `GardenStore` con teléfono de WhatsApp, área de servicio en Tucumán y perfil de Instagram.
+- Título y descripción en español para cada una de las páginas públicas (`index.html`, `catalogo.html`, `vivero.html`, `cuidados.html`, `juegos.html`, `contacto.html`, `privacidad.html`, `terminos.html`) y `noindex, nofollow` en `admin.html` y `404.html`.
+- URL canónica de cada página, metadatos Open Graph y tarjetas de X (`twitter:*`) con `og:image:alt` y `twitter:image:alt` para las fotografías reales.
+- `robots.txt` permite el rastreo público, bloquea `/admin`, `/admin.html` y `/api/`, y apunta al `sitemap.xml` con las páginas públicas.
+- Datos estructurados JSON-LD: `GardenStore` en portada, `ContactPage` en contacto, `BreadcrumbList` en todas las páginas públicas y `FAQPage` en `/cuidados.html`.
+- Páginas legales iniciales en `/privacidad.html` y `/terminos.html` (con marcas `[Pendiente de completar]` para los datos comerciales que faltan).
 - Secciones enlazables para catálogo y contacto, más la página propia `/cuidados.html`.
 - La guía de cuidados tiene HTML semántico, título y descripción propios y metadatos Open Graph para compartir.
 - Texto real del negocio y de sus especies, evitando contenido genérico.
@@ -21,7 +22,7 @@ La meta es que las personas encuentren el vivero cuando buscan plantas carnívor
 - Al elegir el dominio final, reemplazar la URL de Netlify en canonical, Open Graph, Twitter, JSON-LD, `robots.txt` y `sitemap.xml`.
 - Crear páginas por especie o producto cuando los datos se confirmen.
 - Mantener precio, disponibilidad, tamaño, envío y promociones sincronizados con el catálogo real.
-- Publicar una política de privacidad, términos de venta y condiciones de entrega.
+- Completar los datos pendientes en `/privacidad.html` y `/terminos.html` (razón social/email y zonas/costos de entrega).
 - Enviar un sitemap a Search Console una vez publicado el dominio.
 - Confirmar que `@carnivoras_tucuman` siga siendo la cuenta oficial y vincular Facebook si el negocio abre o confirma esa cuenta.
 

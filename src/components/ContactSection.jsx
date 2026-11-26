@@ -27,6 +27,18 @@ const CONTACT_TOPICS = [
 
 export default function ContactSection({ showHeading = true, showShortcuts = false }) {
   const { settings } = useSiteContent();
+  const cityLabel = settings.city || 'Tucumán, Argentina';
+
+  const contactTopics = [
+    {
+      badge: 'STOCK Y ENVÍOS',
+      title: 'Consultar disponibilidad y entrega',
+      description: `Confirmamos ejemplares listos hoy y coordinamos entrega en ${cityLabel}.`,
+      cta: 'Consultar disponibilidad',
+      message: 'Hola, quería consultar qué plantas carnívoras tienen disponibles hoy y cómo coordinar entrega en Tucumán.',
+    },
+    ...CONTACT_TOPICS.slice(1),
+  ];
 
   return (
     <section className="contact-section section-pad" id="contacto" aria-labelledby={showHeading ? 'contact-title' : undefined} aria-label={showHeading ? undefined : 'Contacto directo por WhatsApp e Instagram'}>
@@ -59,7 +71,7 @@ export default function ContactSection({ showHeading = true, showShortcuts = fal
 
       {showShortcuts && (
         <div className="page-shell contact-shortcuts">
-          {CONTACT_TOPICS.map((topic) => (
+          {contactTopics.map((topic) => (
             <article className="contact-shortcut" key={topic.badge}>
               <span className="contact-shortcut__badge">{topic.badge}</span>
               <h3>{topic.title}</h3>

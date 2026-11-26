@@ -86,4 +86,4 @@ const productSchema = new mongoose.Schema({
 
 productSchema.index({ isActive: 1, category: 1, sortOrder: 1 });
 
-export const Product = mongoose.model('Product', productSchema);
+export const Product = mongoose.models.Product || mongoose.model('Product', productSchema);

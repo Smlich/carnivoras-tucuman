@@ -1,28 +1,23 @@
 # Arquitectura del proyecto
 
-## Frontend y primera API
+## Frontend multipágina y API compartida
 
 ```text
-Navegador
-  └── React + Vite
-       ├── catálogo, filtros y carrito
-       ├── GET /api/products mediante proxy de Vite
-       ├── carrito persistido en localStorage
-       ├── estado de acceso social desde Express
-       ├── panel Better Auth cargado al abrir la cuenta y si hay proveedor habilitado
-       └── enlace wa.me con resumen del pedido
-  └── /cuidados.html (HTML semántico, sin JavaScript de aplicación)
+Navegador (9 páginas Vite)
+  ├── React: /, /catalogo.html, /vivero.html, /juegos.html, /contacto.html, /admin.html
+  │     ├── GET /api/site-data (ajustes, catálogo activo, galería, preview de juegos)
+  │     ├── carrito en localStorage + nota opcional + enlace wa.me + POST /api/orders
+  │     └── sesión Google OAuth y panel Admin
+  └── HTML estático: /cuidados.html, /privacidad.html, /terminos.html
+        ├── contenido indexable + JSON-LD (BreadcrumbList / FAQPage)
+        └── scripts progresivos (/visit-counter.js, /mobile-nav.js)
 
-Vite
-  └── Express
-       ├── GET /api/health
-       ├── GET /api/products
-       ├── GET /api/auth/status
-       ├── Better Auth → Google/Facebook → cuentas y sesiones en MongoDB
-       └── Mongoose → MongoDB o catálogo de demostración durante desarrollo
+Backend compatible (/api/*)
+  ├── Netlify Functions (netlify/functions/api.mjs) + Netlify Blobs + public/_headers + 404.html
+  └── Express 5 (server/src) + Mongoose (MongoDB Atlas) + Better Auth
 ```
 
-El navegador mantiene el carrito de este dispositivo. WhatsApp recibe un borrador del pedido; el negocio confirma stock, precio y entrega manualmente. No se reciben pagos ni se crean pedidos en el servidor. Atlas y Google OAuth ya funcionan en desarrollo; Facebook sigue pendiente. Si MongoDB no está configurado en desarrollo, la API devuelve el catálogo local con source: demo-catalog; esa respuesta no es persistencia.
+El navegador recuerda las cantidades del carrito en `localStorage` y recalcula precios y disponibilidad contra el servidor al registrar consultas en `POST /api/orders`. WhatsApp sigue siendo el canal comercial para confirmar stock, medio de pago y entrega manualmente. Si MongoDB no está configurado en desarrollo, Express sirve el catálogo local con `source: demo-catalog` sin persistencia.
 
 ## Arquitectura objetivo: MERN
 
@@ -32,15 +27,15 @@ React (cliente)
        └── Node.js + Express
             ├── autenticación OAuth (Google / Facebook)
             ├── validación y reglas de negocio
-            └── MongoDB (productos, cuentas, pedidos)
+            └── MongoDB (productos, cuentas, pedidos, medios, métricas)
 ```
 
 El cliente nunca se conecta directamente a MongoDB. El servidor valida cada operación, controla permisos y conserva los secretos de OAuth. Las rutas de administración requieren autorización. Los identificadores y secretos de proveedor viven en variables de entorno del servidor.
 
 ## Topología para los dos despliegues
 
-- **Netlify (prueba):** publica `dist` y una Netlify Function acotada al contador de visitas. `VITE_STATIC_PREVIEW=true` usa el catálogo local y omite consultas de la API MERN y autenticación; no requiere secretos ni escribe en Atlas. La función guarda solo el total agregado en Netlify Blobs.
-- **Hostinger (final):** un proceso Express sirve `dist` y `/api/*` en el mismo origen. Mongoose y Better Auth usan Atlas; las credenciales OAuth y de base de datos se configuran en el panel del hosting, nunca en Git.
+- **Netlify:** publica `dist` (9 páginas HTML + `public/_headers` + `public/404.html`) y la función unificada `netlify/functions/api.mjs` (`/api/*`) sobre Netlify Blobs para catálogo editable, álbum, juegos, pedidos, Google OAuth con PKCE, panel admin y contador de visitas.
+- **Hostinger (opcional a futuro):** un proceso Express sirve `dist` y `/api/*` en el mismo origen. Mongoose y Better Auth usan MongoDB Atlas; las credenciales OAuth y de base de datos se configuran en el panel del hosting, nunca en Git.
 
 ## Decisiones de la primera entrega
 

@@ -16,6 +16,7 @@ export default function CatalogLightbox({
     ? products.findIndex((product) => product.id === activeProduct.id)
     : -1;
   const canNavigate = products.length > 1 && activeIndex !== -1;
+  const isOutOfStock = activeProduct?.stockStatus === 'unavailable';
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -91,12 +92,17 @@ export default function CatalogLightbox({
             <h2 id="catalog-viewer-title">{activeProduct.name}</h2>
             <p className="catalog-viewer__species">{activeProduct.species}</p>
             <p>{activeProduct.description}</p>
-            <p>{activeProduct.note}</p>
+            <p>{isOutOfStock ? 'Sin stock momentáneo · Consultá próxima fecha' : activeProduct.note}</p>
             <p className="catalog-viewer__quality">Foto original en máxima calidad</p>
             <div className="catalog-viewer__actions">
               <strong className="catalog-viewer__price">{formatPrice(activeProduct.price)}</strong>
-              <button className="button button--dark" type="button" onClick={() => onAdd(activeProduct)}>
-                <span aria-hidden="true">+</span> Agregar al pedido
+              <button
+                className="button button--dark"
+                type="button"
+                disabled={isOutOfStock}
+                onClick={() => { if (!isOutOfStock) onAdd(activeProduct); }}
+              >
+                {isOutOfStock ? 'Sin stock' : (<><span aria-hidden="true">+</span> Agregar al pedido</>)}
               </button>
             </div>
             <p className="catalog-viewer__added" role="status" aria-live="polite">

@@ -26,11 +26,21 @@ export const adminLoginSchema = z.object({
 export const adminAccountUpdateSchema = z.object({
   email: z.string().trim().email('Ingresá un correo válido.').max(160),
   name: z.string().trim().min(2, 'Ingresá un nombre de al menos 2 caracteres.').max(80),
-  currentPassword: z.string().min(1, 'Ingresá tu contraseña actual para confirmar cambios.').max(200),
+  currentPassword: z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.string().min(1).max(200).optional(),
+  ),
   newPassword: z.preprocess(
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
     z.string().min(8, 'La nueva contraseña debe tener al menos 8 caracteres.').max(200).optional(),
   ),
+});
+
+export const productsQuerySchema = z.object({
+  category: z.enum(['combos', 'otras', 'venus', 'especiales']).optional(),
+  q: z.string().trim().max(80).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(48).default(24),
 });
 
 export const siteSettingsSchema = z.object({
@@ -45,7 +55,11 @@ export const siteSettingsSchema = z.object({
     (value) => (typeof value === 'string' && value.trim() === '' ? '' : value),
     z.union([z.literal(''), safePathOrHttpsUrl]),
   ),
-  announcementItems: z.array(z.string().trim().min(2).max(90)).min(1).max(6),
+  announcementItems: z.array(z.string().trim().min(2).max(90)).min(1).max(6).default([
+    'Vivero botánico · Tucumán, Argentina',
+    'Fotos reales de nuestras plantas',
+    'Consultas directas por WhatsApp',
+  ]),
   showPreviewBanner: z.boolean(),
   previewBannerText: z.string().trim().min(4).max(180),
   heroEyebrow: z.string().trim().min(3).max(90),
@@ -61,9 +75,9 @@ export const siteSettingsSchema = z.object({
   priceFreezeStartDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato esperado AAAA-MM-DD.'),
   heroPrimaryCtaLabel: z.string().trim().min(2).max(50),
   heroSecondaryCtaLabel: z.string().trim().min(2).max(60),
-  heroProofTag: z.string().trim().min(2).max(8),
-  heroProofTitle: z.string().trim().min(3).max(90),
-  heroProofSubtitle: z.string().trim().min(3).max(160),
+  heroProofTag: z.string().trim().min(2).max(8).default('TUC'),
+  heroProofTitle: z.string().trim().min(3).max(90).default('Atención directa desde Tucumán, Argentina'),
+  heroProofSubtitle: z.string().trim().min(3).max(160).default('Consultá stock vigente, envíos y cuidados personalizados por WhatsApp.'),
   featuredProductIds: z.array(z.string().trim().regex(/^[a-z0-9-]+$/)).min(1).max(8),
 });
 

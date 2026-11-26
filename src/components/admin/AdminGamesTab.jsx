@@ -32,12 +32,14 @@ function slugify(value) {
 
 export default function AdminGamesTab({ games, onChanged, onStatus }) {
   const [editingSlug, setEditingSlug] = useState(null);
+  const [slugTouched, setSlugTouched] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_GAME, sortOrder: games.length });
   const [propsJson, setPropsJson] = useState(JSON.stringify(EMPTY_GAME.adminProps, null, 2));
   const [isSaving, setIsSaving] = useState(false);
 
   function startNew() {
     setEditingSlug(null);
+    setSlugTouched(false);
     setForm({ ...EMPTY_GAME, sortOrder: games.length });
     setPropsJson(JSON.stringify(EMPTY_GAME.adminProps, null, 2));
   }
@@ -45,6 +47,7 @@ export default function AdminGamesTab({ games, onChanged, onStatus }) {
   function startEdit(game) {
     const props = game.adminProps && typeof game.adminProps === 'object' ? game.adminProps : {};
     setEditingSlug(game.slug);
+    setSlugTouched(true);
     setForm({
       slug: game.slug,
       title: game.title,
@@ -185,7 +188,7 @@ export default function AdminGamesTab({ games, onChanged, onStatus }) {
                 type="text"
                 required
                 value={form.title}
-                onChange={(e) => setForm((c) => ({ ...c, title: e.target.value, slug: editingSlug ? c.slug : slugify(e.target.value) }))}
+                onChange={(e) => setForm((c) => ({ ...c, title: e.target.value, slug: editingSlug || slugTouched ? c.slug : slugify(e.target.value) }))}
               />
             </label>
             <label className="admin-field">
@@ -196,7 +199,10 @@ export default function AdminGamesTab({ games, onChanged, onStatus }) {
                 disabled={Boolean(editingSlug)}
                 pattern="[a-z0-9-]+"
                 value={form.slug}
-                onChange={(e) => setForm((c) => ({ ...c, slug: slugify(e.target.value) }))}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  setForm((c) => ({ ...c, slug: slugify(e.target.value) }));
+                }}
               />
             </label>
           </div>

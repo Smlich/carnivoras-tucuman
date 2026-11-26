@@ -108,7 +108,7 @@ test('envía cabeceras CSP explícitas y respeta orígenes permitidos de CORS', 
 test('redirige secciones HTML y entrega 404 HTML o JSON según la ruta en producción', async (context) => {
   const origin = await startTestServer(createApp({ env: productionEnv }), context);
 
-  for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin']) {
+  for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin', 'privacidad', 'terminos']) {
     const redirectResponse = await fetch(`${origin}/${page}`, { redirect: 'manual' });
     assert.equal(redirectResponse.status, 301);
     assert.equal(redirectResponse.headers.get('location'), `/${page}.html`);
@@ -130,4 +130,44 @@ test('redirige secciones HTML y entrega 404 HTML o JSON según la ruta en produc
   });
   assert.equal(apiNotFound.status, 404);
   assert.equal((await apiNotFound.json()).error.code, 'ROUTE_NOT_FOUND');
+});
+
+test('POST /api/orders recalcula precios en el servidor y aplica rate limit', async (context) => {
+  const origin = await startTestServer(createApp({ rateLimits: { ordersMax: 2 } }), context);
+
+  const created = await fetch(`${origin}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      customerName: 'Lucía',
+      items: [{ id: 'venus-pequena', name: 'Falso', price: 1, quantity: 2 }],
+    }),
+  });
+  assert.equal(created.status, 201);
+  const createdBody = await created.json();
+  assert.equal(createdBody.data.items[0].name, 'Venus atrapamoscas pequeña');
+  assert.equal(createdBody.data.items[0].price, 6000);
+  assert.equal(createdBody.data.totalARS, 12000);
+
+  const invalid = await fetch(`${origin}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      customerName: 'Lucía',
+      items: [{ id: 'no-existe', name: 'X', price: 100, quantity: 1 }],
+    }),
+  });
+  assert.equal(invalid.status, 400);
+  assert.equal((await invalid.json()).error.code, 'INVALID_ORDER_ITEM');
+
+  const limited = await fetch(`${origin}/api/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      customerName: 'Lucía',
+      items: [{ id: 'venus-pequena', name: 'X', price: 6000, quantity: 1 }],
+    }),
+  });
+  assert.equal(limited.status, 429);
+  assert.equal((await limited.json()).error.code, 'RATE_LIMIT_EXCEEDED');
 });

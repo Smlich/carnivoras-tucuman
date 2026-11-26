@@ -12,6 +12,7 @@ import {
   buildAdminCookie,
   buildClearAdminCookie,
   createAdminToken,
+  getPrimaryAdminEmail,
   hashPasswordPbkdf2,
   isAdminConfigured,
   parseAdminEmails,
@@ -44,6 +45,7 @@ import {
   siteSettingsSchema,
   validateAndDecodeImageBase64,
 } from '../schemas/admin-schemas.js';
+import { extractManagedMediaKey } from '../utils/media-cleanup.js';
 
 function mapDbProduct(doc) {
   return {
@@ -171,21 +173,38 @@ async function loadRegisteredGoogleUsers() {
   }
 }
 
-async function ensureProductsSeeded() {
-  if ((await Product.countDocuments()) === 0) {
-    await Product.insertMany(defaultAdminProducts.map(toDbProduct));
+async function ensureSeeded(Model, markerKey, docs) {
+  const alreadySeeded = await SiteMetric.exists({ key: markerKey });
+  if (alreadySeeded) return;
+  if ((await Model.countDocuments()) === 0) {
+    await Model.insertMany(docs);
   }
+  await SiteMetric.updateOne({ key: markerKey }, { $setOnInsert: { key: markerKey, count: 1 } }, { upsert: true });
+}
+
+async function ensureProductsSeeded() {
+  await ensureSeeded(Product, 'seeded:products', defaultAdminProducts.map(toDbProduct));
 }
 
 async function ensureGallerySeeded() {
-  if ((await GalleryItem.countDocuments()) === 0) {
-    await GalleryItem.insertMany(defaultGalleryItems.map(toDbGallery));
-  }
+  await ensureSeeded(GalleryItem, 'seeded:gallery', defaultGalleryItems.map(toDbGallery));
 }
 
 async function ensureGamesSeeded() {
-  if ((await Game.countDocuments()) === 0) {
-    await Game.insertMany(defaultAdminGames);
+  await ensureSeeded(Game, 'seeded:games', defaultAdminGames);
+}
+
+async function cleanupUnreferencedDbMedia(candidateUrls = []) {
+  const keys = [...new Set(candidateUrls.map(extractManagedMediaKey).filter(Boolean))];
+  for (const key of keys) {
+    const url = '/api/media/' + key;
+    const [usedByProduct, usedByGallery] = await Promise.all([
+      Product.exists({ image: url }),
+      GalleryItem.exists({ src: url }),
+    ]);
+    if (!usedByProduct && !usedByGallery) {
+      await MediaAsset.deleteOne({ key }).catch(() => {});
+    }
   }
 }
 
@@ -275,7 +294,14 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
       });
     }
 
-    const token = createAdminToken({ email: verification.email, name: verification.name }, appEnv.ADMIN_SESSION_SECRET);
+    const token = createAdminToken(
+      {
+        email: verification.email,
+        name: verification.name,
+        ver: Number.isInteger(overrideAccount?.tokenVersion) ? overrideAccount.tokenVersion : 0,
+      },
+      appEnv.ADMIN_SESSION_SECRET,
+    );
     response.setHeader('Set-Cookie', buildAdminCookie(token, { secure: isSecureCookie || request.secure }));
     return response.status(200).json({
       data: { user: { email: verification.email, name: verification.name, role: 'admin', method: 'password' } },
@@ -300,10 +326,21 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
 
     const body = adminAccountUpdateSchema.parse(request.body ?? {});
     const overrideAccount = await getStoredAdminAccount();
+    const verificationEmail = request.adminUser.method === 'google'
+      ? (overrideAccount?.email || getPrimaryAdminEmail(appEnv))
+      : request.adminUser.email;
+    const passwordConfigured = Boolean(
+      overrideAccount?.passwordHash || appEnv.ADMIN_PASSWORD_HASH || appEnv.ADMIN_PASSWORD,
+    );
 
-    if (request.adminUser.method === 'password' || overrideAccount) {
+    if (passwordConfigured) {
+      if (!body.currentPassword) {
+        return response.status(401).json({
+          error: { code: 'INVALID_CURRENT_PASSWORD', message: 'La contraseña actual no coincide.' },
+        });
+      }
       const verification = verifyBootstrapCredentials({
-        email: request.adminUser.email,
+        email: verificationEmail,
         password: body.currentPassword,
         envConfig: appEnv,
         overrideAccount,
@@ -315,27 +352,36 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
       }
     }
 
-    if (!body.newPassword && !overrideAccount && request.adminUser.method === 'google') {
+    if (!passwordConfigured && !body.newPassword) {
       return response.status(400).json({
-        error: { code: 'NEW_PASSWORD_REQUIRED', message: 'Definí una nueva contraseña para habilitar el acceso local.' },
+        error: { code: 'NEW_PASSWORD_REQUIRED', message: 'Definí una nueva contraseña (mínimo 8 caracteres) para habilitar el acceso local.' },
       });
     }
 
     const nextPasswordHash = hashPasswordPbkdf2(body.newPassword || body.currentPassword);
+    const nextTokenVersion = (Number.isInteger(overrideAccount?.tokenVersion) ? overrideAccount.tokenVersion : 0) + 1;
     const saved = await AdminAccount.findOneAndUpdate(
       { key: 'primary' },
-      { email: body.email.trim().toLowerCase(), name: body.name.trim(), passwordHash: nextPasswordHash },
+      {
+        email: body.email.trim().toLowerCase(),
+        name: body.name.trim(),
+        passwordHash: nextPasswordHash,
+        tokenVersion: nextTokenVersion,
+      },
       { upsert: true, returnDocument: 'after' },
     ).lean();
 
     if (appEnv.ADMIN_SESSION_SECRET && appEnv.ADMIN_SESSION_SECRET.length >= 32) {
-      const nextToken = createAdminToken({ email: saved.email, name: saved.name }, appEnv.ADMIN_SESSION_SECRET);
+      const nextToken = createAdminToken(
+        { email: saved.email, name: saved.name, method: request.adminUser.method, ver: nextTokenVersion },
+        appEnv.ADMIN_SESSION_SECRET,
+      );
       response.setHeader('Set-Cookie', buildAdminCookie(nextToken, { secure: isSecureCookie || request.secure }));
     }
 
     return response.status(200).json({
       data: {
-        user: { email: saved.email, name: saved.name, role: 'admin', method: 'password' },
+        user: { email: saved.email, name: saved.name, role: 'admin', method: request.adminUser.method },
         updatedAt: saved.updatedAt,
       },
     });
@@ -360,7 +406,7 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
       });
     }
 
-    const [metricDoc, productCount, activeProductCount, galleryCount, gameCount, ordersCount, pendingCount, settingsDoc, registeredUsers] = await Promise.all([
+    const [metricDoc, productCount, activeProductCount, galleryCount, gameCount, ordersCount, pendingCount, settingsDoc, usersTotal] = await Promise.all([
       SiteMetric.findOne({ key: 'visits' }).lean(),
       Product.countDocuments(),
       Product.countDocuments({ isActive: true }),
@@ -369,7 +415,7 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
       OrderInquiry.countDocuments(),
       OrderInquiry.countDocuments({ status: { $in: ['nuevo', 'en-proceso'] } }),
       SiteSettings.findOne({ key: 'main' }).lean(),
-      loadRegisteredGoogleUsers(),
+      mongoose.connection?.db ? mongoose.connection.db.collection('user').countDocuments().catch(() => 0) : 0,
     ]);
 
     const effProductsTotal = productCount > 0 ? productCount : defaultAdminProducts.length;
@@ -387,7 +433,7 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
         gamesTotal: effGamesTotal,
         ordersTotal: ordersCount,
         pendingOrders: pendingCount,
-        usersTotal: registeredUsers.length,
+        usersTotal,
         googleOAuthConfigured: Boolean(auth),
         showPreviewBanner: mergedSettings.showPreviewBanner,
         storageMode: 'mongodb',
@@ -441,8 +487,12 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
     await ensureProductsSeeded();
     const slug = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.slug);
     const item = productPayloadSchema.parse({ ...(request.body ?? {}), id: slug });
+    const previous = await Product.findOne({ slug }).lean();
+    if (!previous) return response.status(404).json({ error: { code: 'PRODUCT_NOT_FOUND', message: 'No encontramos ese producto.' } });
     const updated = await Product.findOneAndUpdate({ slug }, toDbProduct(item), { returnDocument: 'after' }).lean();
-    if (!updated) return response.status(404).json({ error: { code: 'PRODUCT_NOT_FOUND', message: 'No encontramos ese producto.' } });
+    if (previous.image && previous.image !== updated.image) {
+      await cleanupUnreferencedDbMedia([previous.image]);
+    }
     return response.status(200).json({ data: mapDbProduct(updated) });
   });
 
@@ -452,6 +502,7 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
     const slug = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.slug);
     const deleted = await Product.findOneAndDelete({ slug }).lean();
     if (!deleted) return response.status(404).json({ error: { code: 'PRODUCT_NOT_FOUND', message: 'No encontramos ese producto.' } });
+    if (deleted.image) await cleanupUnreferencedDbMedia([deleted.image]);
     return response.status(200).json({ data: { deletedId: slug } });
   });
 
@@ -482,8 +533,12 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
     await ensureGallerySeeded();
     const id = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.id);
     const item = galleryItemPayloadSchema.parse({ ...(request.body ?? {}), id });
+    const previous = await GalleryItem.findOne({ itemId: id }).lean();
+    if (!previous) return response.status(404).json({ error: { code: 'GALLERY_ITEM_NOT_FOUND', message: 'No encontramos esa fotografía.' } });
     const updated = await GalleryItem.findOneAndUpdate({ itemId: id }, toDbGallery(item), { returnDocument: 'after' }).lean();
-    if (!updated) return response.status(404).json({ error: { code: 'GALLERY_ITEM_NOT_FOUND', message: 'No encontramos esa fotografía.' } });
+    if (previous.src && previous.src !== updated.src) {
+      await cleanupUnreferencedDbMedia([previous.src]);
+    }
     return response.status(200).json({ data: mapDbGallery(updated) });
   });
 
@@ -493,6 +548,7 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
     const id = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.id);
     const deleted = await GalleryItem.findOneAndDelete({ itemId: id }).lean();
     if (!deleted) return response.status(404).json({ error: { code: 'GALLERY_ITEM_NOT_FOUND', message: 'No encontramos esa fotografía.' } });
+    if (deleted.src) await cleanupUnreferencedDbMedia([deleted.src]);
     return response.status(200).json({ data: { deletedId: id } });
   });
 

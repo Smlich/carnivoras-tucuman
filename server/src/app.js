@@ -92,6 +92,7 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   const productsLimiter = createRateLimiter({ max: rateLimits.productsMax ?? 120 });
   const gamesLimiter = createRateLimiter({ max: rateLimits.gamesMax ?? 60 });
   const visitsLimiter = createRateLimiter({ max: rateLimits.visitsMax ?? 20 });
+  const ordersLimiter = createRateLimiter({ windowMs: 5 * 60_000, max: rateLimits.ordersMax ?? 15 });
   const adminLimiter = createRateLimiter({ max: rateLimits.adminMax ?? 120 });
 
   app.get('/api/auth/status', authStatusLimiter, (request, response) => {
@@ -123,10 +124,11 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   app.use('/api/games', gamesLimiter, createGamesRouter({ auth, appEnv }));
   app.use('/api/visits', visitsLimiter, createVisitsRouter());
   app.use('/api/admin', adminLimiter, createAdminRouter({ auth, appEnv }));
+  app.post('/api/orders', ordersLimiter);
   app.use('/api', productsLimiter, createPublicSiteRouter({ isProduction, auth }));
 
   if (isProduction) {
-    for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin']) {
+    for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin', 'privacidad', 'terminos']) {
       app.get([`/${page}`, `/${page}/`], (request, response) => {
         response.redirect(301, `/${page}.html`);
       });

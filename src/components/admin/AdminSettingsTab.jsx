@@ -126,6 +126,17 @@ export default function AdminSettingsTab({ settings, products, onChanged, onStat
           <textarea rows="2" required value={form.heroLead} onChange={(e) => setForm((c) => ({ ...c, heroLead: e.target.value }))} />
         </label>
 
+        <div className="admin-grid-2">
+          <label className="admin-field">
+            <span>Botón principal (Catálogo)</span>
+            <input type="text" required value={form.heroPrimaryCtaLabel || ''} onChange={(e) => setForm((c) => ({ ...c, heroPrimaryCtaLabel: e.target.value }))} />
+          </label>
+          <label className="admin-field">
+            <span>Botón secundario (Cuidados)</span>
+            <input type="text" required value={form.heroSecondaryCtaLabel || ''} onChange={(e) => setForm((c) => ({ ...c, heroSecondaryCtaLabel: e.target.value }))} />
+          </label>
+        </div>
+
         <div className="admin-grid-3">
           <label className="admin-field">
             <span>Insignia del contador</span>

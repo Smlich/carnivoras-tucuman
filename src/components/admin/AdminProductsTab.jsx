@@ -41,17 +41,20 @@ const STOCK_LABELS = {
 
 export default function AdminProductsTab({ products, onChanged, onStatus }) {
   const [editingId, setEditingId] = useState(null);
+  const [slugTouched, setSlugTouched] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   function startNew() {
     setEditingId(null);
+    setSlugTouched(false);
     setForm({ ...EMPTY_FORM, sortOrder: products.length });
   }
 
   function startEdit(product) {
     setEditingId(product.id);
+    setSlugTouched(true);
     setForm({
       id: product.id,
       name: product.name,
@@ -177,7 +180,7 @@ export default function AdminProductsTab({ products, onChanged, onStatus }) {
                 onChange={(e) => setForm((c) => ({
                   ...c,
                   name: e.target.value,
-                  id: editingId ? c.id : slugify(e.target.value),
+                  id: editingId || slugTouched ? c.id : slugify(e.target.value),
                 }))}
               />
             </label>
@@ -189,7 +192,10 @@ export default function AdminProductsTab({ products, onChanged, onStatus }) {
                 disabled={Boolean(editingId)}
                 pattern="[a-z0-9-]+"
                 value={form.id}
-                onChange={(e) => setForm((c) => ({ ...c, id: slugify(e.target.value) }))}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  setForm((c) => ({ ...c, id: slugify(e.target.value) }));
+                }}
               />
             </label>
           </div>

@@ -25,6 +25,10 @@ const adminAccountSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  tokenVersion: {
+    type: Number,
+    default: 1,
+  },
 }, {
   timestamps: true,
   versionKey: false,

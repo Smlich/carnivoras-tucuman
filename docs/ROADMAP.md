@@ -138,6 +138,8 @@ Plan inicial de seis semanas, con sesiones de 60 a 90 minutos y una carga orient
 
 **Estado parcial de integración continua:** `.github/workflows/ci.yml` instala con `npm ci`, ejecuta `npm test` y construye el frontend en pull requests y cambios a `main`. La suite cubre configuración, disponibilidad OAuth y lectura/filtros del catálogo en modo demo. En desarrollo existe una prueba local de solo lectura contra Atlas para salud, listado y detalle; faltan pruebas exhaustivas de consultas con una base aislada, el flujo de pedidos y la auditoría integral de accesibilidad. Netlify publica automáticamente los cambios de `main`.
 
+**Actualización (26 de noviembre de 2026):** la función `netlify/functions/api.mjs` (la que realmente atiende pedidos, admin y OAuth en Netlify) ahora guarda las listas con escritura condicional por ETag y reintentos, así que pedidos, usuarios y cambios de administración simultáneos ya no se pisan. Se exporta `createApiHandler` para probarla con un almacén en memoria; las pruebas están en `server/test/netlify-api.test.js` y corren con `npm test`.
+
 **Lección:** recorre [integración continua con GitHub Actions](LESSON_06_GITHUB_ACTIONS.md), [las pruebas de configuración y OAuth](LESSON_11_API_CONFIGURATION_TESTS.md) y [las pruebas del catálogo](LESSON_12_CATALOG_API_TESTS.md) para relacionar cada aserción y comando con CI.
 
 **Entrega:** versión de portafolio desplegada, instrucciones reproducibles, [plan mensual de contenidos](CONTENT_PLAN.md) adaptado a las redes oficiales y lista de mejoras priorizada.

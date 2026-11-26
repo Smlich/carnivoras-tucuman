@@ -3,6 +3,7 @@ import {
   ADMIN_COOKIE_NAME,
   isAdminConfigured,
   isAdminGoogleEmail,
+  isAdminTokenVersionValid,
   parseAdminEmails,
   parseCookies,
   verifyAdminToken,
@@ -16,13 +17,14 @@ export async function getStoredAdminAccount() {
   return AdminAccount.findOne({ key: 'primary' }).lean();
 }
 
-export async function resolveAdminAccess(request, { auth = null, appEnv = env } = {}) {
+export async function resolveAdminAccess(request, { auth = null, appEnv = env, overrideAccount } = {}) {
+  const storedOverride = overrideAccount !== undefined ? overrideAccount : await getStoredAdminAccount();
   const cookies = parseCookies(request.headers.cookie || '');
   const cookieToken = cookies[ADMIN_COOKIE_NAME];
 
   if (cookieToken && appEnv.ADMIN_SESSION_SECRET) {
     const tokenUser = verifyAdminToken(cookieToken, appEnv.ADMIN_SESSION_SECRET);
-    if (tokenUser) {
+    if (tokenUser && isAdminTokenVersionValid(tokenUser, storedOverride)) {
       return {
         email: tokenUser.email,
         name: tokenUser.name || 'Administrador',
@@ -33,13 +35,12 @@ export async function resolveAdminAccess(request, { auth = null, appEnv = env } 
   }
 
   if (auth) {
-    const overrideAccount = await getStoredAdminAccount();
-    if (parseAdminEmails(appEnv).length > 0 || overrideAccount?.email) {
+    if (parseAdminEmails(appEnv).length > 0 || storedOverride?.email) {
       try {
         const sessionData = await auth.api.getSession({ headers: fromNodeHeaders(request.headers) });
         const userEmail = sessionData?.user?.email;
         const emailVerified = sessionData?.user?.emailVerified !== false;
-        if (userEmail && emailVerified && isAdminGoogleEmail(userEmail, appEnv, overrideAccount)) {
+        if (userEmail && emailVerified && isAdminGoogleEmail(userEmail, appEnv, storedOverride)) {
           return {
             email: userEmail.toLowerCase(),
             name: sessionData.user.name || 'Administrador',
@@ -81,7 +82,7 @@ export function createRequireAdmin({ auth = null, appEnv = env } = {}) {
         });
       }
 
-      const adminUser = await resolveAdminAccess(request, { auth, appEnv });
+      const adminUser = await resolveAdminAccess(request, { auth, appEnv, overrideAccount });
       if (!adminUser) {
         return response.status(401).json({
           error: {

@@ -15,9 +15,11 @@ import { Game } from '../models/Game.js';
 import { MediaAsset } from '../models/MediaAsset.js';
 import { OrderInquiry } from '../models/OrderInquiry.js';
 import { Product } from '../models/Product.js';
+import { SiteMetric } from '../models/SiteMetric.js';
 import { SiteSettings } from '../models/SiteSettings.js';
 import { orderCreateSchema } from '../schemas/admin-schemas.js';
 import { sanitizePublicGamesPreview } from '../utils/game-visibility.js';
+import { resolveOrderItems } from '../utils/order-pricing.js';
 
 function mapDbProductToClient(document) {
   return {
@@ -78,11 +80,13 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
       });
     }
 
-    const [settingsDoc, productDocs, galleryDocs, gameDocs] = await Promise.all([
+    const [settingsDoc, productDocs, galleryDocs, gameDocs, productsSeeded, gallerySeeded] = await Promise.all([
       SiteSettings.findOne({ key: 'main' }).lean(),
       Product.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean(),
       GalleryItem.find({ isActive: true }).sort({ sortOrder: 1 }).lean(),
       Game.find().sort({ sortOrder: 1 }).lean(),
+      SiteMetric.exists({ key: 'seeded:products' }),
+      SiteMetric.exists({ key: 'seeded:gallery' }),
     ]);
 
     const settings = settingsDoc?.settings
@@ -91,11 +95,11 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
 
     const products = productDocs.length > 0
       ? productDocs.map(mapDbProductToClient)
-      : (await Product.countDocuments()) === 0 ? defaultAdminProducts : [];
+      : (!productsSeeded && (await Product.countDocuments()) === 0) ? defaultAdminProducts : [];
 
     const gallery = galleryDocs.length > 0
       ? galleryDocs.map(mapDbGalleryToClient)
-      : (await GalleryItem.countDocuments()) === 0 ? defaultGalleryItems : [];
+      : (!gallerySeeded && (await GalleryItem.countDocuments()) === 0) ? defaultGalleryItems : [];
 
     const gamesList = gameDocs.length > 0 ? gameDocs : defaultAdminGames;
 
@@ -119,10 +123,13 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
       return response.status(200).json({ data: defaultGalleryItems, meta: { total: defaultGalleryItems.length } });
     }
 
-    const galleryDocs = await GalleryItem.find({ isActive: true }).sort({ sortOrder: 1 }).lean();
+    const [galleryDocs, gallerySeeded] = await Promise.all([
+      GalleryItem.find({ isActive: true }).sort({ sortOrder: 1 }).lean(),
+      SiteMetric.exists({ key: 'seeded:gallery' }),
+    ]);
     const gallery = galleryDocs.length > 0
       ? galleryDocs.map(mapDbGalleryToClient)
-      : (await GalleryItem.countDocuments()) === 0 ? defaultGalleryItems : [];
+      : (!gallerySeeded && (await GalleryItem.countDocuments()) === 0) ? defaultGalleryItems : [];
 
     return response.status(200).json({ data: gallery, meta: { total: gallery.length } });
   });
@@ -147,8 +154,27 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
 
   router.post('/orders', async (request, response) => {
     const input = orderCreateSchema.parse(request.body ?? {});
+
+    let catalogProducts = defaultAdminProducts;
+    if (isDatabaseConnected()) {
+      const productDocs = await Product.find({ isActive: true }).lean();
+      catalogProducts = productDocs.length > 0
+        ? productDocs.map(mapDbProductToClient)
+        : (await Product.countDocuments()) === 0 ? defaultAdminProducts : [];
+    } else if (isProduction) {
+      return response.status(503).json({
+        error: { code: 'DATABASE_UNAVAILABLE', message: 'No pudimos registrar la consulta.' },
+      });
+    }
+
+    const priced = resolveOrderItems(input.items, catalogProducts);
+    if (priced.error) {
+      return response.status(priced.error.status).json({
+        error: { code: priced.error.code, message: priced.error.message },
+      });
+    }
+
     const orderId = 'PED-' + Date.now().toString(36).toUpperCase() + '-' + randomBytes(2).toString('hex').toUpperCase();
-    const totalARS = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     let sessionUser = null;
     if (auth) {
@@ -169,8 +195,8 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
       customerEmail,
       googleRegistered,
       notes: input.notes,
-      items: input.items,
-      totalARS,
+      items: priced.items,
+      totalARS: priced.totalARS,
       status: 'nuevo',
       adminNotes: '',
       source: input.source,
@@ -192,12 +218,6 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
           adminNotes: saved.adminNotes,
           source: saved.source,
         },
-      });
-    }
-
-    if (isProduction) {
-      return response.status(503).json({
-        error: { code: 'DATABASE_UNAVAILABLE', message: 'No pudimos registrar la consulta.' },
       });
     }
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import {
@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [status, setStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const tabRefs = useRef({});
   const [data, setData] = useState({
     overview: null,
     settings: null,
@@ -43,7 +44,7 @@ export default function AdminDashboard() {
     users: [],
   });
 
-  const loadAll = useCallback(async () => {
+  const loadAll = useCallback(async ({ syncSite = false } = {}) => {
     try {
       const [overview, settings, products, gallery, games, orders, users] = await Promise.all([
         fetchAdminOverview(),
@@ -55,13 +56,28 @@ export default function AdminDashboard() {
         fetchAdminUsers().catch(() => []),
       ]);
       setData({ overview, settings, products, gallery, games, orders, users: Array.isArray(users) ? users : [] });
-      await reloadSiteData();
+      if (syncSite) await reloadSiteData();
     } catch (error) {
       setStatus({ type: 'error', text: error.message });
     } finally {
       setIsLoading(false);
     }
   }, [reloadSiteData]);
+
+  const handleRefreshAfterChange = useCallback(() => loadAll({ syncSite: true }), [loadAll]);
+
+  function handleTabKeyDown(event, index) {
+    let nextIndex = null;
+    if (event.key === 'ArrowRight') nextIndex = (index + 1) % TABS.length;
+    else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + TABS.length) % TABS.length;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = TABS.length - 1;
+    if (nextIndex === null) return;
+    event.preventDefault();
+    const nextTab = TABS[nextIndex];
+    setActiveTab(nextTab.id);
+    tabRefs.current[nextTab.id]?.focus();
+  }
 
   useEffect(() => {
     loadAll();
@@ -103,14 +119,19 @@ export default function AdminDashboard() {
 
       <main className="page-shell admin-main">
         <nav className="admin-tabs" role="tablist" aria-label="Secciones de administración">
-          {TABS.map((tab) => (
+          {TABS.map((tab, index) => (
             <button
               key={tab.id}
+              ref={(node) => { tabRefs.current[tab.id] = node; }}
+              id={`admin-tab-${tab.id}`}
               type="button"
               role="tab"
               aria-selected={activeTab === tab.id}
+              aria-controls={`admin-panel-${tab.id}`}
+              tabIndex={activeTab === tab.id ? 0 : -1}
               className={'admin-tab' + (activeTab === tab.id ? ' is-active' : '')}
               onClick={() => setActiveTab(tab.id)}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
             >
               {tab.label}
             </button>
@@ -127,7 +148,7 @@ export default function AdminDashboard() {
         {isLoading ? (
           <p className="admin-loading">Cargando panel de administración…</p>
         ) : (
-          <>
+          <div role="tabpanel" id={`admin-panel-${activeTab}`} aria-labelledby={`admin-tab-${activeTab}`}>
             {activeTab === 'overview' && (
               <section className="admin-overview" aria-labelledby="overview-title">
                 <h1 id="overview-title" className="visually-hidden">Resumen general del sitio</h1>
@@ -193,19 +214,19 @@ export default function AdminDashboard() {
             )}
 
             {activeTab === 'products' && (
-              <AdminProductsTab products={data.products} onChanged={loadAll} onStatus={setStatus} />
+              <AdminProductsTab products={data.products} onChanged={handleRefreshAfterChange} onStatus={setStatus} />
             )}
 
             {activeTab === 'settings' && data.settings && (
-              <AdminSettingsTab settings={data.settings} products={data.products} onChanged={loadAll} onStatus={setStatus} />
+              <AdminSettingsTab settings={data.settings} products={data.products} onChanged={handleRefreshAfterChange} onStatus={setStatus} />
             )}
 
             {activeTab === 'gallery' && (
-              <AdminGalleryTab gallery={data.gallery} onChanged={loadAll} onStatus={setStatus} />
+              <AdminGalleryTab gallery={data.gallery} onChanged={handleRefreshAfterChange} onStatus={setStatus} />
             )}
 
             {activeTab === 'games' && (
-              <AdminGamesTab games={data.games} onChanged={loadAll} onStatus={setStatus} />
+              <AdminGamesTab games={data.games} onChanged={handleRefreshAfterChange} onStatus={setStatus} />
             )}
 
             {activeTab === 'account' && (
@@ -213,12 +234,12 @@ export default function AdminDashboard() {
                 adminUser={admin}
                 orders={data.orders}
                 users={data.users}
-                onChanged={loadAll}
+                onChanged={handleRefreshAfterChange}
                 onAccountChanged={refreshAdminSession}
                 onStatus={setStatus}
               />
             )}
-          </>
+          </div>
         )}
       </main>
     </div>

@@ -257,6 +257,7 @@ export function createAdminToken(user, secret, ttlSeconds = ADMIN_SESSION_TTL_SE
     name: String(user.name || 'Administrador').trim() || 'Administrador',
     role: 'admin',
     method: user.method || 'password',
+    ver: Number.isInteger(user.ver) ? user.ver : 0,
     iat: nowSeconds,
     exp: nowSeconds + ttlSeconds,
   }, secret);
@@ -266,6 +267,13 @@ export function verifyAdminToken(token, secret) {
   const parsed = verifySignedPayload(token, secret);
   if (!parsed || parsed.role !== 'admin' || !parsed.email) return null;
   return parsed;
+}
+
+export function isAdminTokenVersionValid(parsedToken, overrideAccount = null) {
+  if (!parsedToken) return false;
+  if (parsedToken.method === 'google') return true;
+  if (!overrideAccount || !Number.isInteger(overrideAccount.tokenVersion)) return true;
+  return parsedToken.ver === overrideAccount.tokenVersion;
 }
 
 export function createUserToken(user, secret, ttlSeconds = USER_SESSION_TTL_SECONDS) {

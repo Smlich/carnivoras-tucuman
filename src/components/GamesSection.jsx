@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSiteContent } from '../context/SiteContentContext';
 import { fetchUnlockedGames } from '../services/games-api';
@@ -31,15 +31,20 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
       ? 'Solo administrador'
       : 'Próximamente';
 
-  function sendPlayerContext() {
+  let resolvedOrigin = window.location.origin;
+  if (iframeSrc) {
+    try {
+      resolvedOrigin = new URL(iframeSrc, window.location.origin).origin;
+    } catch {
+      resolvedOrigin = window.location.origin;
+    }
+  }
+  const isSameOriginFrame = resolvedOrigin === window.location.origin;
+
+  const sendPlayerContext = useCallback(() => {
     const frameWindow = iframeRef.current?.contentWindow;
     if (!frameWindow || !iframeSrc) return;
-    let targetOrigin = window.location.origin;
-    try {
-      targetOrigin = new URL(iframeSrc, window.location.origin).origin;
-    } catch {
-      targetOrigin = window.location.origin;
-    }
+    const targetOrigin = isSameOriginFrame ? '*' : resolvedOrigin;
 
     frameWindow.postMessage({
       type: 'CARNIVORAS_PLAYER_CONTEXT',
@@ -50,21 +55,14 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
       gameSlug: game.slug,
       adminProps: isAdmin ? (game.adminProps ?? {}) : {},
     }, targetOrigin);
-  }
+  }, [game.adminProps, game.slug, iframeSrc, isAdmin, isSameOriginFrame, playerName, resolvedOrigin]);
 
   useEffect(() => {
     if (!isPlaying || !iframeSrc) return undefined;
 
-    let targetOrigin = window.location.origin;
-    try {
-      targetOrigin = new URL(iframeSrc, window.location.origin).origin;
-    } catch {
-      targetOrigin = window.location.origin;
-    }
-
     function handleMessage(event) {
-      if (event.origin !== targetOrigin) return;
       if (event.source !== iframeRef.current?.contentWindow) return;
+      if (!isSameOriginFrame && event.origin !== resolvedOrigin) return;
       if (event.data?.type === 'CARNIVORAS_REQUEST_CONTEXT') {
         sendPlayerContext();
       }
@@ -72,7 +70,7 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  });
+  }, [isPlaying, iframeSrc, isSameOriginFrame, resolvedOrigin, sendPlayerContext]);
 
   return (
     <article className={'game-card' + (locked ? ' is-locked' : '') + (isAdmin ? ' is-admin-view' : '')}>
@@ -116,7 +114,7 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
             ref={iframeRef}
             title={game.title}
             src={iframeSrc}
-            sandbox="allow-scripts allow-same-origin allow-pointer-lock"
+            sandbox={isSameOriginFrame ? 'allow-scripts allow-pointer-lock' : 'allow-scripts allow-same-origin allow-pointer-lock'}
             allow="fullscreen"
             allowFullScreen
             loading="lazy"

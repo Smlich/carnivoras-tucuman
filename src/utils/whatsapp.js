@@ -7,12 +7,14 @@ function normalizeCustomerInfo(customer) {
       name: customer.trim(),
       googleRegistered: false,
       email: '',
+      notes: '',
     };
   }
   return {
     name: String(customer?.name || '').trim(),
     googleRegistered: Boolean(customer?.googleRegistered),
     email: String(customer?.email || '').trim(),
+    notes: String(customer?.notes || '').trim(),
   };
 }
 
@@ -33,6 +35,13 @@ export function createOrderMessage(items, storeSettings = store, customer = {}) 
     ? `Hola, soy ${info.name} y quiero consultar este pedido en ${businessName}:`
     : `Hola, quiero consultar este pedido en ${businessName}:`;
 
+  const customerLines = [
+    'Datos del cliente:',
+    '• Nombre: ' + (info.name || 'No indicado'),
+    '• Cuenta de Google: ' + formatGoogleStatusLabel(info),
+    ...(info.notes ? ['• Nota: ' + info.notes] : []),
+  ];
+
   return [
     greeting,
     '',
@@ -40,9 +49,7 @@ export function createOrderMessage(items, storeSettings = store, customer = {}) 
     '',
     'Total de referencia: ' + formatPrice(total),
     '',
-    'Datos del cliente:',
-    '• Nombre: ' + (info.name || 'No indicado'),
-    '• Cuenta de Google: ' + formatGoogleStatusLabel(info),
+    ...customerLines,
     '',
     '¿Podrían confirmar disponibilidad, precio vigente y entrega? Gracias.',
   ].join('\n');

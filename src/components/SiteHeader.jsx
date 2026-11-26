@@ -84,8 +84,17 @@ export default function SiteHeader({ currentPage = 'inicio', itemCount, onOpenCa
         <a className="brand" href="/" aria-label={settings.storeName + ' — inicio'}>
           <CatalogImage src="/images/catalog/logo-light.png" alt="" className="brand__logo" sizes="48px" />
           <span className="brand__text">
-            <strong>Carnívoras</strong>
-            <span>Tucumán</span>
+            {settings.storeName === 'Carnívoras Tucumán' ? (
+              <>
+                <strong>Carnívoras</strong>
+                <span>Tucumán</span>
+              </>
+            ) : (
+              <>
+                <strong>{settings.storeName}</strong>
+                <span>{settings.city}</span>
+              </>
+            )}
           </span>
         </a>
 

@@ -101,7 +101,11 @@ export default function ProductCatalog({ products: catalogProducts, onAdd, showH
           {resultAnnouncement}
         </p>
 
-        <p className="catalog-note">Precios en pesos argentinos, sin aumentos desde agosto de 2024. Tocá cualquier foto para ampliarla.</p>
+        <p className="catalog-note">
+          {settings.priceFreezeEnabled && settings.priceFreezeLabel
+            ? `Precios de referencia en pesos argentinos (${settings.priceFreezeLabel.toLowerCase()}). Tocá cualquier foto para ampliarla.`
+            : 'Precios de referencia en pesos argentinos. Tocá cualquier foto para ampliarla.'}
+        </p>
 
         {visibleProducts.length > 0 ? (
           <div className="product-grid">

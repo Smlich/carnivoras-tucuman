@@ -14,6 +14,7 @@ import {
   hashPasswordPbkdf2,
   isAdminConfigured,
   isAdminGoogleEmail,
+  isAdminTokenVersionValid,
   isAllowedAdminEmail,
   isGoogleOAuthConfigured,
   parseCookies,
@@ -189,4 +190,20 @@ test('isGoogleOAuthConfigured y isAdminGoogleEmail validan credenciales y elevac
     { ADMIN_EMAILS: 'dueno@gmail.com' },
     null,
   ), false);
+});
+
+test('isAdminTokenVersionValid invalida tokens de contraseña viejos tras cambio de clave', () => {
+  const secret = 'super-secret-admin-signing-key-32-chars-min';
+  const oldPasswordToken = verifyAdminToken(
+    createAdminToken({ email: 'admin@carnivoras.com', name: 'Admin', method: 'password', ver: 1 }, secret, 600),
+    secret,
+  );
+  const googleToken = verifyAdminToken(
+    createAdminToken({ email: 'admin@carnivoras.com', name: 'Admin', method: 'google', ver: 1 }, secret, 600),
+    secret,
+  );
+
+  assert.equal(isAdminTokenVersionValid(oldPasswordToken, { tokenVersion: 1 }), true);
+  assert.equal(isAdminTokenVersionValid(oldPasswordToken, { tokenVersion: 2 }), false);
+  assert.equal(isAdminTokenVersionValid(googleToken, { tokenVersion: 2 }), true);
 });

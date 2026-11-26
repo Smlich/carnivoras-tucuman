@@ -1,6 +1,5 @@
 const storageKey = 'carnivoras-tucuman:visit-count:v1';
 const counterSelector = '[data-visit-counter]';
-const netlifyEndpoint = '/.netlify/functions/visit-counter';
 
 function formatCount(count) {
   return new Intl.NumberFormat('es-AR').format(count);
@@ -31,31 +30,18 @@ function saveCount(count) {
   }
 }
 
-// La portada indica su endpoint (data-visit-endpoint). La guía estática prueba primero /api/visits y cae a Netlify Function.
-function getEndpoints(element) {
-  const configured = element.dataset.visitEndpoint;
-  if (configured) return configured === '/api/visits' ? ['/api/visits', netlifyEndpoint] : [configured];
-  return ['/api/visits', netlifyEndpoint];
+function getEndpoint(element) {
+  return element.dataset.visitEndpoint || '/api/visits';
 }
 
 async function requestCount(element) {
-  const endpoints = getEndpoints(element);
-
-  for (let index = 0; index < endpoints.length; index += 1) {
-    const response = await fetch(endpoints[index], {
-      method: 'POST',
-      headers: { 'X-Counter-Request': '1' },
-      cache: 'no-store',
-    });
-
-    // Solo se prueba el siguiente endpoint cuando el actual no existe en este hosting.
-    if (response.status === 404 && index < endpoints.length - 1) continue;
-    if (!response.ok) throw new Error('The shared visit counter is unavailable.');
-
-    return response.json();
-  }
-
-  throw new Error('The shared visit counter is unavailable.');
+  const response = await fetch(getEndpoint(element), {
+    method: 'POST',
+    headers: { 'X-Counter-Request': '1' },
+    cache: 'no-store',
+  });
+  if (!response.ok) throw new Error('The shared visit counter is unavailable.');
+  return response.json();
 }
 
 async function loadSharedCount(element) {

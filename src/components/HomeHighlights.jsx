@@ -72,7 +72,7 @@ export default function HomeHighlights({ products, onAdd }) {
               <h2 id="featured-title">Ejemplares ideales para <em>empezar hoy.</em></h2>
             </div>
             <p className="section-heading__aside">
-              Seleccionamos cuatro opciones clave entre combos, clásicos y cultivares de colección. En el catálogo completo podés buscar y filtrar todo el stock.
+              Seleccionamos {featuredProducts.length} {featuredProducts.length === 1 ? 'opción clave' : 'opciones clave'} entre combos, clásicos y cultivares de colección. En el catálogo completo podés buscar y filtrar todo el stock.
             </p>
           </div>
 

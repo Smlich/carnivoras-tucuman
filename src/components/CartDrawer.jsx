@@ -9,16 +9,24 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
   const { settings } = useSiteContent();
   const { user, enabled, providers, signInWithProvider } = useAuth();
   const [customerName, setCustomerName] = useState('');
+  const [customerNotes, setCustomerNotes] = useState('');
   const [nameError, setNameError] = useState('');
+  const [orderNotice, setOrderNotice] = useState('');
   const drawerRef = useRef(null);
   const nameInputRef = useRef(null);
   const hasEditedNameRef = useRef(false);
+  const lastSubmissionRef = useRef({ signature: '', at: 0 });
   const emptyStateActionRef = useRef(null);
   const previousItemCount = useRef(items.length);
 
   const isGoogleRegistered = Boolean(user);
   const googleEmail = user?.email || '';
   const googleAvailable = enabled && providers.includes('google');
+  const hasUnavailableItems = items.some((item) => item.stockStatus === 'unavailable');
+
+  useEffect(() => {
+    setOrderNotice('');
+  }, [items, isOpen]);
 
   useEffect(() => {
     if (user?.name && !hasEditedNameRef.current) {
@@ -88,7 +96,7 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  function logOrderInquiry(trimmedName) {
+  function logOrderInquiry(trimmedName, trimmedNotes) {
     if (import.meta.env.VITE_STATIC_PREVIEW === 'true' || items.length === 0) return;
 
     fetch('/api/orders', {
@@ -100,6 +108,7 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
         customerName: trimmedName,
         customerEmail: googleEmail,
         googleRegistered: isGoogleRegistered,
+        notes: trimmedNotes,
         items: items.map((item) => ({
           id: item.id,
           name: item.name,
@@ -112,13 +121,20 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
   }
 
   const trimmedName = customerName.trim();
+  const trimmedNotes = customerNotes.trim();
   const whatsappUrl = createWhatsAppUrl(items, settings, {
     name: trimmedName,
     googleRegistered: isGoogleRegistered,
     email: googleEmail,
+    notes: trimmedNotes,
   });
 
   function handleWhatsAppCheckout(event) {
+    if (hasUnavailableItems) {
+      event.preventDefault();
+      setNameError('Quitá del pedido los productos sin stock antes de consultar.');
+      return;
+    }
     if (trimmedName.length < 2) {
       event.preventDefault();
       setNameError('Ingresá tu nombre para enviar el pedido por WhatsApp.');
@@ -126,7 +142,14 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
       return;
     }
     setNameError('');
-    logOrderInquiry(trimmedName);
+
+    const signature = `${trimmedName}|${trimmedNotes}|${items.map((item) => `${item.id}:${item.quantity}`).join(',')}`;
+    const now = Date.now();
+    if (lastSubmissionRef.current.signature !== signature || now - lastSubmissionRef.current.at > 15_000) {
+      lastSubmissionRef.current = { signature, at: now };
+      logOrderInquiry(trimmedName, trimmedNotes);
+    }
+    setOrderNotice('Consulta registrada. Podés vaciar el pedido cuando termines en WhatsApp.');
   }
 
   return (
@@ -162,6 +185,9 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
                   <div className="cart-item__info">
                     <strong>{item.name}</strong>
                     <span>{formatPrice(item.price)} cada uno</span>
+                    {item.stockStatus === 'unavailable' && (
+                      <small className="cart-item__unavailable">Sin stock momentáneo · quitalo para continuar</small>
+                    )}
                     <div className="quantity-control" role="group" aria-label={'Cantidad de ' + item.name}>
                       <button type="button" onClick={() => onQuantityChange(item.id, item.quantity - 1)} aria-label={'Quitar una unidad de ' + item.name}>−</button>
                       <span aria-live="polite">{item.quantity}</span>
@@ -211,6 +237,16 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
                 />
                 {nameError && <small className="cart-field-error" role="alert">{nameError}</small>}
               </label>
+              <label className="cart-customer-field">
+                <span>Nota o zona de entrega (opcional)</span>
+                <input
+                  type="text"
+                  maxLength={300}
+                  value={customerNotes}
+                  onChange={(event) => setCustomerNotes(event.target.value)}
+                  placeholder="Ej. Barrio Norte, prefiero entrega por la tarde"
+                />
+              </label>
               <div><span>Total de referencia</span><strong>{formatPrice(total)}</strong></div>
               <p>Se envía a WhatsApp tu nombre, el estado de tu cuenta Google y el detalle para confirmar stock y entrega.</p>
               <a
@@ -222,7 +258,17 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
               >
                 Enviar consulta por WhatsApp <span aria-hidden="true">↗</span>
               </a>
-              <button className="clear-cart" type="button" onClick={onClear}>Vaciar pedido</button>
+              {orderNotice && <p className="cart-order-notice" role="status">{orderNotice}</p>}
+              <button
+                className="clear-cart"
+                type="button"
+                onClick={() => {
+                  setCustomerNotes('');
+                  onClear();
+                }}
+              >
+                Vaciar pedido
+              </button>
             </div>
           </>
         )}
