@@ -98,6 +98,7 @@
 
 .care-hero-card img {
   width: 100%;
+  height: auto;
   aspect-ratio: 4 / 5;
   object-fit: cover;
 }
@@ -415,9 +416,10 @@
 
 .care-species-card__photo {
   width: 100%;
+  height: auto;
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  object-position: center 45%;
+  object-position: center 40%;
 }
 
 .care-species-card__body {
