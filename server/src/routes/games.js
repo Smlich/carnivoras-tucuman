@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { fromNodeHeaders } from 'better-auth/node';
 import { Router } from 'express';
 import { z } from 'zod';
@@ -7,7 +8,13 @@ import { isDatabaseConnected } from '../config/database.js';
 import { env } from '../config/env.js';
 import { getStoredAdminAccount, resolveAdminAccess } from '../middleware/require-admin.js';
 import { Game } from '../models/Game.js';
+import { GamePlayConfig } from '../models/GamePlayConfig.js';
+import { GameScore } from '../models/GameScore.js';
+import { gameScorePayloadSchema } from '../schemas/game-runtime-schemas.js';
 import { sanitizeGamesForViewer } from '../utils/game-visibility.js';
+
+const memoryGameConfigs = new Map();
+const memoryGameScores = [];
 
 async function loadGamesList() {
   if (isDatabaseConnected()) {
@@ -28,6 +35,7 @@ export function createGamesRouter({ auth = null, appEnv = env } = {}) {
       if (adminUser) {
         request.gameViewer = {
           playerName: adminUser.name || 'Administrador',
+          email: adminUser.email || '',
           role: 'admin',
           isAdmin: true,
         };
@@ -51,6 +59,7 @@ export function createGamesRouter({ auth = null, appEnv = env } = {}) {
         if (sessionData?.user) {
           request.gameViewer = {
             playerName: sessionData.user.name || 'Cliente',
+            email: sessionData.user.email ? String(sessionData.user.email).toLowerCase() : '',
             role: 'player',
             isAdmin: false,
           };
@@ -84,6 +93,51 @@ export function createGamesRouter({ auth = null, appEnv = env } = {}) {
         total: visibleGames.length,
       },
     });
+  });
+
+  router.get('/:slug/config', async (request, response) => {
+    const slug = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.slug);
+    const viewer = request.gameViewer;
+    const allGames = await loadGamesList();
+    const visibleGames = sanitizeGamesForViewer(allGames, { isAdmin: viewer.isAdmin });
+    const game = visibleGames.find((item) => item.slug === slug);
+    if (!game) {
+      return response.status(404).json({ error: { code: 'GAME_NOT_FOUND', message: 'No encontramos ese juego.' } });
+    }
+    if (isDatabaseConnected()) {
+      const doc = await GamePlayConfig.findOne({ gameSlug: slug }).lean();
+      return response.status(200).json({ data: doc?.config ?? null });
+    }
+    return response.status(200).json({ data: memoryGameConfigs.get(slug) ?? null });
+  });
+
+  router.post('/:slug/scores', async (request, response) => {
+    const slug = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.slug);
+    const viewer = request.gameViewer;
+    const allGames = await loadGamesList();
+    const visibleGames = sanitizeGamesForViewer(allGames, { isAdmin: viewer.isAdmin });
+    const game = visibleGames.find((item) => item.slug === slug);
+    if (!game) {
+      return response.status(404).json({ error: { code: 'GAME_NOT_FOUND', message: 'No encontramos ese juego.' } });
+    }
+    const scoreInput = gameScorePayloadSchema.parse(request.body ?? {});
+    const scoreId = 'SCR-' + Date.now().toString(36).toUpperCase() + '-' + randomBytes(2).toString('hex').toUpperCase();
+    const payload = {
+      scoreId,
+      gameSlug: slug,
+      playerName: viewer.playerName,
+      playerEmail: viewer.email || '',
+      isAdmin: Boolean(viewer.isAdmin),
+      ...scoreInput,
+    };
+    if (isDatabaseConnected()) {
+      const saved = await GameScore.create(payload);
+      return response.status(201).json({ data: { id: saved.scoreId, ...payload, createdAt: saved.createdAt } });
+    }
+    const fallback = { id: scoreId, ...payload, createdAt: new Date().toISOString() };
+    memoryGameScores.unshift(fallback);
+    if (memoryGameScores.length > 250) memoryGameScores.length = 250;
+    return response.status(201).json({ data: fallback });
   });
 
   router.get('/:slug', async (request, response) => {

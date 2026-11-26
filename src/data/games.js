@@ -1,21 +1,22 @@
 // Registro de juegos gratuitos. Lo comparten el servidor (API protegida) y React.
-// Para publicar un juego: ver docs/GAMES_INTEGRATION.md y cambiar status a 'playable' con su embedUrl.
+// Para publicar o ajustar un juego desde el navegador: usar /admin.html o las propiedades in-game de Administrador.
 export const games = [
   {
-    id: 'vivero-carnivoro',
-    slug: 'vivero-carnivoro',
-    title: 'Juego del vivero carnívoro',
-    description: 'Un juego gratuito inspirado en el vivero y sus plantas carnívoras. Está en desarrollo y se desbloquea al iniciar sesión con Google.',
-    status: 'coming-soon',
+    id: 'dionaea-strike',
+    slug: 'dionaea-strike',
+    title: 'Dionaea Strike — Carnívora vs Moscas Alien',
+    description: 'Shoot ’em up aéreo en español con biplano carnívoro, mutaciones biológicas de 8 especies reales y mascotas copiloto. Gratis al ingresar con Google.',
+    status: 'playable',
     requiresAuth: true,
     requiredProviders: ['google'],
-    platform: 'Google AI Studio',
-    embedUrl: null,
-    adminEmbedUrl: null,
+    platform: 'Carnívoras Tucumán · React + Canvas 2D',
+    embedUrl: '/jugar-dionaea.html',
+    adminEmbedUrl: '/jugar-dionaea.html',
     adminProps: {
       adminMode: true,
-      debugTools: true,
+      configPanel: true,
       unlockAll: true,
+      configEndpoint: '/api/admin/games/dionaea-strike/config',
     },
     aspectRatio: '16 / 9',
     badge: 'Gratis con Google',

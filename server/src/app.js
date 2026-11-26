@@ -114,10 +114,11 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
     }));
   }
 
-  // Subida multimedia e imágenes del asistente admiten hasta 3 MB JSON; el resto de rutas queda acotado a 16 KB.
+  // Subida multimedia e imágenes del asistente admiten hasta 3 MB JSON; config de juego hasta 128 KB; resto 16 KB.
   app.use('/api/admin/media', express.json({ limit: '3mb' }));
   app.use('/api/admin/assistant/copy', express.json({ limit: '3mb' }));
   app.use('/api/assistant/care', express.json({ limit: '3mb' }));
+  app.use('/api/admin/games', express.json({ limit: '128kb' }));
   app.use(express.json({ limit: '16kb' }));
 
   app.use('/api/health', createHealthRouter({
@@ -134,7 +135,7 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   app.use('/api', productsLimiter, createPublicSiteRouter({ isProduction, auth, appEnv, fetchImpl }));
 
   if (isProduction) {
-    for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin', 'privacidad', 'terminos']) {
+    for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'jugar-dionaea', 'contacto', 'admin', 'privacidad', 'terminos']) {
       app.get([`/${page}`, `/${page}/`], (request, response) => {
         response.redirect(301, `/${page}.html`);
       });

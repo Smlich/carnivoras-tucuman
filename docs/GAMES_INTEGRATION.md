@@ -1,6 +1,21 @@
-# Integrar un juego de Google AI Studio
+# Integrar un juego en Zona de juegos gratis
 
-La sección **Zona de juegos gratis** (`/juegos.html`) permite jugar gratis a clientes autenticados con Google (en backend MERN) y activa un **Modo Administrador** exclusivo cuando estás logueado como administrador (tanto en Netlify `/admin.html` como en Express MERN).
+La sección **Zona de juegos gratis** (`/juegos.html`) permite jugar gratis a clientes autenticados con Google y activa un **Modo Administrador** exclusivo cuando estás logueado como administrador (tanto en Netlify `/admin.html` como en Express MERN).
+
+## Dionaea Strike integrado directamente en el código fuente
+
+El juego principal **Dionaea Strike** vive compilado y editable directamente dentro de este repositorio:
+- Código fuente React/Canvas 2D + TypeScript: `src/games/dionaea-strike/` (`components/`, `game/`, `assets/images/`, `dionaea.css`, `dionaea-embed.ts`).
+- Pistas musicales `.m4a`: `public/assets/aistudio/`.
+- Entrada aislada en Vite (para no mezclar Tailwind CSS con la tienda): [jugar-dionaea.html](jugar-dionaea.html) y [src/pages/jugar-dionaea-main.jsx](src/pages/jugar-dionaea-main.jsx).
+- Verificación de tipos y reglas de fusión: `npm run lint:game` y `npm test`.
+
+### Regla estricta de Modo Administrador
+- En [jugar-dionaea-main.jsx](src/pages/jugar-dionaea-main.jsx), `isAdmin` se obtiene **exclusivamente** de `useAuth()` tras verificar la sesión real del servidor (`/api/admin/auth/session`).
+- Parámetros de URL como `?admin=1` no tienen efecto para visitantes ni clientes.
+- Cuando iniciás con tu cuenta de administrador, aparece el botón **Administrar** dentro del juego y al guardar cambios se persisten en `PUT /api/admin/games/dionaea-strike/config` para todos los jugadores (`GET /api/games/dionaea-strike/config`). Los puntajes de partida se registran con `POST /api/games/dionaea-strike/scores`.
+
+## Compatibilidad con juegos externos por `<iframe>` (`postMessage`)
 
 ## Cómo se comunica con tu juego (Jugador vs Administrador)
 

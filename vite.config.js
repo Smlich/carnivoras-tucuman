@@ -1,9 +1,10 @@
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   build: {
     rolldownOptions: {
       input: {
@@ -12,6 +13,7 @@ export default defineConfig({
         vivero: resolve(import.meta.dirname, 'vivero.html'),
         cuidados: resolve(import.meta.dirname, 'cuidados.html'),
         juegos: resolve(import.meta.dirname, 'juegos.html'),
+        'jugar-dionaea': resolve(import.meta.dirname, 'jugar-dionaea.html'),
         contacto: resolve(import.meta.dirname, 'contacto.html'),
         admin: resolve(import.meta.dirname, 'admin.html'),
         privacidad: resolve(import.meta.dirname, 'privacidad.html'),

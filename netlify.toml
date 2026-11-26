@@ -55,4 +55,9 @@
   from = "/terminos"
   to = "/terminos.html"
   status = 301
+
+[[redirects]]
+  from = "/jugar-dionaea"
+  to = "/jugar-dionaea.html"
+  status = 301
   force = true

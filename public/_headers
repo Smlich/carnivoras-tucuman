@@ -18,3 +18,11 @@
 /admin.html
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
+
+/jugar-dionaea
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+/jugar-dionaea.html
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store

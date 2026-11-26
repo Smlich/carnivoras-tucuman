@@ -209,4 +209,13 @@ test('Express expone /api/assistant/status y /api/assistant/care con Gemini mock
   });
   assert.equal(careRes.status, 200);
   assert.equal((await careRes.json()).data.severity, 'atencion');
+
+  const unauthGameCfg = await fetch(`${origin}/api/games/dionaea-strike/config`);
+  assert.equal(unauthGameCfg.status, 503);
+  const unauthAdminCfg = await fetch(`${origin}/api/admin/games/dionaea-strike/config`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Admin-Request': '1' },
+    body: JSON.stringify({ gameTitle: 'Hack', player: {}, species: {}, enemies: {}, waves: [{}], bosses: [{}] }),
+  });
+  assert.equal(unauthAdminCfg.status, 503);
 });

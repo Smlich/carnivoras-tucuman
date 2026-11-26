@@ -42,7 +42,7 @@ test('una sesión válida desbloquea la lista de juegos', async (context) => {
   assert.equal(result.meta.unlocked, true);
   assert.equal(result.meta.playerName, 'Ana');
   assert.ok(result.data.length >= 1);
-  assert.equal(result.data[0].slug, 'vivero-carnivoro');
+  assert.equal(result.data[0].slug, 'dionaea-strike');
 });
 
 test('un juego inexistente devuelve un error predecible', async (context) => {

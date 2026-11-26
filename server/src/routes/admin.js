@@ -29,6 +29,8 @@ import {
 import { AdminAccount } from '../models/AdminAccount.js';
 import { GalleryItem } from '../models/GalleryItem.js';
 import { Game } from '../models/Game.js';
+import { GamePlayConfig } from '../models/GamePlayConfig.js';
+import { GameScore } from '../models/GameScore.js';
 import { MediaAsset } from '../models/MediaAsset.js';
 import { OrderInquiry } from '../models/OrderInquiry.js';
 import { Product } from '../models/Product.js';
@@ -46,6 +48,7 @@ import {
   validateAndDecodeImageBase64,
 } from '../schemas/admin-schemas.js';
 import { adminCopyRequestSchema } from '../schemas/assistant-schemas.js';
+import { validateGameRuntimeConfig } from '../schemas/game-runtime-schemas.js';
 import {
   DEFAULT_ADMIN_DAILY_LIMIT,
   generateAdminCopy,
@@ -582,6 +585,38 @@ export function createAdminRouter({ auth = null, appEnv = env, fetchImpl = globa
     }
     const created = await Game.create({ ...parsedGame, requiredProviders: ['google'] });
     return response.status(201).json({ data: mapDbGame(created) });
+  });
+
+  router.get('/games/:slug/config', async (request, response) => {
+    const slug = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.slug);
+    if (!isDatabaseConnected()) return response.status(200).json({ data: null });
+    const doc = await GamePlayConfig.findOne({ gameSlug: slug }).lean();
+    return response.status(200).json({ data: doc?.config ?? null });
+  });
+
+  router.put('/games/:slug/config', async (request, response) => {
+    if (!requireDatabase(response)) return;
+    const slug = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.slug);
+    let validConfig;
+    try {
+      validConfig = validateGameRuntimeConfig(request.body ?? {});
+    } catch (configError) {
+      if (configError instanceof z.ZodError) throw configError;
+      return response.status(400).json({ error: { code: 'VALIDATION_ERROR', message: configError.message } });
+    }
+    const saved = await GamePlayConfig.findOneAndUpdate(
+      { gameSlug: slug },
+      { gameSlug: slug, config: validConfig, updatedBy: request.adminUser?.email || '' },
+      { upsert: true, returnDocument: 'after' },
+    ).lean();
+    return response.status(200).json({ data: saved.config });
+  });
+
+  router.get('/games/:slug/scores', async (request, response) => {
+    const slug = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.slug);
+    if (!isDatabaseConnected()) return response.status(200).json({ data: [] });
+    const docs = await GameScore.find({ gameSlug: slug }).sort({ createdAt: -1 }).limit(250).lean();
+    return response.status(200).json({ data: docs });
   });
 
   router.put('/games/:slug', async (request, response) => {

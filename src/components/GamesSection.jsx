@@ -25,6 +25,15 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
   const iframeRef = useRef(null);
   const iframeSrc = !locked ? resolveGameSrc(game, { role, isAdmin, playerName }) : null;
   const isPlayable = Boolean(iframeSrc) && (game.status === 'playable' || isAdmin);
+  const isDedicatedLauncher = Boolean(iframeSrc) && (() => {
+    try {
+      const parsed = new URL(iframeSrc, window.location.origin);
+      return parsed.origin === window.location.origin && parsed.pathname.startsWith('/jugar-');
+    } catch {
+      return false;
+    }
+  })();
+  const launchHref = isDedicatedLauncher ? new URL(iframeSrc, window.location.origin).pathname : iframeSrc;
   const statusLabel = game.status === 'playable'
     ? 'Disponible'
     : game.status === 'admin-only'
@@ -96,7 +105,13 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
         </details>
       )}
 
-      {!locked && isPlayable && (
+      {!locked && isPlayable && isDedicatedLauncher && (
+        <a className="button button--dark" href={launchHref}>
+          {isAdmin ? 'Jugar con Modo Admin' : 'Jugar ahora'} <span aria-hidden="true">↗</span>
+        </a>
+      )}
+
+      {!locked && isPlayable && !isDedicatedLauncher && (
         <button className="button button--dark" type="button" aria-expanded={isPlaying} onClick={() => onTogglePlay(game.slug)}>
           {isPlaying ? 'Cerrar juego' : (isAdmin && game.status !== 'playable' ? 'Probar vista Admin ahora' : 'Jugar ahora')}
         </button>
@@ -108,7 +123,7 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
         </p>
       )}
 
-      {!locked && isPlayable && isPlaying && (
+      {!locked && isPlayable && !isDedicatedLauncher && isPlaying && (
         <div className="game-card__stage" style={{ aspectRatio: game.aspectRatio }}>
           <iframe
             ref={iframeRef}

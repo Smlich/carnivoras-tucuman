@@ -69,6 +69,10 @@ import {
   sanitizePublicGamesPreview,
 } from '../../server/src/utils/game-visibility.js';
 import {
+  gameScorePayloadSchema,
+  validateGameRuntimeConfig,
+} from '../../server/src/schemas/game-runtime-schemas.js';
+import {
   extractManagedMediaKey,
   isManagedMediaReferenced,
 } from '../../server/src/utils/media-cleanup.js';
@@ -90,6 +94,8 @@ const KEYS = {
   adminAccount: 'admin-account',
   loginThrottle: 'admin-login-throttle',
   assistantQuota: 'assistant-daily-quota',
+  gameConfigPrefix: 'game-config:',
+  gameScores: 'game-scores',
 };
 
 function readRuntimeEnv(name) {
@@ -886,9 +892,9 @@ export function createApiHandler({
         const adminUser = authenticateAdminCookie(request, envConfig, accountOverride);
         const customerUser = !adminUser ? authenticateUserCookie(request, envConfig) : null;
         const viewer = adminUser
-          ? { isAdmin: true, role: 'admin', playerName: adminUser.name }
+          ? { isAdmin: true, role: 'admin', playerName: adminUser.name, email: adminUser.email || '' }
           : customerUser
-            ? { isAdmin: false, role: 'player', playerName: customerUser.name }
+            ? { isAdmin: false, role: 'player', playerName: customerUser.name, email: customerUser.email || '' }
             : null;
 
         if (!viewer) {
@@ -913,6 +919,43 @@ export function createApiHandler({
               total: visibleGames.length,
             },
           });
+        }
+
+        const configMatch = /^\/api\/games\/([a-z0-9-]+)\/config$/.exec(path);
+        if (configMatch && method === 'GET') {
+          const slug = configMatch[1];
+          const game = visibleGames.find((item) => item.slug === slug);
+          if (!game) {
+            return errorResponse(404, 'GAME_NOT_FOUND', 'No encontramos ese juego.');
+          }
+          const savedConfig = await readJsonBlob(store, `${KEYS.gameConfigPrefix}${slug}`, null);
+          return jsonResponse({ data: savedConfig });
+        }
+
+        const scoresMatch = /^\/api\/games\/([a-z0-9-]+)\/scores$/.exec(path);
+        if (scoresMatch && method === 'POST') {
+          if (!isSameOriginRequest(request, url)) {
+            return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
+          }
+          const slug = scoresMatch[1];
+          const game = visibleGames.find((item) => item.slug === slug);
+          if (!game) {
+            return errorResponse(404, 'GAME_NOT_FOUND', 'No encontramos ese juego.');
+          }
+          const scoreInput = gameScorePayloadSchema.parse(await parseJsonBody(request));
+          const record = {
+            id: 'SCR-' + Date.now().toString(36).toUpperCase() + '-' + randomBytes(2).toString('hex').toUpperCase(),
+            gameSlug: slug,
+            playerName: viewer.playerName,
+            playerEmail: viewer.email,
+            isAdmin: viewer.isAdmin,
+            ...scoreInput,
+            createdAt: new Date().toISOString(),
+          };
+          await updateJsonBlob(store, KEYS.gameScores, [], (list) => ({
+            value: [record, ...list].slice(0, 250),
+          }));
+          return jsonResponse({ data: record }, 201);
         }
 
         if (method === 'GET') {
@@ -1273,6 +1316,32 @@ export function createApiHandler({
             if (outcome.response) return outcome.response;
             return jsonResponse({ data: game }, 201);
           }
+        }
+
+        const adminGameConfigMatch = /^\/api\/admin\/games\/([a-z0-9-]+)\/config$/.exec(path);
+        if (adminGameConfigMatch && (method === 'GET' || method === 'PUT')) {
+          const slug = adminGameConfigMatch[1];
+          if (method === 'GET') {
+            const savedConfig = await readJsonBlob(store, `${KEYS.gameConfigPrefix}${slug}`, null);
+            return jsonResponse({ data: savedConfig });
+          }
+          let validConfig;
+          try {
+            validConfig = validateGameRuntimeConfig(await parseJsonBody(request));
+          } catch (configError) {
+            if (configError instanceof SyntaxError || configError instanceof ZodError) throw configError;
+            return errorResponse(400, 'VALIDATION_ERROR', configError.message);
+          }
+          await store.setJSON(`${KEYS.gameConfigPrefix}${slug}`, validConfig);
+          return jsonResponse({ data: validConfig });
+        }
+
+        const adminGameScoresMatch = /^\/api\/admin\/games\/([a-z0-9-]+)\/scores$/.exec(path);
+        if (adminGameScoresMatch && method === 'GET') {
+          const slug = adminGameScoresMatch[1];
+          const allScores = await readJsonBlob(store, KEYS.gameScores, []);
+          const list = Array.isArray(allScores) ? allScores.filter((item) => item.gameSlug === slug) : [];
+          return jsonResponse({ data: list });
         }
 
         if (path.startsWith('/api/admin/games/') && (method === 'PUT' || method === 'DELETE')) {

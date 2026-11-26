@@ -11,7 +11,7 @@ Código fuente: [GitHub · Smlich/carnivoras-tucuman](https://github.com/Smlich/
   - `/catalogo.html` (búsqueda, filtros por categoría y visor de fotos)
   - `/vivero.html` (álbum de 24 fotografías reales con visor ampliado)
   - `/cuidados.html` (guía ilustrada e indexable con fuentes botánicas)
-  - `/juegos.html` (zona de juegos gratis protegida por Google OAuth y modo administrador)
+  - `/juegos.html` y `/jugar-dionaea.html` (zona de juegos gratis con **Dionaea Strike** editable en `src/games/dionaea-strike/`, protegido por Google OAuth y configuración exclusiva de Administrador)
   - `/contacto.html` (WhatsApp directo e Instagram `@carnivoras_tucuman`)
   - `/privacidad.html` y `/terminos.html` (política de privacidad y condiciones de consulta/entrega)
   - `/admin.html` (panel de administración con `noindex` para catálogo, textos, álbum, juegos, pedidos, cuenta y copiloto IA)

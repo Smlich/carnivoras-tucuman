@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createApiHandler } from '../../netlify/functions/api.mjs';
-import { createAdminToken, hashPasswordPbkdf2 } from '../src/auth/admin-session.js';
+import { createAdminToken, createUserToken, hashPasswordPbkdf2 } from '../src/auth/admin-session.js';
 import { defaultAdminProducts } from '../../src/data/site-defaults.js';
 
 const ORIGIN = 'https://test.local';
@@ -536,4 +536,62 @@ test('endpoints de asistente Gemini validan origen, fotos, cuota diaria, admin a
   });
   assert.equal(adminCopy.status, 200);
   assert.equal((await adminCopy.json()).data.suggestedTitle, 'Venus atrapamoscas juvenil');
+});
+
+test('Dionaea Strike restringe configuración a Admin y persiste puntajes de usuarios', async () => {
+  const { call } = setup();
+
+  assert.equal((await call('/api/games/dionaea-strike/config')).status, 401);
+  assert.equal((await call('/api/games/dionaea-strike/scores', { method: 'POST', body: { score: 100 } })).status, 401);
+
+  const playerToken = createUserToken({ id: 'u-1', email: 'cliente@example.com', name: 'Sofía' }, ADMIN_SECRET);
+  const playerHeaders = { cookie: `ct_user_session=${encodeURIComponent(playerToken)}`, origin: ORIGIN };
+
+  const playerTryAdminSave = await call('/api/admin/games/dionaea-strike/config', {
+    method: 'PUT',
+    body: {
+      gameTitle: 'Hack',
+      player: {},
+      species: {},
+      enemies: {},
+      waves: [{}],
+      bosses: [{}],
+    },
+    headers: { ...playerHeaders, 'x-admin-request': '1' },
+  });
+  assert.equal(playerTryAdminSave.status, 401);
+
+  const sampleGameConfig = {
+    gameTitle: 'DIONAEA STRIKE PRO',
+    gameSubtitle: 'Balance Admin',
+    player: { maxHp: 7 },
+    species: { dionaea: { damage: 15 } },
+    enemies: { drone: { hp: 20 } },
+    waves: [{ level: 1 }],
+    bosses: [{ name: 'Mosca Reina' }],
+  };
+  const adminSave = await call('/api/admin/games/dionaea-strike/config', {
+    method: 'PUT',
+    body: sampleGameConfig,
+    headers: adminHeaders(),
+  });
+  assert.equal(adminSave.status, 200);
+
+  const playerReadConfig = await call('/api/games/dionaea-strike/config', { headers: playerHeaders });
+  assert.equal(playerReadConfig.status, 200);
+  assert.equal((await playerReadConfig.json()).data.gameTitle, 'DIONAEA STRIKE PRO');
+
+  const scoreSave = await call('/api/games/dionaea-strike/scores', {
+    method: 'POST',
+    body: { score: 4500, highScore: 4500, maxCombo: 18, levelReached: 3, victory: false, petId: 'roy' },
+    headers: playerHeaders,
+  });
+  assert.equal(scoreSave.status, 201);
+  const scoreBody = await scoreSave.json();
+  assert.equal(scoreBody.data.playerName, 'Sofía');
+  assert.equal(scoreBody.data.score, 4500);
+
+  const adminScores = await call('/api/admin/games/dionaea-strike/scores', { headers: adminHeaders() });
+  assert.equal(adminScores.status, 200);
+  assert.equal((await adminScores.json()).data.length, 1);
 });

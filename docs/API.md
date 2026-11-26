@@ -15,7 +15,7 @@ La misma interfaz de API (`/api/*`) funciona tanto en **Netlify live** (`netlify
 - `GET /api/assistant/status` — indica si el asistente botánico (`GEMINI_API_KEY`) está activo sin exponer configuración ni claves.
 - `POST /api/assistant/care` — diagnóstico multimodal (texto + foto opcional JPG/PNG/WebP hasta 2 MB) para el «Doctor de carnívoras» en `/cuidados.html`, protegido con rate limit por IP y cuota diaria compartida.
 - `POST /api/assistant/recommend` — recomendador de compra sobre productos activos en stock de `/catalogo.html`.
-- `GET /api/games` y `GET /api/games/:slug` — juegos desbloqueados por Google OAuth (`role: 'player'`) o sesión de Administrador (`role: 'admin'`, `isAdmin: true`, incluyendo `adminEmbedUrl` y `adminProps`).
+- `GET /api/games`, `GET /api/games/:slug`, `GET /api/games/:slug/config` y `POST /api/games/:slug/scores` — juegos desbloqueados por Google OAuth (`role: 'player'`) o sesión de Administrador (`role: 'admin'`, `isAdmin: true`), lectura de balance guardado y guardado de puntajes.
 
 ## Endpoints de Administración (`/api/admin/*`)
 
@@ -29,7 +29,7 @@ Todas las mutaciones exigen sesión verificada (`ct_admin_session` cookie `HttpO
 - `GET/PUT /api/admin/settings` — textos globales, hero, latitud `?`, contador desde agosto 2024, banner de aviso y redes/WhatsApp.
 - `GET/POST /api/admin/products` y `PUT/DELETE /api/admin/products/:slug` — CRUD completo de catálogo y stock (limpia automáticamente imágenes `/api/media/*` huérfanas).
 - `GET/POST /api/admin/gallery` y `PUT/DELETE /api/admin/gallery/:id` — CRUD de fotografías del vivero (limpia automáticamente imágenes `/api/media/*` huérfanas).
-- `GET/POST /api/admin/games` y `PUT/DELETE /api/admin/games/:slug` — CRUD de juegos y `adminProps`.
+- `GET/POST /api/admin/games`, `PUT/DELETE /api/admin/games/:slug`, `GET/PUT /api/admin/games/:slug/config` y `GET /api/admin/games/:slug/scores` — CRUD de juegos, persistencia del editor in-game de Dionaea Strike solo para Admin y listado de puntajes.
 - `GET /api/admin/orders` y `PATCH/DELETE /api/admin/orders/:id` — gestión de estado, notas del cliente y notas internas de pedidos.
 - `POST /api/admin/media` — subida segura de PNG/JPEG/WebP (máximo 2 MB, verificación de firma mágica).
 - `GET /api/admin/assistant/status` y `POST /api/admin/assistant/copy` — estado, modelo, contadores diarios y generación con Gemini de descripción, `alt` SEO, caption para Instagram y respuesta rápida para WhatsApp.

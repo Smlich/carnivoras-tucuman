@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')).render(
           currentLabel="Juegos"
           eyebrow="Beneficio para clientes"
           title={<>Juegos gratis con tu cuenta de <em>Google.</em></>}
-          lead="Espacio recreativo para jugar gratis en línea. Próximamente se suma nuestro primer título interactivo sobre plantas carnívoras."
+          lead="Entrá con tu cuenta de Google para jugar gratis en línea a Dionaea Strike y seguir novedades interactivas del vivero."
         />
         <GamesSection showHeading={false} />
       </>
