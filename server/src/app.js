@@ -13,6 +13,7 @@ import { createHealthRouter } from './routes/health.js';
 import { createProductsRouter } from './routes/products.js';
 import { createPublicSiteRouter } from './routes/public-site.js';
 import { createVisitsRouter } from './routes/visits.js';
+import { AssistantServiceError } from './services/gemini-assistant.js';
 
 const frontendDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../../dist');
 
@@ -45,7 +46,7 @@ const notFoundHtml = `<!doctype html>
   </body>
 </html>`;
 
-export function createApp({ auth = null, authProviders = [], env: appEnv = env, rateLimits = {} } = {}) {
+export function createApp({ auth = null, authProviders = [], env: appEnv = env, rateLimits = {}, fetchImpl = globalThis.fetch } = {}) {
   const app = express();
   const isProduction = appEnv.NODE_ENV === 'production';
 
@@ -93,6 +94,7 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   const gamesLimiter = createRateLimiter({ max: rateLimits.gamesMax ?? 60 });
   const visitsLimiter = createRateLimiter({ max: rateLimits.visitsMax ?? 20 });
   const ordersLimiter = createRateLimiter({ windowMs: 5 * 60_000, max: rateLimits.ordersMax ?? 15 });
+  const assistantLimiter = createRateLimiter({ windowMs: rateLimits.assistantWindowMs ?? 10 * 60_000, max: rateLimits.assistantMax ?? 8 });
   const adminLimiter = createRateLimiter({ max: rateLimits.adminMax ?? 120 });
 
   app.get('/api/auth/status', authStatusLimiter, (request, response) => {
@@ -112,8 +114,10 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
     }));
   }
 
-  // Subida multimedia admite hasta 3 MB JSON; el resto de rutas queda acotado a 16 KB.
+  // Subida multimedia e imágenes del asistente admiten hasta 3 MB JSON; el resto de rutas queda acotado a 16 KB.
   app.use('/api/admin/media', express.json({ limit: '3mb' }));
+  app.use('/api/admin/assistant/copy', express.json({ limit: '3mb' }));
+  app.use('/api/assistant/care', express.json({ limit: '3mb' }));
   app.use(express.json({ limit: '16kb' }));
 
   app.use('/api/health', createHealthRouter({
@@ -123,9 +127,11 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   app.use('/api/products', productsLimiter, createProductsRouter({ isProduction }));
   app.use('/api/games', gamesLimiter, createGamesRouter({ auth, appEnv }));
   app.use('/api/visits', visitsLimiter, createVisitsRouter());
-  app.use('/api/admin', adminLimiter, createAdminRouter({ auth, appEnv }));
+  app.use('/api/admin', adminLimiter, createAdminRouter({ auth, appEnv, fetchImpl }));
   app.post('/api/orders', ordersLimiter);
-  app.use('/api', productsLimiter, createPublicSiteRouter({ isProduction, auth }));
+  app.post('/api/assistant/care', assistantLimiter);
+  app.post('/api/assistant/recommend', assistantLimiter);
+  app.use('/api', productsLimiter, createPublicSiteRouter({ isProduction, auth, appEnv, fetchImpl }));
 
   if (isProduction) {
     for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin', 'privacidad', 'terminos']) {
@@ -183,6 +189,12 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
             message: issue.message,
           })),
         },
+      });
+    }
+
+    if (error instanceof AssistantServiceError) {
+      return response.status(error.status).json({
+        error: { code: error.code, message: error.message },
       });
     }
 

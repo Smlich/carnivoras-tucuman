@@ -6,6 +6,7 @@ import {
   uploadAdminMediaFile,
 } from '../../services/admin-api';
 import { formatPrice } from '../../utils/format-price';
+import AdminAiCopilot from './AdminAiCopilot';
 
 const EMPTY_FORM = {
   id: '',
@@ -43,18 +44,21 @@ export default function AdminProductsTab({ products, onChanged, onStatus }) {
   const [editingId, setEditingId] = useState(null);
   const [slugTouched, setSlugTouched] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [lastUploadedFile, setLastUploadedFile] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   function startNew() {
     setEditingId(null);
     setSlugTouched(false);
+    setLastUploadedFile(null);
     setForm({ ...EMPTY_FORM, sortOrder: products.length });
   }
 
   function startEdit(product) {
     setEditingId(product.id);
     setSlugTouched(true);
+    setLastUploadedFile(null);
     setForm({
       id: product.id,
       name: product.name,
@@ -80,6 +84,7 @@ export default function AdminProductsTab({ products, onChanged, onStatus }) {
     setIsUploading(true);
     try {
       const uploaded = await uploadAdminMediaFile(file);
+      setLastUploadedFile(file);
       setForm((current) => ({ ...current, image: uploaded.url }));
       onStatus({ type: 'success', text: `Imagen "${file.name}" subida y lista para guardar.` });
     } catch (error) {
@@ -264,6 +269,33 @@ export default function AdminProductsTab({ products, onChanged, onStatus }) {
               </label>
             </div>
           </div>
+
+          <AdminAiCopilot
+            target="product"
+            context={{
+              name: form.name,
+              species: form.species,
+              category: form.categoryLabel || form.category,
+              price: form.price,
+              note: form.note,
+              existingDescription: form.description,
+            }}
+            imageUrl={form.image}
+            uploadedFile={lastUploadedFile}
+            onApply={(suggestion) => {
+              setForm((c) => {
+                const nextName = c.name.trim() ? c.name : suggestion.suggestedTitle;
+                return {
+                  ...c,
+                  name: nextName,
+                  id: editingId || slugTouched ? c.id : slugify(nextName),
+                  description: suggestion.description || c.description,
+                  imageAlt: suggestion.altText || c.imageAlt,
+                };
+              });
+              onStatus({ type: 'success', text: 'Sugerencias aplicadas al formulario. Revisalas y guardá.' });
+            }}
+          />
 
           <label className="admin-field">
             <span>Texto alternativo accesible (alt)</span>

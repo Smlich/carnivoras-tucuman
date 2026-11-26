@@ -12,6 +12,9 @@ La misma interfaz de API (`/api/*`) funciona tanto en **Netlify live** (`netlify
 - `GET /api/visits` / `POST /api/visits` (`X-Counter-Request: 1`) — contador compartido de sesiones.
 - `GET /api/auth/status`, `GET /api/auth/get-session`, `GET /api/auth/google/start`, `GET /api/auth/callback/google`, `POST /api/auth/sign-out` — flujo OAuth 2.0 + PKCE con Google para clientes en Netlify Functions (en el servidor MERN lo atiende Better Auth bajo `/api/auth/*`).
 - `POST /api/orders` — registra consultas armadas en «Mi pedido» antes de abrir WhatsApp, aplicando rate limit, recalculando precios/nombres desde el catálogo vigente del servidor, bloqueando productos sin stock y adjuntando `customerName`, `notes` opcional y estado verificado en servidor (`googleRegistered`, `customerEmail`).
+- `GET /api/assistant/status` — indica si el asistente botánico (`GEMINI_API_KEY`) está activo sin exponer configuración ni claves.
+- `POST /api/assistant/care` — diagnóstico multimodal (texto + foto opcional JPG/PNG/WebP hasta 2 MB) para el «Doctor de carnívoras» en `/cuidados.html`, protegido con rate limit por IP y cuota diaria compartida.
+- `POST /api/assistant/recommend` — recomendador de compra sobre productos activos en stock de `/catalogo.html`.
 - `GET /api/games` y `GET /api/games/:slug` — juegos desbloqueados por Google OAuth (`role: 'player'`) o sesión de Administrador (`role: 'admin'`, `isAdmin: true`, incluyendo `adminEmbedUrl` y `adminProps`).
 
 ## Endpoints de Administración (`/api/admin/*`)
@@ -29,3 +32,4 @@ Todas las mutaciones exigen sesión verificada (`ct_admin_session` cookie `HttpO
 - `GET/POST /api/admin/games` y `PUT/DELETE /api/admin/games/:slug` — CRUD de juegos y `adminProps`.
 - `GET /api/admin/orders` y `PATCH/DELETE /api/admin/orders/:id` — gestión de estado, notas del cliente y notas internas de pedidos.
 - `POST /api/admin/media` — subida segura de PNG/JPEG/WebP (máximo 2 MB, verificación de firma mágica).
+- `GET /api/admin/assistant/status` y `POST /api/admin/assistant/copy` — estado, modelo, contadores diarios y generación con Gemini de descripción, `alt` SEO, caption para Instagram y respuesta rápida para WhatsApp.

@@ -49,6 +49,12 @@ const environmentSchema = z.object({
   ADMIN_PASSWORD_HASH: optionalText(z.string()),
   ADMIN_SESSION_SECRET: optionalText(z.string().min(32, 'ADMIN_SESSION_SECRET debe tener al menos 32 caracteres.')),
   USER_SESSION_SECRET: optionalText(z.string().min(32, 'USER_SESSION_SECRET debe tener al menos 32 caracteres.')),
+  GEMINI_API_KEY: optionalText(z.string().min(10, 'GEMINI_API_KEY parece incompleta.')),
+  GEMINI_MODEL: optionalText(z.string().regex(/^[a-z0-9][a-z0-9._-]{2,64}$/i, 'GEMINI_MODEL inválido.')),
+  GEMINI_DAILY_LIMIT: z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.coerce.number().int().min(1).max(10_000).optional(),
+  ),
 }).superRefine((values, context) => {
   const providerPairs = [
     ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'Google'],

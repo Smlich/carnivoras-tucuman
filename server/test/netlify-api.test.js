@@ -54,7 +54,7 @@ function createFakeStore() {
   };
 }
 
-function setup(env = testEnv, rateLimits = {}) {
+function setup(env = testEnv, rateLimits = {}, fetchImpl = globalThis.fetch) {
   const store = createFakeStore();
   const mediaStore = createFakeStore();
   const handler = createApiHandler({
@@ -62,6 +62,7 @@ function setup(env = testEnv, rateLimits = {}) {
     getMediaStore: () => mediaStore,
     env: (name) => env[name],
     rateLimits,
+    fetchImpl,
   });
   const call = (path, { method = 'GET', body, headers = {} } = {}) => handler(new Request(`${ORIGIN}${path}`, {
     method,
@@ -408,4 +409,131 @@ test('POST /api/orders guarda notas del cliente y la limpieza borra medios huér
 
   await call('/api/admin/gallery/foto-compartida', { method: 'DELETE', headers: adminHeaders() });
   assert.equal(mediaStore.data.has(uploadShared.data.key), false);
+});
+
+test('endpoints de asistente Gemini validan origen, fotos, cuota diaria, admin auth y recomendaciones', async () => {
+  const unconfigured = setup(testEnv);
+  assert.equal((await (await unconfigured.call('/api/assistant/status')).json()).data.enabled, false);
+  const notConfiguredCare = await unconfigured.call('/api/assistant/care', {
+    method: 'POST',
+    body: { question: '¿Qué agua uso?' },
+  });
+  assert.equal(notConfiguredCare.status, 503);
+
+  let callMode = 'care';
+  const mockGeminiFetch = async () => ({
+    ok: true,
+    json: async () => ({
+      candidates: [{
+        content: {
+          parts: [{
+            text: callMode === 'care'
+              ? JSON.stringify({
+                severity: 'leve',
+                summary: 'Usá agua de lluvia o destilada.',
+                possibleCauses: ['Riego con agua dura'],
+                steps: ['Cambiá al método de bandeja con agua destilada.'],
+                avoid: ['No uses agua de canilla'],
+                tucumanTip: 'Evitá sol directo entre 12 y 16 h.',
+                recommendedProductIds: ['venus-pequena'],
+              })
+              : callMode === 'recommend'
+                ? JSON.stringify({
+                  intro: 'Te conviene empezar con Venus.',
+                  recommendations: [
+                    { productId: 'venus-pequena', reason: 'Ideal para empezar en Tucumán.', careSummary: 'Sol suave y bandeja.' },
+                  ],
+                  generalTip: 'Siempre agua de lluvia.',
+                })
+                : JSON.stringify({
+                  suggestedTitle: 'Venus atrapamoscas juvenil',
+                  description: 'Ejemplar sano en crecimiento.',
+                  altText: 'Venus atrapamoscas con trampas abiertas.',
+                  instagramCaption: 'Disponible #CarnivorasTucuman',
+                  whatsappPitch: 'Tenemos Venus listas para retirar.',
+                }),
+          }],
+        },
+      }],
+    }),
+  });
+
+  const aiEnv = { ...testEnv, GEMINI_API_KEY: 'AIzaSyTestKeyExample987654', GEMINI_DAILY_LIMIT: '3' };
+  const { call } = setup(aiEnv, { assistantMax: 10 }, mockGeminiFetch);
+
+  assert.equal((await (await call('/api/assistant/status')).json()).data.enabled, true);
+
+  const foreignCare = await call('/api/assistant/care', {
+    method: 'POST',
+    body: { question: '¿Qué hago con mi planta?' },
+    headers: { origin: 'https://otro.example' },
+  });
+  assert.equal(foreignCare.status, 403);
+
+  const forgedImageCare = await call('/api/assistant/care', {
+    method: 'POST',
+    body: {
+      question: '¿Qué tiene mi planta?',
+      image: { contentType: 'image/png', dataBase64: Buffer.from('falsa-imagen-123456').toString('base64') },
+    },
+  });
+  assert.equal(forgedImageCare.status, 400);
+  assert.equal((await forgedImageCare.json()).error.code, 'INVALID_MEDIA');
+
+  const validPng = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x01, 0x02, 0x03]);
+  callMode = 'care';
+  const okCare = await call('/api/assistant/care', {
+    method: 'POST',
+    body: {
+      question: 'Tiene hojas viejas oscuras',
+      species: 'Venus',
+      image: { contentType: 'image/png', dataBase64: validPng.toString('base64') },
+    },
+  });
+  assert.equal(okCare.status, 200);
+  const okCareBody = await okCare.json();
+  assert.equal(okCareBody.data.recommendedProducts[0].id, 'venus-pequena');
+
+  callMode = 'recommend';
+  const okRec = await call('/api/assistant/recommend', {
+    method: 'POST',
+    body: { query: 'Balcón con sol de mañana en Yerba Buena', budgetMaxARS: 10000 },
+  });
+  assert.equal(okRec.status, 200);
+  assert.equal((await okRec.json()).data.recommendations[0].product.price, 6000);
+
+  callMode = 'care';
+  const thirdCall = await call('/api/assistant/care', {
+    method: 'POST',
+    body: { question: 'Consulta número 3 del día' },
+  });
+  assert.equal(thirdCall.status, 200);
+
+  const fourthLimited = await call('/api/assistant/care', {
+    method: 'POST',
+    body: { question: 'Consulta 4 supera cuota diaria' },
+  });
+  assert.equal(fourthLimited.status, 429);
+  assert.equal((await fourthLimited.json()).error.code, 'ASSISTANT_DAILY_LIMIT');
+
+  assert.equal((await call('/api/admin/assistant/status')).status, 401);
+
+  const uploaded = await (await call('/api/admin/media', {
+    method: 'POST',
+    body: { filename: 'venus-ai.png', contentType: 'image/png', dataBase64: validPng.toString('base64') },
+    headers: adminHeaders(),
+  })).json();
+
+  callMode = 'admin';
+  const adminStatus = await (await call('/api/admin/assistant/status', { headers: adminHeaders() })).json();
+  assert.equal(adminStatus.data.usedToday, 3);
+  assert.equal(adminStatus.data.dailyLimit, 3);
+
+  const adminCopy = await call('/api/admin/assistant/copy', {
+    method: 'POST',
+    body: { target: 'product', name: 'Venus', imageUrl: uploaded.data.url },
+    headers: adminHeaders(),
+  });
+  assert.equal(adminCopy.status, 200);
+  assert.equal((await adminCopy.json()).data.suggestedTitle, 'Venus atrapamoscas juvenil');
 });

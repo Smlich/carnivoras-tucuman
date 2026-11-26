@@ -17,7 +17,16 @@ import { OrderInquiry } from '../models/OrderInquiry.js';
 import { Product } from '../models/Product.js';
 import { SiteMetric } from '../models/SiteMetric.js';
 import { SiteSettings } from '../models/SiteSettings.js';
-import { orderCreateSchema } from '../schemas/admin-schemas.js';
+import { orderCreateSchema, validateAndDecodeImageBase64 } from '../schemas/admin-schemas.js';
+import { careAssistantRequestSchema, catalogRecommendRequestSchema } from '../schemas/assistant-schemas.js';
+import {
+  diagnoseCarnivorousPlant,
+  getArgentinaDateKey,
+  getGeminiDailyLimit,
+  getGeminiModel,
+  isGeminiConfigured,
+  recommendCatalogProducts,
+} from '../services/gemini-assistant.js';
 import { sanitizePublicGamesPreview } from '../utils/game-visibility.js';
 import { resolveOrderItems } from '../utils/order-pricing.js';
 
@@ -54,8 +63,38 @@ function mapDbGalleryToClient(document) {
   };
 }
 
-export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'production', auth = null } = {}) {
+export function createPublicSiteRouter({
+  isProduction = env.NODE_ENV === 'production',
+  auth = null,
+  appEnv = env,
+  fetchImpl = globalThis.fetch,
+} = {}) {
   const router = Router();
+  const dailyQuotaState = { date: '', count: 0 };
+
+  function tryConsumePublicDailyQuota() {
+    const today = getArgentinaDateKey();
+    if (dailyQuotaState.date !== today) {
+      dailyQuotaState.date = today;
+      dailyQuotaState.count = 0;
+    }
+    const limit = getGeminiDailyLimit(appEnv);
+    if (dailyQuotaState.count >= limit) return false;
+    dailyQuotaState.count += 1;
+    return true;
+  }
+
+  async function loadActiveCatalogForAssistant() {
+    if (!isDatabaseConnected()) {
+      return isProduction ? [] : defaultAdminProducts;
+    }
+    const [productDocs, productsSeeded] = await Promise.all([
+      Product.find({ isActive: true }).sort({ sortOrder: 1, name: 1 }).lean(),
+      SiteMetric.exists({ key: 'seeded:products' }),
+    ]);
+    if (productDocs.length > 0) return productDocs.map(mapDbProductToClient);
+    return (!productsSeeded && (await Product.countDocuments()) === 0) ? defaultAdminProducts : [];
+  }
 
   router.get('/site-data', async (request, response) => {
     response.set('Cache-Control', 'no-store');
@@ -229,6 +268,93 @@ export function createPublicSiteRouter({ isProduction = env.NODE_ENV === 'produc
       },
       meta: { persisted: false },
     });
+  });
+
+  router.get('/assistant/status', (request, response) => {
+    response.set('Cache-Control', 'no-store');
+    return response.status(200).json({
+      data: {
+        enabled: isGeminiConfigured(appEnv),
+      },
+    });
+  });
+
+  router.post('/assistant/care', async (request, response) => {
+    if (!isGeminiConfigured(appEnv)) {
+      return response.status(503).json({
+        error: {
+          code: 'ASSISTANT_NOT_CONFIGURED',
+          message: 'El asistente botánico no está activo en este momento.',
+        },
+      });
+    }
+
+    const input = careAssistantRequestSchema.parse(request.body ?? {});
+    let normalizedImage = null;
+    if (input.image) {
+      try {
+        const buffer = validateAndDecodeImageBase64(input.image.dataBase64, input.image.contentType);
+        normalizedImage = { contentType: input.image.contentType, dataBase64: buffer.toString('base64') };
+      } catch (mediaError) {
+        return response.status(400).json({ error: { code: 'INVALID_MEDIA', message: mediaError.message } });
+      }
+    }
+
+    if (!tryConsumePublicDailyQuota()) {
+      return response.status(429).json({
+        error: {
+          code: 'ASSISTANT_DAILY_LIMIT',
+          message: 'Alcanzamos el límite diario de consultas del asistente. Escribinos por WhatsApp y te ayudamos directo.',
+        },
+      });
+    }
+
+    const catalogProducts = await loadActiveCatalogForAssistant();
+    const result = await diagnoseCarnivorousPlant({
+      apiKey: appEnv.GEMINI_API_KEY.trim(),
+      model: getGeminiModel(appEnv),
+      question: input.question,
+      species: input.species,
+      locationContext: input.locationContext,
+      image: normalizedImage,
+      catalogProducts,
+      fetchImpl,
+    });
+    return response.status(200).json({ data: result });
+  });
+
+  router.post('/assistant/recommend', async (request, response) => {
+    if (!isGeminiConfigured(appEnv)) {
+      return response.status(503).json({
+        error: {
+          code: 'ASSISTANT_NOT_CONFIGURED',
+          message: 'El recomendador no está activo en este momento.',
+        },
+      });
+    }
+
+    const input = catalogRecommendRequestSchema.parse(request.body ?? {});
+    if (!tryConsumePublicDailyQuota()) {
+      return response.status(429).json({
+        error: {
+          code: 'ASSISTANT_DAILY_LIMIT',
+          message: 'Alcanzamos el límite diario de recomendaciones automáticas. Podés consultarnos por WhatsApp.',
+        },
+      });
+    }
+
+    const catalogProducts = await loadActiveCatalogForAssistant();
+    const result = await recommendCatalogProducts({
+      apiKey: appEnv.GEMINI_API_KEY.trim(),
+      model: getGeminiModel(appEnv),
+      query: input.query,
+      sunlight: input.sunlight,
+      experience: input.experience,
+      budgetMaxARS: input.budgetMaxARS,
+      catalogProducts,
+      fetchImpl,
+    });
+    return response.status(200).json({ data: result });
   });
 
   return router;

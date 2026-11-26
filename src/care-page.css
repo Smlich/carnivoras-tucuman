@@ -759,3 +759,287 @@
   .species-stats { grid-template-columns: 1fr; }
   .care-guide__contact .button { width: 100%; }
 }
+
+/* DOCTOR DE CARNÍVORAS (GEMINI) */
+.care-doctor {
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 3.2vw, 30px);
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+  background: var(--paper-bright);
+  box-shadow: 0 18px 40px -28px rgba(5, 22, 16, .28);
+}
+
+.care-doctor__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.care-doctor__chip {
+  min-height: 36px;
+  padding: 6px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+
+.care-doctor__chip:hover {
+  border-color: var(--bog-abyss);
+  background: var(--mist);
+}
+
+.care-doctor__chip:focus-visible,
+.care-doctor__upload-btn:focus-within,
+.care-doctor__remove-photo:focus-visible {
+  outline: 2px solid var(--bog-abyss);
+  outline-offset: 2px;
+}
+
+.care-doctor__notice,
+.care-doctor__error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+}
+
+.care-doctor__notice {
+  border: 1px solid rgba(5, 22, 16, .16);
+  background: var(--mist);
+  color: var(--ink);
+}
+
+.care-doctor__notice strong { display: block; margin-bottom: 3px; color: var(--bog-abyss); }
+.care-doctor__notice p { margin: 0; font-size: 14px; color: var(--ink-muted); }
+
+.care-doctor__error {
+  border: 1px solid #e4b4b4;
+  background: #fdf2f2;
+  color: #7d1919;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.care-doctor__error p { margin: 0; }
+.care-doctor__wa-inline { color: #15402b; font-weight: 700; text-decoration: underline; }
+
+.care-doctor__form {
+  display: grid;
+  gap: 14px;
+}
+
+.care-doctor__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.care-doctor__field {
+  display: grid;
+  gap: 6px;
+}
+
+.care-doctor__field span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bog-abyss);
+}
+
+.care-doctor__field input,
+.care-doctor__field select,
+.care-doctor__field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14.5px;
+}
+
+.care-doctor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.care-doctor__upload-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.care-doctor__upload-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 14px;
+  border: 1px dashed var(--bog-abyss);
+  border-radius: 11px;
+  background: var(--paper);
+  color: var(--bog-abyss);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.care-doctor__upload-btn input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.care-doctor__photo-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.care-doctor__photo-preview img {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.care-doctor__remove-photo {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.care-doctor__result {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1.5px solid rgba(5, 22, 16, .18);
+  border-radius: 18px;
+  background: var(--paper);
+}
+
+.care-doctor__result-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.care-doctor__result-head h3 { margin: 0; font-size: 1.25rem; color: var(--bog-abyss); }
+
+.care-doctor__badge {
+  display: inline-flex;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.care-doctor__badge--leve { background: #e6f4d4; color: #15402b; }
+.care-doctor__badge--atencion { background: #fdf0c8; color: #5c4300; }
+.care-doctor__badge--urgente { background: #fde2e2; color: #7d1919; }
+
+.care-doctor__summary { margin: 0; font-size: 15.5px; line-height: 1.6; color: var(--ink); }
+
+.care-doctor__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.care-doctor__block h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--bog-abyss);
+}
+
+.care-doctor__block ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+.care-doctor__avoid,
+.care-doctor__tip {
+  margin: 0;
+  padding: 11px 14px;
+  border-radius: 11px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.care-doctor__avoid { background: #fdf2f2; color: #7d1919; }
+.care-doctor__tip { background: #edf5e1; color: #15402b; }
+
+.care-doctor__products h3 { margin: 0 0 10px; font-size: 15px; color: var(--bog-abyss); }
+
+.care-doctor__product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.care-doctor__product-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--bog-abyss);
+  text-decoration: none;
+}
+
+.care-doctor__product-card span { display: block; font-size: 12.5px; color: var(--ink-muted); }
+
+.care-doctor__result-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 720px) {
+  .care-doctor__row,
+  .care-doctor__cols,
+  .care-doctor__product-grid {
+    grid-template-columns: 1fr;
+  }
+  .care-doctor__actions .button,
+  .care-doctor__result-foot .button {
+    width: 100%;
+  }
+}

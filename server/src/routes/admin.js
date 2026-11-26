@@ -45,6 +45,15 @@ import {
   siteSettingsSchema,
   validateAndDecodeImageBase64,
 } from '../schemas/admin-schemas.js';
+import { adminCopyRequestSchema } from '../schemas/assistant-schemas.js';
+import {
+  DEFAULT_ADMIN_DAILY_LIMIT,
+  generateAdminCopy,
+  getArgentinaDateKey,
+  getGeminiDailyLimit,
+  getGeminiModel,
+  isGeminiConfigured,
+} from '../services/gemini-assistant.js';
 import { extractManagedMediaKey } from '../utils/media-cleanup.js';
 
 function mapDbProduct(doc) {
@@ -221,8 +230,9 @@ function requireDatabase(response) {
   return true;
 }
 
-export function createAdminRouter({ auth = null, appEnv = env } = {}) {
+export function createAdminRouter({ auth = null, appEnv = env, fetchImpl = globalThis.fetch } = {}) {
   const router = Router();
+  const dailyAdminQuotaState = { date: '', count: 0 };
   const requireAdmin = createRequireAdmin({ auth, appEnv });
   const loginLimiter = createRateLimiter({
     windowMs: 15 * 60_000,
@@ -664,6 +674,84 @@ export function createAdminRouter({ auth = null, appEnv = env } = {}) {
         size: buffer.length,
       },
     });
+  });
+
+  router.get('/assistant/status', (request, response) => {
+    const today = getArgentinaDateKey();
+    const adminUsedToday = dailyAdminQuotaState.date === today ? dailyAdminQuotaState.count : 0;
+    return response.status(200).json({
+      data: {
+        enabled: isGeminiConfigured(appEnv),
+        model: getGeminiModel(appEnv),
+        dailyLimit: getGeminiDailyLimit(appEnv),
+        usedToday: 0,
+        adminDailyLimit: DEFAULT_ADMIN_DAILY_LIMIT,
+        adminUsedToday,
+      },
+    });
+  });
+
+  router.post('/assistant/copy', async (request, response) => {
+    if (!isGeminiConfigured(appEnv)) {
+      return response.status(503).json({
+        error: {
+          code: 'ASSISTANT_NOT_CONFIGURED',
+          message: 'Configurá GEMINI_API_KEY en tu entorno para activar el Copiloto IA.',
+        },
+      });
+    }
+
+    const body = adminCopyRequestSchema.parse(request.body ?? {});
+    let resolvedImage = null;
+    if (body.image) {
+      try {
+        const buffer = validateAndDecodeImageBase64(body.image.dataBase64, body.image.contentType);
+        resolvedImage = { contentType: body.image.contentType, dataBase64: buffer.toString('base64') };
+      } catch (mediaError) {
+        return response.status(400).json({ error: { code: 'INVALID_MEDIA', message: mediaError.message } });
+      }
+    } else if (body.imageUrl && isDatabaseConnected()) {
+      const mediaKey = extractManagedMediaKey(body.imageUrl);
+      if (mediaKey) {
+        const asset = await MediaAsset.findOne({ key: mediaKey }).lean();
+        if (asset?.data && ['image/png', 'image/jpeg', 'image/webp'].includes(asset.contentType)) {
+          const buffer = Buffer.from(asset.data.buffer || asset.data);
+          if (buffer.length > 0 && buffer.length <= 2 * 1024 * 1024) {
+            resolvedImage = { contentType: asset.contentType, dataBase64: buffer.toString('base64') };
+          }
+        }
+      }
+    }
+
+    const today = getArgentinaDateKey();
+    if (dailyAdminQuotaState.date !== today) {
+      dailyAdminQuotaState.date = today;
+      dailyAdminQuotaState.count = 0;
+    }
+    if (dailyAdminQuotaState.count >= DEFAULT_ADMIN_DAILY_LIMIT) {
+      return response.status(429).json({
+        error: {
+          code: 'ASSISTANT_DAILY_LIMIT',
+          message: 'Se alcanzó el límite diario del Copiloto IA de administración.',
+        },
+      });
+    }
+    dailyAdminQuotaState.count += 1;
+
+    const result = await generateAdminCopy({
+      apiKey: appEnv.GEMINI_API_KEY.trim(),
+      model: getGeminiModel(appEnv),
+      target: body.target,
+      name: body.name,
+      species: body.species,
+      category: body.category,
+      price: body.price,
+      note: body.note,
+      existingDescription: body.existingDescription,
+      image: resolvedImage,
+      fetchImpl,
+    });
+    return response.status(200).json({ data: result });
   });
 
   return router;

@@ -171,3 +171,42 @@ test('POST /api/orders recalcula precios en el servidor y aplica rate limit', as
   assert.equal(limited.status, 429);
   assert.equal((await limited.json()).error.code, 'RATE_LIMIT_EXCEEDED');
 });
+
+test('Express expone /api/assistant/status y /api/assistant/care con Gemini mockeado', async (context) => {
+  const aiEnv = { ...productionEnv, GEMINI_API_KEY: 'AIzaSyExpressMockKey12345' };
+  const origin = await startTestServer(createApp({
+    env: aiEnv,
+    fetchImpl: async () => ({
+      ok: true,
+      json: async () => ({
+        candidates: [{
+          content: {
+            parts: [{
+              text: JSON.stringify({
+                severity: 'atencion',
+                summary: 'Revisá la calidad del agua.',
+                possibleCauses: ['Sales minerales'],
+                steps: ['Usá agua destilada.'],
+                avoid: ['No uses agua de red'],
+                tucumanTip: 'En Tucumán cuidá el calor extremo.',
+                recommendedProductIds: [],
+              }),
+            }],
+          },
+        }],
+      }),
+    }),
+  }), context);
+
+  const statusRes = await fetch(`${origin}/api/assistant/status`);
+  assert.equal(statusRes.status, 200);
+  assert.equal((await statusRes.json()).data.enabled, true);
+
+  const careRes = await fetch(`${origin}/api/assistant/care`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question: 'Mi Drosera perdió sus gotitas' }),
+  });
+  assert.equal(careRes.status, 200);
+  assert.equal((await careRes.json()).data.severity, 'atencion');
+});

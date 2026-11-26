@@ -5,6 +5,7 @@ import {
   updateAdminGalleryItem,
   uploadAdminMediaFile,
 } from '../../services/admin-api';
+import AdminAiCopilot from './AdminAiCopilot';
 
 const EMPTY_GALLERY = {
   id: '',
@@ -42,18 +43,21 @@ export default function AdminGalleryTab({ gallery, onChanged, onStatus }) {
   const [editingId, setEditingId] = useState(null);
   const [slugTouched, setSlugTouched] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_GALLERY, sortOrder: gallery.length });
+  const [lastUploadedFile, setLastUploadedFile] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   function startNew() {
     setEditingId(null);
     setSlugTouched(false);
+    setLastUploadedFile(null);
     setForm({ ...EMPTY_GALLERY, sortOrder: gallery.length });
   }
 
   function startEdit(item) {
     setEditingId(item.id);
     setSlugTouched(true);
+    setLastUploadedFile(null);
     setForm({ ...item });
   }
 
@@ -66,6 +70,7 @@ export default function AdminGalleryTab({ gallery, onChanged, onStatus }) {
     try {
       const uploaded = await uploadAdminMediaFile(file);
       const dims = await readImageDimensions(uploaded.url);
+      setLastUploadedFile(file);
       setForm((c) => ({ ...c, src: uploaded.url, width: dims.width, height: dims.height }));
       onStatus({ type: 'success', text: `Fotografía "${file.name}" subida (${dims.width}×${dims.height}).` });
     } catch (error) {
@@ -202,6 +207,31 @@ export default function AdminGalleryTab({ gallery, onChanged, onStatus }) {
               </label>
             </div>
           </div>
+
+          <AdminAiCopilot
+            target="gallery"
+            context={{
+              name: form.title,
+              species: form.label,
+              category: form.label,
+              existingDescription: form.description,
+            }}
+            imageUrl={form.src}
+            uploadedFile={lastUploadedFile}
+            onApply={(suggestion) => {
+              setForm((c) => {
+                const nextTitle = c.title.trim() ? c.title : suggestion.suggestedTitle;
+                return {
+                  ...c,
+                  title: nextTitle,
+                  id: editingId || slugTouched ? c.id : slugify(nextTitle),
+                  description: suggestion.description || c.description,
+                  alt: suggestion.altText || c.alt,
+                };
+              });
+              onStatus({ type: 'success', text: 'Sugerencias aplicadas al álbum. Revisalas y guardá.' });
+            }}
+          />
 
           <label className="admin-field">
             <span>Descripción</span>

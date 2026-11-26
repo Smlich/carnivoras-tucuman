@@ -132,6 +132,17 @@ export async function deleteAdminOrder(id) {
   return requestAdminJson('/api/admin/orders/' + encodeURIComponent(id), { method: 'DELETE', body: {} });
 }
 
+export async function fetchAdminAssistantStatus() {
+  return requestAdminJson('/api/admin/assistant/status');
+}
+
+export async function generateAdminAssistantCopy(payload) {
+  return requestAdminJson('/api/admin/assistant/copy', {
+    method: 'POST',
+    body: payload,
+  });
+}
+
 export async function uploadAdminMediaFile(file) {
   if (!file) throw new Error('Seleccioná una imagen primero.');
   if (!ALLOWED_MIME_TYPES.includes(file.type)) {

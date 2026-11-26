@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../styles.css';
+import CatalogRecommender from '../components/CatalogRecommender';
 import PageBanner from '../components/PageBanner';
 import ProductCatalog from '../components/ProductCatalog';
 import StoreLayout from '../components/StoreLayout';
@@ -20,6 +21,7 @@ function CatalogoPageContent({ products, onAdd }) {
         title={<>Pequeñas maravillas, <em>grandes personalidades.</em></>}
         lead={lead}
       />
+      <CatalogRecommender products={products} onAdd={onAdd} />
       <ProductCatalog products={products} onAdd={onAdd} showHeading={false} />
     </>
   );

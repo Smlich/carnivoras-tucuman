@@ -49,6 +49,22 @@ import {
   validateAndDecodeImageBase64,
 } from '../../server/src/schemas/admin-schemas.js';
 import {
+  adminCopyRequestSchema,
+  careAssistantRequestSchema,
+  catalogRecommendRequestSchema,
+} from '../../server/src/schemas/assistant-schemas.js';
+import {
+  AssistantServiceError,
+  DEFAULT_ADMIN_DAILY_LIMIT,
+  diagnoseCarnivorousPlant,
+  generateAdminCopy,
+  getArgentinaDateKey,
+  getGeminiDailyLimit,
+  getGeminiModel,
+  isGeminiConfigured,
+  recommendCatalogProducts,
+} from '../../server/src/services/gemini-assistant.js';
+import {
   sanitizeGamesForViewer,
   sanitizePublicGamesPreview,
 } from '../../server/src/utils/game-visibility.js';
@@ -73,6 +89,7 @@ const KEYS = {
   users: 'registered-users',
   adminAccount: 'admin-account',
   loginThrottle: 'admin-login-throttle',
+  assistantQuota: 'assistant-daily-quota',
 };
 
 function readRuntimeEnv(name) {
@@ -95,6 +112,9 @@ function getAdminEnvConfig(readEnv = readRuntimeEnv) {
     GOOGLE_CLIENT_SECRET: readEnv('GOOGLE_CLIENT_SECRET') || '',
     USER_SESSION_SECRET: readEnv('USER_SESSION_SECRET') || '',
     BETTER_AUTH_SECRET: readEnv('BETTER_AUTH_SECRET') || '',
+    GEMINI_API_KEY: readEnv('GEMINI_API_KEY') || '',
+    GEMINI_MODEL: readEnv('GEMINI_MODEL') || '',
+    GEMINI_DAILY_LIMIT: readEnv('GEMINI_DAILY_LIMIT') || '',
   };
 }
 
@@ -373,15 +393,61 @@ function extensionForMime(contentType) {
   return 'jpg';
 }
 
+function normalizeValidatedImage(image) {
+  if (!image) return null;
+  const buffer = validateAndDecodeImageBase64(image.dataBase64, image.contentType);
+  return {
+    contentType: image.contentType,
+    dataBase64: buffer.toString('base64'),
+  };
+}
+
+async function consumeDailyQuota(store, bucket, limit) {
+  const todayKey = getArgentinaDateKey();
+  const outcome = await updateJsonBlob(store, KEYS.assistantQuota, {}, (current) => {
+    const prevToday = current?.[todayKey] && typeof current[todayKey] === 'object'
+      ? current[todayKey]
+      : { public: 0, admin: 0 };
+    const used = Number.isInteger(prevToday[bucket]) ? prevToday[bucket] : 0;
+    if (used >= limit) {
+      return { response: { allowed: false, used, limit } };
+    }
+    const nextToday = {
+      public: bucket === 'public' ? used + 1 : (Number.isInteger(prevToday.public) ? prevToday.public : 0),
+      admin: bucket === 'admin' ? used + 1 : (Number.isInteger(prevToday.admin) ? prevToday.admin : 0),
+    };
+    return {
+      value: { [todayKey]: nextToday },
+      result: { allowed: true, used: nextToday[bucket], limit },
+    };
+  });
+  return outcome.response || outcome.result;
+}
+
+async function readDailyQuota(store) {
+  const todayKey = getArgentinaDateKey();
+  const stored = await readJsonBlob(store, KEYS.assistantQuota, {});
+  const today = stored?.[todayKey] && typeof stored[todayKey] === 'object' ? stored[todayKey] : {};
+  return {
+    public: Number.isInteger(today.public) ? today.public : 0,
+    admin: Number.isInteger(today.admin) ? today.admin : 0,
+  };
+}
+
 export function createApiHandler({
   getSiteStore: resolveSiteStore = getSiteStore,
   getMediaStore: resolveMediaStore = getMediaStore,
   env = readRuntimeEnv,
   rateLimits = {},
+  fetchImpl = globalThis.fetch,
 } = {}) {
   const checkOrdersLimit = createMemoryLimiter({
     windowMs: rateLimits.ordersWindowMs ?? 5 * 60_000,
     max: rateLimits.ordersMax ?? 15,
+  });
+  const checkAssistantLimit = createMemoryLimiter({
+    windowMs: rateLimits.assistantWindowMs ?? 10 * 60_000,
+    max: rateLimits.assistantMax ?? 8,
   });
   const loginMax = rateLimits.loginMax ?? 10;
   const loginWindowMs = rateLimits.loginWindowMs ?? 15 * 60_000;
@@ -705,6 +771,113 @@ export function createApiHandler({
           value: [order, ...orders].slice(0, 250),
         }));
         return jsonResponse({ data: order }, 201);
+      }
+
+      if (path === '/api/assistant/status' && method === 'GET') {
+        return jsonResponse({
+          data: {
+            enabled: isGeminiConfigured(envConfig),
+          },
+        });
+      }
+
+      if (path === '/api/assistant/care' && method === 'POST') {
+        if (!isSameOriginRequest(request, url)) {
+          return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
+        }
+        if (!isGeminiConfigured(envConfig)) {
+          return errorResponse(503, 'ASSISTANT_NOT_CONFIGURED', 'El asistente botánico no está activo en este momento.');
+        }
+        const retryAfter = checkAssistantLimit(getClientIp(request));
+        if (retryAfter > 0) {
+          return jsonResponse(
+            {
+              error: {
+                code: 'RATE_LIMIT_EXCEEDED',
+                message: 'Hiciste varias consultas seguidas. Esperá unos minutos o escribinos por WhatsApp.',
+              },
+            },
+            429,
+            { 'Retry-After': String(retryAfter) },
+          );
+        }
+
+        const input = careAssistantRequestSchema.parse(await parseJsonBody(request));
+        let normalizedImage = null;
+        if (input.image) {
+          try {
+            normalizedImage = normalizeValidatedImage(input.image);
+          } catch (mediaError) {
+            return errorResponse(400, 'INVALID_MEDIA', mediaError.message);
+          }
+        }
+
+        const quota = await consumeDailyQuota(store, 'public', getGeminiDailyLimit(envConfig));
+        if (!quota.allowed) {
+          return errorResponse(
+            429,
+            'ASSISTANT_DAILY_LIMIT',
+            'Alcanzamos el límite diario de consultas del asistente. Escribinos por WhatsApp y te ayudamos directo.',
+          );
+        }
+
+        const activeProducts = (await loadProducts(store)).filter((item) => item.isActive !== false);
+        const result = await diagnoseCarnivorousPlant({
+          apiKey: envConfig.GEMINI_API_KEY.trim(),
+          model: getGeminiModel(envConfig),
+          question: input.question,
+          species: input.species,
+          locationContext: input.locationContext,
+          image: normalizedImage,
+          catalogProducts: activeProducts,
+          fetchImpl,
+        });
+        return jsonResponse({ data: result });
+      }
+
+      if (path === '/api/assistant/recommend' && method === 'POST') {
+        if (!isSameOriginRequest(request, url)) {
+          return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
+        }
+        if (!isGeminiConfigured(envConfig)) {
+          return errorResponse(503, 'ASSISTANT_NOT_CONFIGURED', 'El recomendador no está activo en este momento.');
+        }
+        const retryAfter = checkAssistantLimit(getClientIp(request));
+        if (retryAfter > 0) {
+          return jsonResponse(
+            {
+              error: {
+                code: 'RATE_LIMIT_EXCEEDED',
+                message: 'Hiciste varias consultas seguidas. Esperá unos minutos o escribinos por WhatsApp.',
+              },
+            },
+            429,
+            { 'Retry-After': String(retryAfter) },
+          );
+        }
+
+        const input = catalogRecommendRequestSchema.parse(await parseJsonBody(request));
+        const quota = await consumeDailyQuota(store, 'public', getGeminiDailyLimit(envConfig));
+        if (!quota.allowed) {
+          return errorResponse(
+            429,
+            'ASSISTANT_DAILY_LIMIT',
+            'Alcanzamos el límite diario de recomendaciones automáticas. Podés consultarnos por WhatsApp.',
+          );
+        }
+
+        const activeProducts = (await loadProducts(store)).filter((item) => item.isActive !== false);
+        const result = await recommendCatalogProducts({
+          apiKey: envConfig.GEMINI_API_KEY.trim(),
+          model: getGeminiModel(envConfig),
+          query: input.query,
+          sunlight: input.sunlight,
+          experience: input.experience,
+          budgetMaxARS: input.budgetMaxARS,
+          catalogProducts: activeProducts,
+          fetchImpl,
+        });
+        return jsonResponse({ data: result });
       }
 
       // 3. JUEGOS PROTEGIDOS (GOOGLE OAUTH O SESIÓN DE ADMINISTRADOR)
@@ -1152,6 +1325,67 @@ export function createApiHandler({
           return jsonResponse({ data: updatedOrder || { deletedId: id } });
         }
 
+        if (path === '/api/admin/assistant/status' && method === 'GET') {
+          const used = await readDailyQuota(store);
+          return jsonResponse({
+            data: {
+              enabled: isGeminiConfigured(envConfig),
+              model: getGeminiModel(envConfig),
+              dailyLimit: getGeminiDailyLimit(envConfig),
+              usedToday: used.public,
+              adminDailyLimit: DEFAULT_ADMIN_DAILY_LIMIT,
+              adminUsedToday: used.admin,
+            },
+          });
+        }
+
+        if (path === '/api/admin/assistant/copy' && method === 'POST') {
+          if (!isGeminiConfigured(envConfig)) {
+            return errorResponse(503, 'ASSISTANT_NOT_CONFIGURED', 'Configurá GEMINI_API_KEY en Netlify para activar el Copiloto IA.');
+          }
+          const body = adminCopyRequestSchema.parse(await parseJsonBody(request));
+          let resolvedImage = null;
+          if (body.image) {
+            try {
+              resolvedImage = normalizeValidatedImage(body.image);
+            } catch (mediaError) {
+              return errorResponse(400, 'INVALID_MEDIA', mediaError.message);
+            }
+          } else if (body.imageUrl) {
+            const mediaKey = extractManagedMediaKey(body.imageUrl);
+            if (mediaKey) {
+              const entry = await resolveMediaStore().getWithMetadata(mediaKey, { type: 'arrayBuffer', consistency: 'strong' });
+              const mime = entry?.metadata?.contentType;
+              if (entry?.data && ['image/png', 'image/jpeg', 'image/webp'].includes(mime)) {
+                const buffer = Buffer.from(entry.data);
+                if (buffer.length > 0 && buffer.length <= 2 * 1024 * 1024) {
+                  resolvedImage = { contentType: mime, dataBase64: buffer.toString('base64') };
+                }
+              }
+            }
+          }
+
+          const quota = await consumeDailyQuota(store, 'admin', DEFAULT_ADMIN_DAILY_LIMIT);
+          if (!quota.allowed) {
+            return errorResponse(429, 'ASSISTANT_DAILY_LIMIT', 'Se alcanzó el límite diario del Copiloto IA de administración.');
+          }
+
+          const result = await generateAdminCopy({
+            apiKey: envConfig.GEMINI_API_KEY.trim(),
+            model: getGeminiModel(envConfig),
+            target: body.target,
+            name: body.name,
+            species: body.species,
+            category: body.category,
+            price: body.price,
+            note: body.note,
+            existingDescription: body.existingDescription,
+            image: resolvedImage,
+            fetchImpl,
+          });
+          return jsonResponse({ data: result });
+        }
+
         if (path === '/api/admin/media' && method === 'POST') {
           const payload = mediaUploadSchema.parse(await parseJsonBody(request));
           let buffer;
@@ -1201,6 +1435,10 @@ export function createApiHandler({
 
       if (error instanceof BlobConflictError) {
         return errorResponse(409, 'WRITE_CONFLICT', error.message);
+      }
+
+      if (error instanceof AssistantServiceError) {
+        return errorResponse(error.status, error.code, error.message);
       }
 
       console.error('Error en función API de Netlify:', error?.message || error);
