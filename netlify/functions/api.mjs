@@ -294,8 +294,9 @@ function requireAdminMutationHeaders(request, url) {
 function authenticateAdminCookie(request, envConfig, accountOverride = null) {
   const cookies = parseCookies(request.headers.get('cookie') || '');
   const token = cookies.ct_admin_session;
-  if (!token || !envConfig.ADMIN_SESSION_SECRET) return null;
-  const parsed = verifyAdminToken(token, envConfig.ADMIN_SESSION_SECRET);
+  const adminSecret = envConfig.ADMIN_SESSION_SECRET || getSessionSigningSecret(envConfig);
+  if (!token || !adminSecret) return null;
+  const parsed = verifyAdminToken(token, adminSecret);
   if (!parsed || !isAdminTokenVersionValid(parsed, accountOverride)) return null;
   return {
     email: parsed.email,
@@ -322,6 +323,27 @@ function authenticateUserCookie(request, envConfig) {
     emailVerified: parsed.emailVerified !== false,
     exp: parsed.exp,
   };
+}
+
+function resolveNetlifyAdminUser(request, envConfig, accountOverride = null) {
+  const cookieAdmin = authenticateAdminCookie(request, envConfig, accountOverride);
+  if (cookieAdmin) return cookieAdmin;
+
+  const googleUser = authenticateUserCookie(request, envConfig);
+  if (
+    googleUser
+    && googleUser.emailVerified !== false
+    && isAdminGoogleEmail(googleUser.email, envConfig, accountOverride)
+  ) {
+    return {
+      email: googleUser.email,
+      name: googleUser.name || 'Administrador',
+      role: 'admin',
+      method: 'google',
+    };
+  }
+
+  return null;
 }
 
 async function loadRegisteredUsers(store) {
@@ -627,14 +649,15 @@ export function createApiHandler({
         ];
 
         const accountOverride = await readJsonBlob(store, KEYS.adminAccount, null);
-        const canGrantAdmin = envConfig.ADMIN_SESSION_SECRET
-          && envConfig.ADMIN_SESSION_SECRET.length >= 32
+        const adminSecret = envConfig.ADMIN_SESSION_SECRET || signingSecret;
+        const canGrantAdmin = adminSecret
+          && adminSecret.length >= 32
           && isAdminGoogleEmail(savedUser.email, envConfig, accountOverride);
 
         if (canGrantAdmin) {
           const adminToken = createAdminToken(
             { email: savedUser.email, name: savedUser.name, method: 'google' },
-            envConfig.ADMIN_SESSION_SECRET,
+            adminSecret,
           );
           responseCookies.push(buildAdminCookie(adminToken, { secure: https }));
         } else if (returnTo.startsWith('/admin.html')) {
@@ -650,7 +673,7 @@ export function createApiHandler({
         }
 
         const cookies = [buildClearUserCookie({ secure: https })];
-        const adminUser = authenticateAdminCookie(request, envConfig);
+        const adminUser = resolveNetlifyAdminUser(request, envConfig);
         if (adminUser?.method === 'google') {
           cookies.push(buildClearAdminCookie({ secure: https }));
         }
@@ -889,7 +912,7 @@ export function createApiHandler({
       // 3. JUEGOS PROTEGIDOS (GOOGLE OAUTH O SESIÓN DE ADMINISTRADOR)
       if (path === '/api/games' || path.startsWith('/api/games/')) {
         const accountOverride = await readJsonBlob(store, KEYS.adminAccount, null);
-        const adminUser = authenticateAdminCookie(request, envConfig, accountOverride);
+        const adminUser = resolveNetlifyAdminUser(request, envConfig, accountOverride);
         const customerUser = !adminUser ? authenticateUserCookie(request, envConfig) : null;
         const viewer = adminUser
           ? { isAdmin: true, role: 'admin', playerName: adminUser.name, email: adminUser.email || '' }
@@ -929,7 +952,10 @@ export function createApiHandler({
             return errorResponse(404, 'GAME_NOT_FOUND', 'No encontramos ese juego.');
           }
           const savedConfig = await readJsonBlob(store, `${KEYS.gameConfigPrefix}${slug}`, null);
-          return jsonResponse({ data: savedConfig });
+          return jsonResponse({
+            data: savedConfig,
+            meta: { isAdmin: viewer.isAdmin, role: viewer.role },
+          });
         }
 
         const scoresMatch = /^\/api\/games\/([a-z0-9-]+)\/scores$/.exec(path);
@@ -980,7 +1006,7 @@ export function createApiHandler({
         const googleAllowed = isGoogleOAuthConfigured(envConfig)
           && (parseAdminEmails(envConfig).length > 0 || Boolean(accountOverride?.email));
         const configured = isAdminConfigured(envConfig, accountOverride) || googleAllowed;
-        const user = configured ? authenticateAdminCookie(request, envConfig, accountOverride) : null;
+        const user = configured ? resolveNetlifyAdminUser(request, envConfig, accountOverride) : null;
 
         if (!user && url.searchParams.get('meta') !== '1') {
           return jsonResponse({
@@ -1082,7 +1108,7 @@ export function createApiHandler({
         if (csrfCheck) return csrfCheck;
 
         const cookies = [buildClearAdminCookie({ secure: https })];
-        const adminUser = authenticateAdminCookie(request, envConfig);
+        const adminUser = resolveNetlifyAdminUser(request, envConfig);
         if (adminUser?.method === 'google') {
           cookies.push(buildClearUserCookie({ secure: https }));
         }
@@ -1104,7 +1130,7 @@ export function createApiHandler({
           return errorResponse(503, 'ADMIN_NOT_CONFIGURED', 'La cuenta de administración no está configurada.');
         }
 
-        const adminUser = authenticateAdminCookie(request, envConfig, accountOverride);
+        const adminUser = resolveNetlifyAdminUser(request, envConfig, accountOverride);
         if (!adminUser) {
           return errorResponse(401, 'ADMIN_AUTH_REQUIRED', 'Iniciá sesión como administrador para acceder al panel.');
         }

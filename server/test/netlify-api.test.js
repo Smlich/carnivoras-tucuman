@@ -577,9 +577,43 @@ test('Dionaea Strike restringe configuración a Admin y persiste puntajes de usu
   });
   assert.equal(adminSave.status, 200);
 
+  const playerSessionRes = await call('/api/admin/auth/session', { headers: playerHeaders });
+  assert.equal(playerSessionRes.status, 200);
+  assert.equal((await playerSessionRes.json()).data.authenticated, false);
+
   const playerReadConfig = await call('/api/games/dionaea-strike/config', { headers: playerHeaders });
   assert.equal(playerReadConfig.status, 200);
-  assert.equal((await playerReadConfig.json()).data.gameTitle, 'DIONAEA STRIKE PRO');
+  const playerReadBody = await playerReadConfig.json();
+  assert.equal(playerReadBody.data.gameTitle, 'DIONAEA STRIKE PRO');
+  assert.equal(playerReadBody.meta.isAdmin, false);
+
+  // Admin autenticado vía Google (solo cookie ct_user_session) también recibe permisos Admin reales
+  const googleAdminToken = createUserToken({
+    id: 'adm-1',
+    email: testEnv.ADMIN_EMAIL,
+    name: 'Facundo Admin',
+    provider: 'google',
+    emailVerified: true,
+  }, ADMIN_SECRET);
+  const googleAdminHeaders = { cookie: `ct_user_session=${encodeURIComponent(googleAdminToken)}`, origin: ORIGIN };
+
+  const googleAdminSessionRes = await call('/api/admin/auth/session', { headers: googleAdminHeaders });
+  assert.equal(googleAdminSessionRes.status, 200);
+  const googleAdminSessionBody = await googleAdminSessionRes.json();
+  assert.equal(googleAdminSessionBody.data.authenticated, true);
+  assert.equal(googleAdminSessionBody.data.user.email, testEnv.ADMIN_EMAIL);
+
+  const googleAdminReadCfg = await call('/api/games/dionaea-strike/config', { headers: googleAdminHeaders });
+  assert.equal(googleAdminReadCfg.status, 200);
+  assert.equal((await googleAdminReadCfg.json()).meta.isAdmin, true);
+
+  const googleAdminPutCfg = await call('/api/admin/games/dionaea-strike/config', {
+    method: 'PUT',
+    body: { ...sampleGameConfig, gameTitle: 'DIONAEA STRIKE GOOGLE ADMIN' },
+    headers: { ...googleAdminHeaders, 'x-admin-request': '1' },
+  });
+  assert.equal(googleAdminPutCfg.status, 200);
+  assert.equal((await googleAdminPutCfg.json()).data.gameTitle, 'DIONAEA STRIKE GOOGLE ADMIN');
 
   const scoreSave = await call('/api/games/dionaea-strike/scores', {
     method: 'POST',

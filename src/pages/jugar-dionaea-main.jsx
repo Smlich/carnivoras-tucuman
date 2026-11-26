@@ -69,7 +69,9 @@ function GameAccessGate({ children }) {
 function DionaeaPlayerWorkspace() {
   const { isAdmin } = useAuth();
   const [serverConfig, setServerConfig] = useState(undefined);
+  const [serverIsAdmin, setServerIsAdmin] = useState(false);
   const [saveNotice, setSaveNotice] = useState('');
+  const effectiveIsAdmin = Boolean(isAdmin || serverIsAdmin);
 
   useEffect(() => {
     let active = true;
@@ -79,8 +81,12 @@ function DionaeaPlayerWorkspace() {
     })
       .then((res) => (res.ok ? res.json() : null))
       .then((payload) => {
-        if (active && payload?.data) {
+        if (!active || !payload) return;
+        if (payload.data) {
           setServerConfig(payload.data);
+        }
+        if (payload.meta && typeof payload.meta.isAdmin === 'boolean') {
+          setServerIsAdmin(payload.meta.isAdmin);
         }
       })
       .catch(() => {});
@@ -90,7 +96,7 @@ function DionaeaPlayerWorkspace() {
   }, []);
 
   const handleAdminConfigSave = useCallback(async (nextConfig) => {
-    if (!isAdmin) return;
+    if (!effectiveIsAdmin) return;
     setSaveNotice('Guardando configuración en el servidor…');
     try {
       const response = await fetch('/api/admin/games/dionaea-strike/config', {
@@ -113,7 +119,7 @@ function DionaeaPlayerWorkspace() {
     } finally {
       window.setTimeout(() => setSaveNotice(''), 4000);
     }
-  }, [isAdmin]);
+  }, [effectiveIsAdmin]);
 
   const handleScoreSubmit = useCallback((result) => {
     fetch('/api/games/dionaea-strike/scores', {
@@ -144,9 +150,9 @@ function DionaeaPlayerWorkspace() {
       )}
 
       <CarnivoraShmupGame
-        isAdmin={Boolean(isAdmin)}
+        isAdmin={effectiveIsAdmin}
         initialConfig={serverConfig}
-        onConfigChange={isAdmin ? handleAdminConfigSave : undefined}
+        onConfigChange={effectiveIsAdmin ? handleAdminConfigSave : undefined}
         onScoreSubmit={handleScoreSubmit}
         assetBasePath="/"
       />

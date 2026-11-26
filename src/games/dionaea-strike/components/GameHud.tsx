@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowLeftRight, Crosshair, Flame, Gamepad2, Pause, RotateCcw, Volume2, VolumeX, Zap } from 'lucide-react';
+import { AlertTriangle, ArrowLeftRight, Crosshair, Flame, Gamepad2, Pause, RotateCcw, Settings2, Volume2, VolumeX, Zap } from 'lucide-react';
 import { getComboRank, getControlPrompts } from '../game/fusionRules';
 import { ALL_SPECIES_IDS, PET_CATALOG } from '../game/gameConfig';
 import type { GameConfig, HudSnapshot, PetId } from '../game/types';
@@ -8,6 +8,8 @@ interface GameHudProps {
   hud: HudSnapshot;
   config: GameConfig;
   muted: boolean;
+  isAdmin?: boolean;
+  onOpenAdmin?: () => void;
   onToggleMute: () => void;
   onPause: () => void;
   onRestart: () => void;
@@ -73,6 +75,8 @@ export function GameHud({
   hud,
   config,
   muted,
+  isAdmin = false,
+  onOpenAdmin,
   onToggleMute,
   onPause,
   onRestart,
@@ -286,6 +290,23 @@ export function GameHud({
               </div>
 
               <div className="flex items-center gap-1 pointer-events-auto">
+                {isAdmin && onOpenAdmin && (
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    data-testid="hud-admin-btn"
+                    onClick={(e) => {
+                      e.currentTarget.blur();
+                      onOpenAdmin();
+                    }}
+                    aria-label="Abrir configuración de administrador"
+                    title="Configuración Admin"
+                    className="touch-manipulation min-w-8 h-8 sm:h-7 px-2 rounded-md bg-emerald-950/95 border border-emerald-400/70 shadow-[0_2px_0_#090D16] inline-flex items-center justify-center gap-1 text-emerald-200 hover:bg-emerald-900 cursor-pointer"
+                  >
+                    <Settings2 className="w-3.5 h-3.5 text-emerald-300" />
+                    <span className="hidden sm:inline text-[10px] font-bold">Admin</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   tabIndex={-1}

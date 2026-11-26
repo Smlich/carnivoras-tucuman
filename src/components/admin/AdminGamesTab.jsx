@@ -163,6 +163,11 @@ export default function AdminGamesTab({ games, onChanged, onStatus }) {
                 <small>{game.slug} · {game.platform} · Embed: {game.embedUrl || 'pendiente'}</small>
               </div>
               <div className="admin-item-row__actions">
+                {(game.adminEmbedUrl || game.embedUrl || '').startsWith('/jugar-') && (
+                  <a className="admin-btn-secondary" href={game.adminEmbedUrl || game.embedUrl}>
+                    Jugar como Admin ↗
+                  </a>
+                )}
                 <button type="button" className="admin-btn-secondary" onClick={() => startEdit(game)}>Editar</button>
                 <button type="button" className="admin-btn-danger" onClick={() => handleDelete(game)} disabled={isSaving}>Borrar</button>
               </div>

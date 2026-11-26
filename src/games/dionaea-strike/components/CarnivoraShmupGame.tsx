@@ -694,6 +694,18 @@ export function CarnivoraShmupGame({
               </div>
 
               <div className="relative flex items-center gap-1.5">
+                {isAdmin && (
+                  <button
+                    type="button"
+                    data-testid="admin-top-btn"
+                    onClick={() => setShowAdmin(true)}
+                    className="touch-manipulation inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-emerald-950/95 hover:bg-emerald-900 text-emerald-100 text-xs font-bold border-2 border-emerald-400/70 shadow-[0_3px_0_#050810] cursor-pointer whitespace-nowrap"
+                  >
+                    <Settings2 className="w-4 h-4 text-emerald-300" />
+                    <span>Modo Admin · Configurar</span>
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={() => {
@@ -915,9 +927,9 @@ export function CarnivoraShmupGame({
                   <button
                     type="button"
                     onClick={() => setShowAdmin(true)}
-                    className="touch-manipulation inline-flex items-center gap-2 px-4 py-3 sm:py-3.5 rounded-xl bg-[#0F172A]/95 hover:bg-[#1E293B] text-slate-100 font-semibold text-xs sm:text-sm border-2 border-[#050810] shadow-[0_4px_0_#050810] transition-colors cursor-pointer whitespace-nowrap"
+                    className="touch-manipulation inline-flex items-center gap-2 px-4 py-3 sm:py-3.5 rounded-xl bg-emerald-950/95 hover:bg-emerald-900 text-emerald-100 font-bold text-xs sm:text-sm border-2 border-emerald-400/70 shadow-[0_4px_0_#050810] transition-colors cursor-pointer whitespace-nowrap"
                   >
-                    <Settings2 className="w-4 h-4 text-emerald-400" />
+                    <Settings2 className="w-4 h-4 text-emerald-300" />
                     <span>Administrar</span>
                   </button>
                 )}
@@ -1057,6 +1069,12 @@ export function CarnivoraShmupGame({
           hud={hud}
           config={config}
           muted={muted}
+          isAdmin={isAdmin}
+          onOpenAdmin={() => {
+            simRef.current?.clearInputs();
+            simRef.current?.setStatus('paused');
+            setShowAdmin(true);
+          }}
           onToggleMute={handleToggleMute}
           onPause={handleTogglePause}
           onRestart={handleStart}

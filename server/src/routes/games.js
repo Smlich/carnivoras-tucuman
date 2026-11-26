@@ -106,9 +106,9 @@ export function createGamesRouter({ auth = null, appEnv = env } = {}) {
     }
     if (isDatabaseConnected()) {
       const doc = await GamePlayConfig.findOne({ gameSlug: slug }).lean();
-      return response.status(200).json({ data: doc?.config ?? null });
+      return response.status(200).json({ data: doc?.config ?? null, meta: { isAdmin: viewer.isAdmin, role: viewer.role } });
     }
-    return response.status(200).json({ data: memoryGameConfigs.get(slug) ?? null });
+    return response.status(200).json({ data: memoryGameConfigs.get(slug) ?? null, meta: { isAdmin: viewer.isAdmin, role: viewer.role } });
   });
 
   router.post('/:slug/scores', async (request, response) => {
