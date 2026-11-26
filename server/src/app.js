@@ -118,9 +118,11 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   app.use('/api/visits', visitsLimiter, createVisitsRouter());
 
   if (isProduction) {
-    app.get(['/cuidados', '/cuidados/'], (request, response) => {
-      response.redirect(301, '/cuidados.html');
-    });
+    for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto']) {
+      app.get([`/${page}`, `/${page}/`], (request, response) => {
+        response.redirect(301, `/${page}.html`);
+      });
+    }
 
     app.use(express.static(frontendDirectory, {
       setHeaders(response, filePath) {

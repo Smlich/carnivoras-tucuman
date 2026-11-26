@@ -1,14 +1,42 @@
 import { store } from '../config/store';
 import { createContactUrl } from '../utils/whatsapp';
 
-export default function ContactSection() {
+const CONTACT_TOPICS = [
+  {
+    badge: 'STOCK Y ENVÍOS',
+    title: 'Consultar disponibilidad y entrega',
+    description: 'Confirmamos ejemplares listos hoy y coordinamos entrega en San Miguel de Tucumán.',
+    cta: 'Consultar disponibilidad',
+    message: 'Hola, quería consultar qué plantas carnívoras tienen disponibles hoy y cómo coordinar entrega en Tucumán.',
+  },
+  {
+    badge: 'ASESORAMIENTO',
+    title: 'Confirmar cuidados de tu planta',
+    description: 'Mandanos foto, cuánta luz recibe y qué agua usás para guiarte paso a paso sin costo.',
+    cta: 'Pedir asesoramiento',
+    message: 'Hola, ya tengo una planta carnívora y quería consultar por sus cuidados (luz, riego y sustrato).',
+  },
+  {
+    badge: 'ARREGLOS Y COMBOS',
+    title: 'Combos para regalo o principiantes',
+    description: 'Te ayudamos a elegir el primer combo según el sol y el espacio que tengas en casa.',
+    cta: 'Preguntar por combos',
+    message: 'Hola, quiero asesoramiento para elegir un combo inicial de plantas carnívoras.',
+  },
+];
+
+export default function ContactSection({ showHeading = true, showShortcuts = false }) {
   return (
-    <section className="contact-section section-pad" id="contacto" aria-labelledby="contact-title">
+    <section className="contact-section section-pad" id="contacto" aria-labelledby={showHeading ? 'contact-title' : undefined} aria-label={showHeading ? undefined : 'Contacto directo por WhatsApp e Instagram'}>
       <div className="page-shell contact-card">
         <img className="contact-card__ornament" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
         <div className="contact-card__copy">
-          <p className="eyebrow"><span className="eyebrow__line" /> Hablemos de plantas</p>
-          <h2 id="contact-title">Tu próxima planta está <em>a un mensaje.</em></h2>
+          {showHeading && <p className="eyebrow"><span className="eyebrow__line" /> Hablemos de plantas</p>}
+          {showHeading ? (
+            <h2 id="contact-title">Tu próxima planta está <em>a un mensaje.</em></h2>
+          ) : (
+            <h2>Tu próxima planta está <em>a un mensaje.</em></h2>
+          )}
           <p>Te ayudamos a elegir, respondemos dudas de cuidado y coordinamos disponibilidad y entrega en {store.city}.</p>
         </div>
         <div className="contact-card__action">
@@ -27,6 +55,21 @@ export default function ContactSection() {
           </a>
         </div>
       </div>
+
+      {showShortcuts && (
+        <div className="page-shell contact-shortcuts">
+          {CONTACT_TOPICS.map((topic) => (
+            <article className="contact-shortcut" key={topic.badge}>
+              <span className="contact-shortcut__badge">{topic.badge}</span>
+              <h3>{topic.title}</h3>
+              <p>{topic.description}</p>
+              <a className="text-link" href={createContactUrl(topic.message)} target="_blank" rel="noreferrer">
+                {topic.cta} <span aria-hidden="true">↗</span>
+              </a>
+            </article>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

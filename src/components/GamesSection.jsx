@@ -38,7 +38,7 @@ function GameCard({ game, locked, isPlaying, onTogglePlay }) {
   );
 }
 
-export default function GamesSection() {
+export default function GamesSection({ showHeading = true }) {
   const { isStaticPreview, isLoading, enabled, providers, user } = useAuth();
   const [unlocked, setUnlocked] = useState({ status: 'idle', games: [], playerName: '' });
   const [playingSlug, setPlayingSlug] = useState(null);
@@ -75,7 +75,7 @@ export default function GamesSection() {
       const { authClient } = await import('../services/auth-client');
       const result = await authClient.signIn.social({
         provider: 'google',
-        callbackURL: window.location.origin + '/#juegos',
+        callbackURL: window.location.origin + '/juegos.html',
       });
       if (result?.error) throw new Error('Inicio de sesión rechazado.');
     } catch {
@@ -134,15 +134,17 @@ export default function GamesSection() {
   }
 
   return (
-    <section className="games-section section-pad" id="juegos" aria-labelledby="games-title">
+    <section className="games-section section-pad" id="juegos" aria-labelledby={showHeading ? 'games-title' : undefined} aria-label={showHeading ? undefined : 'Zona de juegos gratis'}>
       <div className="page-shell">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow"><span className="eyebrow__line" /> Zona de juegos gratis</p>
-            <h2 id="games-title">Jugá mientras <em>tus plantas crecen.</em></h2>
+        {showHeading && (
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow"><span className="eyebrow__line" /> Zona de juegos gratis</p>
+              <h2 id="games-title">Jugá mientras <em>tus plantas crecen.</em></h2>
+            </div>
+            <p className="section-heading__aside">Un regalo para quienes inician sesión con Google: juegos gratuitos creados por nosotros.</p>
           </div>
-          <p className="section-heading__aside">Un regalo para quienes inician sesión con Google: juegos gratuitos creados por nosotros.</p>
-        </div>
+        )}
         {content}
       </div>
     </section>

@@ -8,7 +8,11 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
+        catalogo: resolve(import.meta.dirname, 'catalogo.html'),
+        vivero: resolve(import.meta.dirname, 'vivero.html'),
         cuidados: resolve(import.meta.dirname, 'cuidados.html'),
+        juegos: resolve(import.meta.dirname, 'juegos.html'),
+        contacto: resolve(import.meta.dirname, 'contacto.html'),
       },
     },
   },

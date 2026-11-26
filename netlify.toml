@@ -8,3 +8,28 @@
 [build.environment]
   NODE_VERSION = "24"
   VITE_STATIC_PREVIEW = "true"
+
+[[redirects]]
+  from = "/catalogo"
+  to = "/catalogo.html"
+  status = 301
+
+[[redirects]]
+  from = "/vivero"
+  to = "/vivero.html"
+  status = 301
+
+[[redirects]]
+  from = "/cuidados"
+  to = "/cuidados.html"
+  status = 301
+
+[[redirects]]
+  from = "/juegos"
+  to = "/juegos.html"
+  status = 301
+
+[[redirects]]
+  from = "/contacto"
+  to = "/contacto.html"
+  status = 301

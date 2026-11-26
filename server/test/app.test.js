@@ -105,12 +105,18 @@ test('envía cabeceras CSP explícitas y respeta orígenes permitidos de CORS', 
   assert.equal(disallowedResponse.headers.get('access-control-allow-origin'), null);
 });
 
-test('redirige /cuidados y entrega 404 HTML o JSON según la ruta en producción', async (context) => {
+test('redirige secciones HTML y entrega 404 HTML o JSON según la ruta en producción', async (context) => {
   const origin = await startTestServer(createApp({ env: productionEnv }), context);
 
-  const redirectResponse = await fetch(`${origin}/cuidados`, { redirect: 'manual' });
-  assert.equal(redirectResponse.status, 301);
-  assert.equal(redirectResponse.headers.get('location'), '/cuidados.html');
+  for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto']) {
+    const redirectResponse = await fetch(`${origin}/${page}`, { redirect: 'manual' });
+    assert.equal(redirectResponse.status, 301);
+    assert.equal(redirectResponse.headers.get('location'), `/${page}.html`);
+
+    const trailingResponse = await fetch(`${origin}/${page}/`, { redirect: 'manual' });
+    assert.equal(trailingResponse.status, 301);
+    assert.equal(trailingResponse.headers.get('location'), `/${page}.html`);
+  }
 
   const htmlNotFound = await fetch(`${origin}/pagina-que-no-existe`, {
     headers: { Accept: 'text/html' },

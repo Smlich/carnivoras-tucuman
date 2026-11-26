@@ -23,7 +23,7 @@ export function createWhatsAppUrl(items) {
   return 'https://wa.me/' + store.whatsappNumber + '?text=' + message;
 }
 
-export function createContactUrl() {
-  const message = encodeURIComponent('Hola, quisiera consultar por sus plantas carnívoras.');
+export function createContactUrl(customMessage = 'Hola, quisiera consultar por sus plantas carnívoras.') {
+  const message = encodeURIComponent(customMessage);
   return 'https://wa.me/' + store.whatsappNumber + '?text=' + message;
 }

@@ -263,6 +263,94 @@
   text-underline-offset: 3px;
 }
 
+/* LÁMINAS DIDÁCTICAS ILUSTRADAS */
+.guide-callout {
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  align-items: center;
+  gap: 24px;
+  margin: 24px 0 0;
+  padding: clamp(18px, 3vw, 26px);
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: 0 12px 30px rgba(5, 22, 16, .06);
+}
+
+.guide-callout img,
+.guide-plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+}
+
+.guide-callout__body strong {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  color: var(--bog-abyss);
+  background: var(--lime);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.guide-callout__body h3 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.guide-callout__body p {
+  margin: 0 0 12px;
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.guide-callout__steps {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0 0 0 18px;
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.guide-plate {
+  margin: 0 0 24px;
+  padding: clamp(16px, 2.5vw, 24px);
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: 0 12px 30px rgba(5, 22, 16, .05);
+}
+
+.guide-plate__legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 18px;
+  margin: 14px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  list-style: none;
+}
+
+.guide-plate__legend strong {
+  color: var(--ink);
+  font-family: var(--font-display);
+}
+
 /* CÓMO CAZAN (MECANISMOS CON FOTOS REALES) */
 .care-mechanisms {
   display: grid;
@@ -343,6 +431,11 @@
   color: #f4f7ec;
   background: linear-gradient(155deg, var(--bog-canopy), var(--bog-abyss));
   box-shadow: 0 22px 52px rgba(5, 22, 16, .16);
+}
+
+.tray-guide__visuals {
+  display: grid;
+  gap: 16px;
 }
 
 .tray-guide__diagram {
@@ -669,6 +762,7 @@
   .care-guide__hero { grid-template-columns: 1fr; }
   .care-principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .care-mechanisms { grid-template-columns: 1fr; }
+  .guide-callout { grid-template-columns: 1fr; }
   .tray-guide { grid-template-columns: 1fr; }
   .care-guide__contact { flex-direction: column; align-items: flex-start; }
 }
@@ -677,6 +771,7 @@
   .care-guide { padding-bottom: 58px; }
   .care-guide__section { padding-top: 52px; }
   .care-principles { grid-template-columns: 1fr; }
+  .guide-plate__legend { grid-template-columns: 1fr; }
   .do-dont-grid { grid-template-columns: 1fr; }
   .diagnostic-grid { grid-template-columns: 1fr; }
   .species-stats { grid-template-columns: 1fr; }

@@ -18,8 +18,8 @@ function getGenusKey(label) {
   return 'vivero';
 }
 
-export default function GallerySection() {
-  const [isExpanded, setIsExpanded] = useState(false);
+export default function GallerySection({ defaultExpanded = false, showHeading = true }) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [activeIndex, setActiveIndex] = useState(null);
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -54,18 +54,20 @@ export default function GallerySection() {
   }
 
   return (
-    <section className="gallery-section section-pad" id="galeria" aria-labelledby="gallery-title">
+    <section className="gallery-section section-pad" id="galeria" aria-labelledby={showHeading ? 'gallery-title' : undefined} aria-label={showHeading ? undefined : 'Álbum del vivero'}>
       <div className="page-shell">
-        <div className="section-heading gallery-section__heading">
-          <div>
-            <p className="eyebrow"><span className="eyebrow__line" /> Álbum del vivero</p>
-            <h2 id="gallery-title">De nuestro vivero, <em>sin filtros.</em></h2>
+        {showHeading && (
+          <div className="section-heading gallery-section__heading">
+            <div>
+              <p className="eyebrow"><span className="eyebrow__line" /> Álbum del vivero</p>
+              <h2 id="gallery-title">De nuestro vivero, <em>sin filtros.</em></h2>
+            </div>
+            <div className="gallery-section__intro">
+              <p>Una colección de fotos reales, tomadas mientras cultivamos y observamos nuestras plantas.</p>
+              <a className="text-link" href="/catalogo.html">Ver plantas del catálogo <span aria-hidden="true">↗</span></a>
+            </div>
           </div>
-          <div className="gallery-section__intro">
-            <p>Una colección de fotos reales, tomadas mientras cultivamos y observamos nuestras plantas.</p>
-            <a className="text-link" href="#catalogo">Ver plantas del catálogo <span aria-hidden="true">↗</span></a>
-          </div>
-        </div>
+        )}
 
         <div className="gallery-grid" id="gallery-grid">
           {visibleItems.map((item, index) => (

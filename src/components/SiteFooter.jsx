@@ -1,6 +1,15 @@
 import { store } from '../config/store';
 import CatalogImage from './CatalogImage';
 
+const footerPages = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Catálogo', href: '/catalogo.html' },
+  { label: 'Álbum del vivero', href: '/vivero.html' },
+  { label: 'Guía de cuidados', href: '/cuidados.html' },
+  { label: 'Juegos gratis', href: '/juegos.html' },
+  { label: 'Contacto', href: '/contacto.html' },
+];
+
 export default function SiteFooter() {
   const socialLinks = [
     { label: store.instagramHandle, href: store.instagramUrl },
@@ -10,18 +19,18 @@ export default function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="page-shell site-footer__main">
-        <a className="footer-brand" href="#inicio" aria-label={store.name + ' — volver al inicio'}>
+        <a className="footer-brand" href="/" aria-label={store.name + ' — volver al inicio'}>
           <CatalogImage src="/images/catalog/logo-dark.png" alt="" className="footer-brand__logo" sizes="49px" />
           <span><strong>Carnívoras</strong><small>Tucumán · Argentina</small></span>
         </a>
         <p className="site-footer__line">Un rincón extraordinario de la naturaleza, cultivado con paciencia.</p>
         <div className="site-footer__links">
-          <a href="#catalogo">Catálogo</a>
-          <a href="#galeria">Álbum</a>
-          <a href="/cuidados.html">Guía de cuidados</a>
-          <a href="#juegos">Juegos</a>
-          <a href="#contacto">Contacto</a>
-          {socialLinks.map((item) => <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>)}
+          {footerPages.map((item) => (
+            <a key={item.href} href={item.href}>{item.label}</a>
+          ))}
+          {socialLinks.map((item) => (
+            <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>
+          ))}
         </div>
       </div>
       <section className="page-shell site-footer__marks" aria-label="Origen y desarrollo">

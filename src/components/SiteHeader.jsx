@@ -2,6 +2,15 @@ import { store } from '../config/store';
 import AccountMenu from './AccountMenu';
 import CatalogImage from './CatalogImage';
 
+const navLinks = [
+  { id: 'inicio', label: 'Inicio', href: '/' },
+  { id: 'catalogo', label: 'Catálogo', href: '/catalogo.html' },
+  { id: 'vivero', label: 'Vivero', href: '/vivero.html' },
+  { id: 'cuidados', label: 'Cuidados', href: '/cuidados.html' },
+  { id: 'juegos', label: 'Juegos', href: '/juegos.html' },
+  { id: 'contacto', label: 'Contacto', href: '/contacto.html' },
+];
+
 function BagIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="bag-icon">
@@ -11,11 +20,11 @@ function BagIcon() {
   );
 }
 
-export default function SiteHeader({ itemCount, onOpenCart }) {
+export default function SiteHeader({ currentPage = 'inicio', itemCount, onOpenCart }) {
   return (
     <header className="site-header">
       <div className="site-header__inner page-shell">
-        <a className="brand" href="#inicio" aria-label={store.name + ' — inicio'}>
+        <a className="brand" href="/" aria-label={store.name + ' — inicio'}>
           <CatalogImage src="/images/catalog/logo-light.png" alt="" className="brand__logo" sizes="48px" />
           <span className="brand__text">
             <strong>Carnívoras</strong>
@@ -24,11 +33,15 @@ export default function SiteHeader({ itemCount, onOpenCart }) {
         </a>
 
         <nav className="main-nav" aria-label="Navegación principal">
-          <a href="#catalogo">Catálogo</a>
-          <a href="#galeria">Vivero</a>
-          <a href="/cuidados.html">Cuidados</a>
-          <a href="#juegos">Juegos</a>
-          <a href="#contacto">Contacto</a>
+          {navLinks.map((link) => (
+            <a
+              key={link.id}
+              href={link.href}
+              aria-current={currentPage === link.id ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
 
         <div className="site-header__actions">
