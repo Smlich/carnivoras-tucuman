@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { AuthProvider } from '../context/AuthContext';
 import { SiteContentProvider, useSiteContent } from '../context/SiteContentContext';
 import { useCart } from '../hooks/use-cart';
-import AnnouncementBar from './AnnouncementBar';
 import CartDrawer from './CartDrawer';
 import PreviewBanner from './PreviewBanner';
 import SiteFooter from './SiteFooter';
@@ -31,7 +30,6 @@ function StorefrontShell({ currentPage, children }) {
   return (
     <>
       <a className="skip-link" href="#contenido">Saltar al contenido</a>
-      <AnnouncementBar />
       <PreviewBanner />
       <SiteHeader currentPage={currentPage} itemCount={cart.count} onOpenCart={() => setIsCartOpen(true)} />
       <main id="contenido" tabIndex={-1}>

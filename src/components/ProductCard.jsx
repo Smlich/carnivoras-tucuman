@@ -1,8 +1,7 @@
 import { formatPrice } from '../utils/format-price';
 import CatalogImage from './CatalogImage';
 
-export default function ProductCard({ product, index = 0, onAdd, onInspect }) {
-  const specimenCode = 'CT-' + String(index + 1).padStart(2, '0');
+export default function ProductCard({ product, onAdd, onInspect }) {
   const isOutOfStock = product.stockStatus === 'unavailable';
 
   return (
@@ -24,13 +23,12 @@ export default function ProductCard({ product, index = 0, onAdd, onInspect }) {
             loading="lazy"
             decoding="async"
           />
-          <span className="product-card__zoom" aria-hidden="true">Ampliar HD ↗</span>
+          <span className="product-card__zoom" aria-hidden="true">Ampliar ↗</span>
         </button>
         <span className="product-card__badge">{product.categoryLabel}</span>
       </div>
       <div className="product-card__body">
         <div className="product-card__meta">
-          <span className="product-card__code">{specimenCode}</span>
           <p className="product-card__species">{product.species}</p>
         </div>
         <h3>{product.name}</h3>

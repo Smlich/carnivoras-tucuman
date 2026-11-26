@@ -20,14 +20,6 @@ export default function AdminSettingsTab({ settings, products, onChanged, onStat
     });
   }
 
-  function updateAnnouncement(index, value) {
-    setForm((current) => {
-      const next = [...(current.announcementItems || [])];
-      next[index] = value;
-      return { ...current, announcementItems: next };
-    });
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
     setIsSaving(true);
@@ -88,15 +80,7 @@ export default function AdminSettingsTab({ settings, products, onChanged, onStat
       </section>
 
       <section className="admin-panel">
-        <h2>Barra superior y Aviso global</h2>
-        <div className="admin-grid-3">
-          {[0, 1, 2].map((index) => (
-            <label className="admin-field" key={index}>
-              <span>Frase {index + 1}</span>
-              <input type="text" value={form.announcementItems?.[index] || ''} onChange={(e) => updateAnnouncement(index, e.target.value)} />
-            </label>
-          ))}
-        </div>
+        <h2>Aviso superior global</h2>
         <label className="admin-checkbox">
           <input type="checkbox" checked={Boolean(form.showPreviewBanner)} onChange={(e) => setForm((c) => ({ ...c, showPreviewBanner: e.target.checked }))} />
           <span>Mostrar banner superior de aviso (ej. vista de prueba o aviso de envíos)</span>

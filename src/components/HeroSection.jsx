@@ -2,14 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useSiteContent } from '../context/SiteContentContext';
 import { formatFreezeUnit, getPriceFreezeDuration } from '../utils/price-freeze-duration';
 
-const speciesPalette = [
-  { name: 'Dionaea', dot: 'venus' },
-  { name: 'Drosera', dot: 'drosera' },
-  { name: 'Sarracenia', dot: 'sarracenia' },
-  { name: 'Nepenthes', dot: 'nepenthes' },
-  { name: 'Pinguicula', dot: 'pinguicula' },
-];
-
 export default function HeroSection() {
   const { settings } = useSiteContent();
   const [isLatInfoOpen, setIsLatInfoOpen] = useState(false);
@@ -56,10 +48,6 @@ export default function HeroSection() {
 
   return (
     <section className="hero-stage" id="inicio" aria-labelledby="hero-title">
-      <img className="botanical-ornament botanical-ornament--hero" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
-      <img className="botanical-bloom botanical-bloom--hero" src="/images/botanical/drosera-bloom.svg" alt="" aria-hidden="true" />
-      <img className="botanical-specimen botanical-specimen--hero" src="/images/botanical/venus-trap-specimen.svg" alt="" aria-hidden="true" />
-
       <div className="hero page-shell">
         <div className="hero__copy">
           <div className="hero__eyebrow-wrap" ref={latWrapRef}>
@@ -115,15 +103,6 @@ export default function HeroSection() {
             </div>
           )}
 
-          <ul className="hero__species-pills" aria-label="Géneros cultivados en el vivero">
-            {speciesPalette.map((species) => (
-              <li className="species-pill" key={species.name}>
-                <span className={'species-pill__dot species-pill__dot--' + species.dot} aria-hidden="true" />
-                {species.name}
-              </li>
-            ))}
-          </ul>
-
           <div className="hero__actions">
             <a className="button button--dark" href="/catalogo.html">
               {settings.heroPrimaryCtaLabel} <span aria-hidden="true">↗</span>
@@ -131,14 +110,6 @@ export default function HeroSection() {
             <a className="button button--outline-light" href="/cuidados.html">
               {settings.heroSecondaryCtaLabel} <span aria-hidden="true">→</span>
             </a>
-          </div>
-
-          <div className="hero__proof">
-            <div className="hero__proof-mark" aria-hidden="true">{settings.heroProofTag}</div>
-            <p>
-              <strong>{settings.heroProofTitle}</strong>
-              <span>{settings.heroProofSubtitle}</span>
-            </p>
           </div>
         </div>
 
@@ -155,13 +126,6 @@ export default function HeroSection() {
               fetchPriority="high"
               decoding="async"
             />
-            <div className="hero__photo-caption">
-              <span className="hero__caption-dot" aria-hidden="true" />
-              <span>
-                <strong>Nepenthes del vivero</strong>
-                <small>Fotografía original · cultivo sin filtros artificiales</small>
-              </span>
-            </div>
           </div>
         </div>
       </div>

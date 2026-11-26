@@ -5,28 +5,24 @@ import ProductCard from './ProductCard';
 
 const SITE_DIRECTORY = [
   {
-    tag: 'SECCIÓN 01',
     title: 'Catálogo completo',
     description: 'Explorá todas las especies, combos, promociones y cultivares con fotos ampliables en alta definición.',
     href: '/catalogo.html',
     cta: 'Abrir catálogo',
   },
   {
-    tag: 'SECCIÓN 02',
     title: 'Álbum del vivero',
     description: 'Fotografías reales de nuestras trampas, gotas de mucílago, jarros y floraciones en cultivo tucumano.',
     href: '/vivero.html',
     cta: 'Ver álbum',
   },
   {
-    tag: 'SECCIÓN 03',
     title: 'Guía ilustrada de cuidados',
     description: 'Aprendé con láminas botánicas y paso a paso el riego por bandeja, luz solar y sustratos inertes.',
     href: '/cuidados.html',
     cta: 'Leer guía',
   },
   {
-    tag: 'SECCIÓN 04',
     title: 'Zona de juegos gratis',
     description: 'Espacio recreativo para jugar gratis en línea al iniciar sesión con Google, próximo a estrenarse.',
     href: '/juegos.html',
@@ -121,7 +117,6 @@ export default function HomeHighlights({ products, onAdd }) {
           <div className="home-directory__grid">
             {SITE_DIRECTORY.map((item) => (
               <a className="directory-card" key={item.href} href={item.href}>
-                <span className="directory-card__tag">{item.tag}</span>
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>
                 <span className="directory-card__cta">{item.cta} <span aria-hidden="true">→</span></span>

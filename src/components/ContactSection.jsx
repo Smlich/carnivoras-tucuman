@@ -31,7 +31,6 @@ export default function ContactSection({ showHeading = true, showShortcuts = fal
   return (
     <section className="contact-section section-pad" id="contacto" aria-labelledby={showHeading ? 'contact-title' : undefined} aria-label={showHeading ? undefined : 'Contacto directo por WhatsApp e Instagram'}>
       <div className="page-shell contact-card">
-        <img className="contact-card__ornament" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
         <div className="contact-card__copy">
           {showHeading && <p className="eyebrow"><span className="eyebrow__line" /> Hablemos de plantas</p>}
           {showHeading ? (

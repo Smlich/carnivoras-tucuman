@@ -1,9 +1,5 @@
 .care-page {
-  background:
-    linear-gradient(rgba(30, 122, 60, .03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 122, 60, .03) 1px, transparent 1px),
-    var(--paper);
-  background-size: 28px 28px, 28px 28px, 100% 100%;
+  background: var(--paper);
 }
 
 .care-guide { padding-bottom: 84px; }
@@ -38,8 +34,7 @@
   border-radius: 26px;
   color: #f6faee;
   background:
-    radial-gradient(ellipse at 86% 6%, rgba(183, 244, 62, .2), transparent 40%),
-    radial-gradient(ellipse at 12% 95%, rgba(223, 134, 247, .16), transparent 42%),
+    radial-gradient(ellipse at 86% 6%, rgba(183, 244, 62, .16), transparent 44%),
     linear-gradient(145deg, var(--bog-canopy) 0%, var(--bog-abyss) 100%);
   box-shadow: 0 28px 65px rgba(5, 22, 16, .2);
 }
@@ -109,23 +104,6 @@
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.35;
-}
-
-.care-guide__ornament {
-  z-index: 1;
-  top: -54px;
-  right: -18px;
-  width: clamp(200px, 28vw, 330px);
-  opacity: .24;
-  transform: rotate(-10deg);
-}
-
-.care-guide__bloom {
-  z-index: 1;
-  bottom: -14px;
-  left: 38%;
-  width: 64px;
-  opacity: .65;
 }
 
 /* ÍNDICE RÁPIDO */
@@ -734,21 +712,8 @@
   border-radius: 24px;
   color: #f6faee;
   background:
-    radial-gradient(ellipse at 100% 0%, rgba(183, 244, 62, .2), transparent 44%),
+    radial-gradient(ellipse at 100% 0%, rgba(183, 244, 62, .16), transparent 44%),
     var(--bog-abyss);
-}
-
-.care-guide__contact::after {
-  position: absolute;
-  z-index: -1;
-  top: -80px;
-  right: -50px;
-  width: 240px;
-  height: 360px;
-  background: url('/images/botanical/hanging-pitcher-vine.svg') center / contain no-repeat;
-  content: '';
-  opacity: .2;
-  transform: rotate(-24deg);
 }
 
 .care-guide__contact > div { max-width: 660px; }

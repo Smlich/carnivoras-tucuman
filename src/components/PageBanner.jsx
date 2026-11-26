@@ -1,7 +1,6 @@
 export default function PageBanner({ currentLabel, eyebrow, title, lead }) {
   return (
     <section className="page-banner hero-stage">
-      <img className="botanical-ornament botanical-ornament--banner" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
       <div className="page-shell page-banner__inner">
         <nav className="page-breadcrumb" aria-label="Ruta de navegación">
           <a href="/">Inicio</a>

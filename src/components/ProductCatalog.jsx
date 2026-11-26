@@ -101,7 +101,7 @@ export default function ProductCatalog({ products: catalogProducts, onAdd, showH
           {resultAnnouncement}
         </p>
 
-        <p className="catalog-note"><span aria-hidden="true">i</span> Valores publicados en pesos argentinos — precios congelados desde agosto de 2024. Tocá cualquier foto para verla ampliada.</p>
+        <p className="catalog-note">Precios en pesos argentinos, sin aumentos desde agosto de 2024. Tocá cualquier foto para ampliarla.</p>
 
         {visibleProducts.length > 0 ? (
           <div className="product-grid">

@@ -36,19 +36,13 @@
   </head>
   <body class="care-page">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
-    <div class="announcement-bar">
-      <span class="announcement-bar__dot" aria-hidden="true"></span>
-      Manual de cultivo · Tucumán, Argentina
-      <span class="announcement-bar__separator" aria-hidden="true">·</span>
-      Guía ilustrada con fotos reales y fuentes botánicas
-    </div>
     <header class="site-header">
       <div class="site-header__inner page-shell">
         <a class="brand" href="/" aria-label="Carnívoras Tucumán — inicio">
           <img src="/images/catalog/optimized/logo-light.webp" alt="" class="brand__logo" width="48" height="48" />
           <span class="brand__text"><strong>Carnívoras</strong><span>Tucumán</span></span>
         </a>
-        <nav class="main-nav" aria-label="Navegación principal">
+        <nav id="main-nav-menu" class="main-nav" aria-label="Navegación principal">
           <a href="/">Inicio</a>
           <a href="/catalogo.html">Catálogo</a>
           <a href="/vivero.html">Vivero</a>
@@ -56,6 +50,23 @@
           <a href="/juegos.html">Juegos</a>
           <a href="/contacto.html">Contacto</a>
         </nav>
+        <div class="site-header__actions">
+          <button
+            class="nav-toggle"
+            type="button"
+            data-nav-toggle
+            aria-expanded="false"
+            aria-controls="main-nav-menu"
+            aria-label="Abrir menú de secciones"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="nav-toggle__icon nav-toggle__icon--open">
+              <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="nav-toggle__icon nav-toggle__icon--close">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -65,8 +76,6 @@
       </nav>
 
       <header class="care-guide__hero">
-        <img class="botanical-ornament care-guide__ornament" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
-        <img class="botanical-bloom care-guide__bloom" src="/images/botanical/drosera-bloom.svg" alt="" aria-hidden="true" />
 
         <div class="care-guide__hero-copy">
           <p class="eyebrow eyebrow--light"><span class="eyebrow__line"></span> Manual didáctico · Carnívoras Tucumán</p>
@@ -603,5 +612,6 @@
       </div>
     </footer>
     <script type="module" src="/visit-counter.js"></script>
+    <script type="module" src="/mobile-nav.js"></script>
   </body>
 </html>
