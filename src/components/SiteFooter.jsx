@@ -18,8 +18,8 @@ export default function SiteFooter() {
         <div className="site-footer__links">
           <a href="#catalogo">Catálogo</a>
           <a href="#galeria">Álbum</a>
+          <a href="/cuidados.html">Guía de cuidados</a>
           <a href="#juegos">Juegos</a>
-          <a href="/cuidados.html">Cuidados</a>
           <a href="#contacto">Contacto</a>
           {socialLinks.map((item) => <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer">{item.label}</a>)}
         </div>

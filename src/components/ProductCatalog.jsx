@@ -135,8 +135,8 @@ export default function ProductCatalog({ products: catalogProducts, onAdd }) {
 
         {visibleProducts.length > 0 ? (
           <div className="product-grid">
-            {visibleProducts.map((product) => (
-              <ProductCard key={product.id} product={product} onAdd={onAdd} onInspect={openProduct} />
+            {visibleProducts.map((product, index) => (
+              <ProductCard key={product.id} product={product} index={index} onAdd={onAdd} onInspect={openProduct} />
             ))}
           </div>
         ) : (

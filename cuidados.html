@@ -3,33 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0b2119" />
+    <meta name="theme-color" content="#051610" />
     <meta
       name="description"
-      content="Guía inicial para cuidar Venus atrapamoscas, Drosera capensis y Sarracenia. Agua, luz, sustrato y reposo explicados con fuentes botánicas."
+      content="Guía ilustrada y didáctica para cuidar Venus atrapamoscas, Drosera, Sarracenia, Nepenthes y Pinguicula. Agua, luz, bandeja de riego y fichas reales."
     />
     <link rel="canonical" href="https://carnivorastucuman.netlify.app/cuidados.html" />
     <meta property="og:type" content="article" />
     <meta property="og:locale" content="es_AR" />
     <meta property="og:site_name" content="Carnívoras Tucumán" />
-    <meta property="og:title" content="Cómo cuidar plantas carnívoras | Carnívoras Tucumán" />
+    <meta property="og:title" content="Cómo cuidar plantas carnívoras | Guía ilustrada de Carnívoras Tucumán" />
     <meta property="og:url" content="https://carnivorastucuman.netlify.app/cuidados.html" />
     <meta
       property="og:description"
-      content="Una guía práctica para empezar con Venus atrapamoscas, Drosera capensis y Sarracenia, con recomendaciones basadas en fuentes botánicas."
+      content="Aprendé paso a paso con fotos reales y diagramas cómo cuidar plantas carnívoras: riego por bandeja, luz, sustrato y fichas por especie."
     />
     <meta property="og:image" content="https://carnivorastucuman.netlify.app/images/gallery/floracion-drosera.jpeg" />
     <meta property="og:image:alt" content="Flores rosada y blanca entre las hojas de una planta carnívora del vivero." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Cómo cuidar plantas carnívoras | Carnívoras Tucumán" />
-    <meta name="twitter:description" content="Una guía práctica para cuidar Venus atrapamoscas, Drosera capensis y Sarracenia." />
+    <meta name="twitter:description" content="Guía ilustrada para cuidar Venus atrapamoscas, Drosera, Sarracenia, Nepenthes y Pinguicula." />
     <meta name="twitter:image" content="https://carnivorastucuman.netlify.app/images/gallery/floracion-drosera.jpeg" />
     <meta name="twitter:image:alt" content="Flores rosada y blanca entre las hojas de una planta carnívora del vivero." />
     <link rel="icon" type="image/png" sizes="64x64" href="/images/catalog/optimized/favicon-64.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/images/catalog/optimized/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Permanent+Marker&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@1,9..144,600&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/src/styles.css" />
     <link rel="stylesheet" href="/src/care-page.css" />
     <title>Cómo cuidar plantas carnívoras | Carnívoras Tucumán</title>
@@ -38,17 +38,21 @@
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
     <div class="announcement-bar">
       <span class="announcement-bar__dot" aria-hidden="true"></span>
-      Cultivadas en Tucumán <span class="announcement-bar__separator">·</span> Guía inicial con fuentes botánicas
+      Manual de cultivo · Tucumán, Argentina
+      <span class="announcement-bar__separator" aria-hidden="true">·</span>
+      Guía ilustrada con fotos reales y fuentes botánicas
     </div>
     <header class="site-header">
       <div class="site-header__inner page-shell">
         <a class="brand" href="/" aria-label="Carnívoras Tucumán — inicio">
-          <img src="/images/catalog/optimized/logo-light.webp" alt="" class="brand__logo" width="52" height="52" />
+          <img src="/images/catalog/optimized/logo-light.webp" alt="" class="brand__logo" width="48" height="48" />
           <span class="brand__text"><strong>Carnívoras</strong><span>Tucumán</span></span>
         </a>
         <nav class="main-nav" aria-label="Navegación principal">
           <a href="/#catalogo">Catálogo</a>
+          <a href="/#galeria">Vivero</a>
           <a href="/cuidados.html" aria-current="page">Cuidados</a>
+          <a href="/#juegos">Juegos</a>
           <a href="/#contacto">Contacto</a>
         </nav>
       </div>
@@ -56,111 +60,451 @@
 
     <main id="contenido" class="care-guide page-shell" tabindex="-1">
       <nav class="care-breadcrumb" aria-label="Ruta de navegación">
-        <a href="/">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Guía de cuidados</span>
+        <a href="/">Inicio</a><span aria-hidden="true">/</span><span aria-current="page">Guía ilustrada de cuidados</span>
       </nav>
 
       <header class="care-guide__hero">
         <img class="botanical-ornament care-guide__ornament" src="/images/botanical/hanging-pitcher-vine.svg" alt="" aria-hidden="true" />
         <img class="botanical-bloom care-guide__bloom" src="/images/botanical/drosera-bloom.svg" alt="" aria-hidden="true" />
-        <p class="eyebrow"><span class="eyebrow__line"></span> Guía de Carnívoras Tucumán</p>
-        <h1>Cómo cuidar <em>plantas carnívoras</em></h1>
-        <p class="care-guide__lead">Un comienzo claro para cuidar Venus atrapamoscas, Drosera capensis y Sarracenia. Agua, luz y reposo cambian según la especie y el lugar donde crece.</p>
-        <a class="button button--dark" href="#principios">Empezar por lo básico <span aria-hidden="true">↓</span></a>
-        <p class="care-guide__note"><strong>Antes de cambiar la rutina:</strong> esta guía reúne pautas generales; si ya tenés una planta nuestra, escribinos con su especie, el lugar donde vive y el tipo de agua que usás.</p>
+
+        <div class="care-guide__hero-copy">
+          <p class="eyebrow eyebrow--light"><span class="eyebrow__line"></span> Manual didáctico · Carnívoras Tucumán</p>
+          <h1>Cómo cuidar <em>plantas carnívoras</em> sin misterios.</h1>
+          <p class="care-guide__lead">
+            En la naturaleza crecen en turberas, pantanos y selvas húmedas con suelos muy pobres. Cuando entendés cómo imitar su agua, luz y sustrato, cuidarlas se vuelve simple y fascinante.
+          </p>
+          <a class="button button--dark" href="#riego">Ver esquema de riego por bandeja <span aria-hidden="true">↓</span></a>
+          <p class="care-guide__note">
+            <strong>Antes de cambiar la rutina:</strong> esta guía reúne pautas generales basadas en el U.S. Botanic Garden e ICPS. Si ya tenés un ejemplar nuestro, consultanos con foto antes de trasplantarlo.
+          </p>
+        </div>
+
+        <div class="care-guide__hero-photos">
+          <figure class="care-hero-card">
+            <img
+              src="/images/gallery/optimized/venus-roseta-centro-rojo-480w.jpg"
+              srcSet="/images/gallery/optimized/venus-roseta-centro-rojo-480w.jpg 480w, /images/gallery/venus-roseta-centro-rojo.jpeg 960w"
+              sizes="(max-width: 980px) 44vw, 220px"
+              alt="Roseta de Venus atrapamoscas sana con trampas verdes y centro rojo intenso."
+              width="960"
+              height="1280"
+            />
+            <figcaption>Dionaea · luz intensa = interior carmesí</figcaption>
+          </figure>
+          <figure class="care-hero-card care-hero-card--offset">
+            <img
+              src="/images/gallery/optimized/floracion-drosera-480w.jpg"
+              srcSet="/images/gallery/optimized/floracion-drosera-480w.jpg 480w, /images/gallery/floracion-drosera.jpeg 960w"
+              sizes="(max-width: 980px) 44vw, 220px"
+              alt="Flores blanca y rosa de Drosera en cultivo del vivero."
+              width="960"
+              height="1280"
+            />
+            <figcaption>Droseras en floración dentro del vivero</figcaption>
+          </figure>
+        </div>
       </header>
 
-      <nav class="care-toc" aria-label="En esta guía">
+      <nav class="care-toc" aria-label="Índice de la guía">
         <span>En esta guía</span>
-        <a href="#principios">Lo básico</a>
-        <a href="#especies">Por especie</a>
+        <a href="#principios">4 Reglas de oro</a>
+        <a href="#mecanismos">Cómo cazan</a>
+        <a href="#riego">Riego paso a paso</a>
+        <a href="#especies">Fichas por especie</a>
+        <a href="#semaforo">Sí vs Nunca</a>
+        <a href="#diagnostico">Diagnóstico rápido</a>
         <a href="#preguntas">Preguntas frecuentes</a>
       </nav>
 
+      <!-- 1. CUATRO REGLAS DE ORO -->
       <section class="care-guide__section" id="principios" aria-labelledby="principios-title">
-        <p class="eyebrow"><span class="eyebrow__line"></span> Cuatro claves</p>
+        <p class="eyebrow"><span class="eyebrow__line"></span> Cuatro claves científicas</p>
         <h2 id="principios-title">Empezá por las <em>condiciones correctas.</em></h2>
+        <p class="care-section-lead">El 90 % de los problemas al empezar ocurren por usar agua de la canilla o tierra de maceta común. Resolvé estos cuatro pilares primero.</p>
+
         <div class="care-principles">
           <article class="care-principle">
-            <span class="care-principle__number">01</span>
+            <div class="care-principle__top">
+              <span class="care-principle__number">01</span>
+              <span class="care-principle__badge">&lt; 50 PPM</span>
+            </div>
             <h3>Agua con pocos minerales</h3>
-            <p>Elegí agua de lluvia o destilada. El agua de red y la mineral pueden aportar minerales que estas plantas no toleran bien.</p>
+            <p>Usá agua de lluvia o agua destilada. El agua corriente de red y el agua mineral acumulan sales que dañan sus raíces finas.</p>
           </article>
           <article class="care-principle">
-            <span class="care-principle__number">02</span>
-            <h3>Mucha luz</h3>
-            <p>La mayoría necesita luz intensa; muchas Sarracenias crecen mejor con sol directo. En interior puede hacer falta una lámpara de cultivo adecuada.</p>
+            <div class="care-principle__top">
+              <span class="care-principle__number">02</span>
+              <span class="care-principle__badge">ACLIMATACIÓN</span>
+            </div>
+            <h3>Mucha luz gradual</h3>
+            <p>Necesitan ambientes muy luminosos; Venus, Drosera capensis y Sarracenia agradecen sol directo, adaptándolas de a poco durante 7 a 10 días.</p>
           </article>
           <article class="care-principle">
-            <span class="care-principle__number">03</span>
-            <h3>Sustrato para carnívoras</h3>
-            <p>No uses tierra de jardín ni sustrato universal. La mezcla depende de la especie; un medio inadecuado puede dañarla.</p>
+            <div class="care-principle__top">
+              <span class="care-principle__number">03</span>
+              <span class="care-principle__badge">SIN ABONO</span>
+            </div>
+            <h3>Sustrato específico</h3>
+            <p>Nunca uses tierra negra, humus ni fertilizante. Se cultivan en musgo sphagnum o mezcla de turba rubia con perlita, según la especie.</p>
           </article>
           <article class="care-principle">
-            <span class="care-principle__number">04</span>
-            <h3>Invierno según la especie</h3>
-            <p>Las necesidades de reposo y humedad cambian entre especies. No copies una rutina de invierno sin identificar la planta y su cultivo.</p>
+            <div class="care-principle__top">
+              <span class="care-principle__number">04</span>
+              <span class="care-principle__badge">CICLO ANUAL</span>
+            </div>
+            <h3>Invierno según especie</h3>
+            <p>Venus y Sarracenia atraviesan un reposo invernal; en cambio Drosera capensis y Nepenthes no hibernan. Identificá primero tu planta.</p>
           </article>
         </div>
-        <p class="care-guide__source-line">Estas pautas generales siguen la orientación de cultivo del <a href="https://www.usbg.gov/gardens-plants/cultivating-carnivorous-plants" target="_blank" rel="noopener noreferrer">U.S. Botanic Garden</a>. Para detalles, consultá la ficha de cada especie enlazada abajo.</p>
+        <p class="care-guide__source-line">Orientación general basada en el <a href="https://www.usbg.gov/gardens-plants/cultivating-carnivorous-plants" target="_blank" rel="noopener noreferrer">U.S. Botanic Garden</a> y en las fichas oficiales de ICPS.</p>
       </section>
 
-      <section class="care-guide__section care-guide__species" id="especies" aria-labelledby="especies-title">
-        <p class="eyebrow"><span class="eyebrow__line"></span> Las plantas del catálogo</p>
-        <h2 id="especies-title">Cuidados que cambian <em>por especie.</em></h2>
+      <!-- 2. CÓMO CAZAN: 3 MECANISMOS -->
+      <section class="care-guide__section" id="mecanismos" aria-labelledby="mecanismos-title">
+        <p class="eyebrow"><span class="eyebrow__line"></span> Biología de las trampas</p>
+        <h2 id="mecanismos-title">Tres estrategias distintas para <em>atrapar presas.</em></h2>
+        <p class="care-section-lead">Todas sus trampas son hojas modificadas para obtener nitrógeno y minerales que faltan en los suelos donde viven.</p>
+
+        <div class="care-mechanisms">
+          <article class="mechanism-card">
+            <div class="mechanism-card__media">
+              <img
+                src="/images/gallery/optimized/venus-trampa-macro-480w.jpg"
+                srcSet="/images/gallery/optimized/venus-trampa-macro-480w.jpg 480w, /images/gallery/venus-trampa-macro.jpeg 1280w"
+                sizes="(max-width: 980px) 92vw, 30vw"
+                alt="Primer plano de una trampa de Venus atrapamoscas Sawtooth mostrando bordes dentados e interior rojo."
+                width="1280"
+                height="1280"
+                loading="lazy"
+              />
+              <span class="mechanism-card__pill">Trampa activa · Cepo</span>
+            </div>
+            <div class="mechanism-card__body">
+              <h3>Cierre mecánico rápido</h3>
+              <p>Tiene pelos sensitivos en su interior. Cuando un insecto roza dos veces en menos de unos 20 segundos, la hoja se cierra y sella para digerir.</p>
+              <p class="mechanism-card__species">Ejemplo: Dionaea muscipula (Venus)</p>
+            </div>
+          </article>
+
+          <article class="mechanism-card">
+            <div class="mechanism-card__media">
+              <img
+                src="/images/gallery/optimized/drosera-tentaculos-macro-480w.jpg"
+                srcSet="/images/gallery/optimized/drosera-tentaculos-macro-480w.jpg 480w, /images/gallery/drosera-tentaculos-macro.jpeg 960w"
+                sizes="(max-width: 980px) 92vw, 30vw"
+                alt="Hojas de Drosera cubiertas de tentáculos rojos con gotitas adhesivas brillantes."
+                width="960"
+                height="1280"
+                loading="lazy"
+              />
+              <span class="mechanism-card__pill">Trampa adhesiva · Gotitas</span>
+            </div>
+            <div class="mechanism-card__body">
+              <h3>Tentáculos con mucílago</h3>
+              <p>Sus hojas producen gotas brillantes de pegamento dulce. Cuando una mosquita queda adherida, la hoja se enrolla lentamente sobre ella.</p>
+              <p class="mechanism-card__species">Ejemplos: Drosera y Pinguicula</p>
+            </div>
+          </article>
+
+          <article class="mechanism-card">
+            <div class="mechanism-card__media">
+              <img
+                src="/images/gallery/optimized/jarro-con-gotas-480w.jpg"
+                srcSet="/images/gallery/optimized/jarro-con-gotas-480w.jpg 480w, /images/gallery/jarro-con-gotas.jpeg 960w"
+                sizes="(max-width: 980px) 92vw, 30vw"
+                alt="Trampa en forma de jarro verde de Nepenthes con gotas de agua en el vivero."
+                width="960"
+                height="1280"
+                loading="lazy"
+              />
+              <span class="mechanism-card__pill">Trampa pasiva · Jarro</span>
+            </div>
+            <div class="mechanism-card__body">
+              <h3>Jarro con néctar y caída</h3>
+              <p>Atrae insectos con néctar en el borde resbaladizo del jarro; al caer al líquido enzimático del fondo no pueden trepar las paredes.</p>
+              <p class="mechanism-card__species">Ejemplos: Sarracenia y Nepenthes</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 3. GUÍA PASO A PASO: EL MÉTODO DE LA BANDEJA -->
+      <section class="care-guide__section" id="riego" aria-labelledby="riego-title">
+        <p class="eyebrow"><span class="eyebrow__line"></span> Esquema didáctico</p>
+        <h2 id="riego-title">El <em>método de la bandeja</em> paso a paso.</h2>
+        <p class="care-section-lead">Para especies de pantano como Venus, Drosera y Sarracenia, el agua no se echa encima de las hojas todo el tiempo: sube desde abajo por capilaridad.</p>
+
+        <div class="tray-guide">
+          <figure class="tray-guide__diagram">
+            <img src="/images/botanical/swamp-water-tray.svg" alt="Diagrama transversal de una maceta sobre bandeja con 1 a 2 cm de agua de lluvia o destilada subiendo por capilaridad hacia las raíces en sustrato inerte." width="680" height="340" loading="lazy" />
+            <figcaption>Esquema para Venus, Drosera y Sarracenia. Atención: <strong>Nepenthes</strong> y muchas <strong>Pinguicula</strong> prefieren riego superior moderado con sustrato húmedo y aireado, sin quedar sumergidas en agua estancada.</figcaption>
+          </figure>
+
+          <ol class="tray-steps">
+            <li class="tray-step">
+              <span class="tray-step__num">1</span>
+              <div>
+                <strong>Elegí agua apta</strong>
+                <p>Juntá agua de lluvia limpia o usá agua destilada / desmineralizada de bidón. Evitá agua de red, de pozo o mineral.</p>
+              </div>
+            </li>
+            <li class="tray-step">
+              <span class="tray-step__num">2</span>
+              <div>
+                <strong>Llená la bandeja (1 a 2 cm)</strong>
+                <p>Apoyá la maceta (con orificios abajo) sobre un platito o bandeja con poca agua. En verano revisá que no se seque por completo.</p>
+              </div>
+            </li>
+            <li class="tray-step">
+              <span class="tray-step__num">3</span>
+              <div>
+                <strong>Dejá airear entre recargas</strong>
+                <p>Cuando el platito se vacíe, esperá un día antes de volver a llenarlo en climas frescos: así oxigenás las raíces y evitás hongos.</p>
+              </div>
+            </li>
+            <li class="tray-step">
+              <span class="tray-step__num">4</span>
+              <div>
+                <strong>No toques ni fuerces las trampas</strong>
+                <p>Cerrarle las trampas con el dedo a la Venus gasta su energía sin darle alimento. Dejá que cace por su cuenta.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 4. FICHAS CIENTÍFICAS POR ESPECIE -->
+      <section class="care-guide__section" id="especies" aria-labelledby="especies-title">
+        <p class="eyebrow"><span class="eyebrow__line"></span> Las 5 familias del vivero</p>
+        <h2 id="especies-title">Fichas ilustradas <em>por especie.</em></h2>
+        <p class="care-section-lead">Cada género viene de un ecosistema distinto. Usá estas tarjetas para darle a tu planta exactamente lo que pide.</p>
+
         <div class="care-species-grid">
           <article class="care-species-card">
-            <p class="care-species-card__latin">Dionaea muscipula</p>
-            <h3>Venus atrapamoscas</h3>
-            <ul>
-              <li>Necesita luz abundante y sustrato húmedo con agua de baja mineralización.</li>
-              <li>La guía introductoria de ICPS distingue el manejo interior del exterior, incluido el reposo. La rutina debe corresponder a tu ejemplar.</li>
-            </ul>
-            <a href="https://www.carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Dionaea_muscipula.pdf" target="_blank" rel="noopener noreferrer">Consultar ficha de ICPS <span aria-hidden="true">↗</span></a>
+            <img
+              class="care-species-card__photo"
+              src="/images/gallery/optimized/venus-en-maceta-480w.jpg"
+              srcSet="/images/gallery/optimized/venus-en-maceta-480w.jpg 480w, /images/gallery/venus-en-maceta.jpeg 960w"
+              sizes="(max-width: 980px) 92vw, 31vw"
+              alt="Venus atrapamoscas en maceta naranja sostenida en el vivero."
+              width="960"
+              height="1280"
+              loading="lazy"
+            />
+            <div class="care-species-card__body">
+              <p class="care-species-card__latin">Dionaea muscipula</p>
+              <h3>Venus atrapamoscas</h3>
+              <div class="species-stats">
+                <div class="species-stat"><span>Luz</span><strong>Sol abundante</strong></div>
+                <div class="species-stat"><span>Riego</span><strong>Bandeja 1–2 cm</strong></div>
+                <div class="species-stat"><span>Invierno</span><strong>Reposo frío</strong></div>
+              </div>
+              <ul>
+                <li>A más luz, más intenso será el rojo del interior de sus trampas.</li>
+                <li>La guía de ICPS diferencia el manejo exterior del interior, incluido el reposo invernal: consultanos según dónde viva tu planta.</li>
+              </ul>
+              <a class="care-species-card__link" href="https://www.carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Dionaea_muscipula.pdf" target="_blank" rel="noopener noreferrer">Ficha oficial ICPS <span aria-hidden="true">↗</span></a>
+            </div>
           </article>
+
           <article class="care-species-card">
-            <p class="care-species-card__latin">Drosera capensis</p>
-            <h3>Drosera capensis</h3>
-            <ul>
-              <li>La ficha de ICPS recomienda mantener la maceta sobre una bandeja con agua para conservar húmedo el sustrato durante todo el año.</li>
-              <li>Describe luz de sol directo y señala que esta especie no requiere un período de reposo.</li>
-            </ul>
-            <a href="https://www.carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Drosera_capensis.pdf" target="_blank" rel="noopener noreferrer">Consultar ficha de ICPS <span aria-hidden="true">↗</span></a>
+            <img
+              class="care-species-card__photo"
+              src="/images/gallery/optimized/drosera-planta-completa-480w.jpg"
+              srcSet="/images/gallery/optimized/drosera-planta-completa-480w.jpg 480w, /images/gallery/drosera-planta-completa.jpeg 960w"
+              sizes="(max-width: 980px) 92vw, 31vw"
+              alt="Drosera capensis adulta de hojas largas en maceta oscura del vivero."
+              width="960"
+              height="1280"
+              loading="lazy"
+            />
+            <div class="care-species-card__body">
+              <p class="care-species-card__latin">Drosera capensis</p>
+              <h3>Drosera capensis</h3>
+              <div class="species-stats">
+                <div class="species-stat"><span>Luz</span><strong>Mucha luz / sol</strong></div>
+                <div class="species-stat"><span>Riego</span><strong>Bandeja todo el año</strong></div>
+                <div class="species-stat"><span>Invierno</span><strong>Sin reposo</strong></div>
+              </div>
+              <ul>
+                <li>La ficha de ICPS recomienda mantener la maceta sobre una bandeja con agua para conservar el sustrato siempre húmedo.</li>
+                <li>Si deja de producir gotitas pegajosas, suele faltar luz intensa (evitá rociarla con agua encima de las hojas).</li>
+              </ul>
+              <a class="care-species-card__link" href="https://www.carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Drosera_capensis.pdf" target="_blank" rel="noopener noreferrer">Ficha oficial ICPS <span aria-hidden="true">↗</span></a>
+            </div>
           </article>
+
           <article class="care-species-card">
-            <p class="care-species-card__latin">Sarracenia</p>
-            <h3>Sarracenia</h3>
-            <ul>
-              <li>En general requiere mucha luz y un medio húmedo; la orientación estacional depende de la especie y el clima de cultivo.</li>
-              <li>La ficha de ICPS enlazada describe específicamente Sarracenia purpurea; no la tomes como receta exacta para otra especie o híbrido.</li>
-            </ul>
-            <a href="https://carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Sarracenia_purpurea.pdf" target="_blank" rel="noopener noreferrer">Consultar ficha de Sarracenia purpurea <span aria-hidden="true">↗</span></a>
+            <img
+              class="care-species-card__photo"
+              src="/images/gallery/optimized/sarracenia-trampas-tubulares-480w.jpg"
+              srcSet="/images/gallery/optimized/sarracenia-trampas-tubulares-480w.jpg 480w, /images/gallery/sarracenia-trampas-tubulares.jpeg 960w"
+              sizes="(max-width: 980px) 92vw, 31vw"
+              alt="Trampas verticales rojizas y verdes de Sarracenia en el vivero."
+              width="960"
+              height="1280"
+              loading="lazy"
+            />
+            <div class="care-species-card__body">
+              <p class="care-species-card__latin">Sarracenia spp.</p>
+              <h3>Sarracenia</h3>
+              <div class="species-stats">
+                <div class="species-stat"><span>Luz</span><strong>Sol directo</strong></div>
+                <div class="species-stat"><span>Riego</span><strong>Bandeja permanente</strong></div>
+                <div class="species-stat"><span>Invierno</span><strong>Reposo natural</strong></div>
+              </div>
+              <ul>
+                <li>Es una de las carnívoras más resistentes al sol fuerte una vez aclimatada al aire libre.</li>
+                <li>La ficha enlazada de ICPS describe <em>Sarracenia purpurea</em>; otros híbridos requieren sol más intenso y distinto manejo invernal.</li>
+              </ul>
+              <a class="care-species-card__link" href="https://carnivorousplants.org/sites/default/files/files/TeacherResources/ICPS_IG_Sarracenia_purpurea.pdf" target="_blank" rel="noopener noreferrer">Ficha de S. purpurea en ICPS <span aria-hidden="true">↗</span></a>
+            </div>
+          </article>
+
+          <article class="care-species-card">
+            <img
+              class="care-species-card__photo"
+              src="/images/gallery/optimized/trampa-tubular-roja-480w.jpg"
+              srcSet="/images/gallery/optimized/trampa-tubular-roja-480w.jpg 480w, /images/gallery/trampa-tubular-roja.jpeg 960w"
+              sizes="(max-width: 980px) 92vw, 31vw"
+              alt="Jarro rojizo de Nepenthes Bloody Mary cultivado en musgo verde en el vivero."
+              width="960"
+              height="1280"
+              loading="lazy"
+            />
+            <div class="care-species-card__body">
+              <p class="care-species-card__latin">Nepenthes (tropical)</p>
+              <h3>Nepenthes (jarro colgante)</h3>
+              <div class="species-stats">
+                <div class="species-stat"><span>Luz</span><strong>Brillante filtrada</strong></div>
+                <div class="species-stat"><span>Riego</span><strong>Desde arriba, sin encharcar</strong></div>
+                <div class="species-stat"><span>Invierno</span><strong>Cálido, sin heladas</strong></div>
+              </div>
+              <ul>
+                <li>A diferencia de la Venus, es una trepadora tropical: prefiere luz brillante indirecta o sol suave de mañana, nunca sol fuerte del mediodía tucumano.</li>
+                <li>Regala por arriba con agua pura cuando el musgo esté húmedo-fresco, sin dejarla sumergida en bandeja con agua fija.</li>
+              </ul>
+              <p class="care-species-card__note">Consultanos según tu variedad (por ej. <em>Bloody Mary</em>) para ajustar humedad y ubicación.</p>
+            </div>
+          </article>
+
+          <article class="care-species-card">
+            <img
+              class="care-species-card__photo"
+              src="/images/gallery/optimized/flor-carnivora-vivero-480w.jpg"
+              srcSet="/images/gallery/optimized/flor-carnivora-vivero-480w.jpg 480w, /images/gallery/flor-carnivora-vivero.jpeg 960w"
+              sizes="(max-width: 980px) 92vw, 31vw"
+              alt="Flor lila de cinco pétalos sobre una Pinguicula en maceta roja."
+              width="960"
+              height="1280"
+              loading="lazy"
+            />
+            <div class="care-species-card__body">
+              <p class="care-species-card__latin">Pinguicula spp.</p>
+              <h3>Pinguicula (grasilla)</h3>
+              <div class="species-stats">
+                <div class="species-stat"><span>Luz</span><strong>Brillante sin sol fuerte</strong></div>
+                <div class="species-stat"><span>Riego</span><strong>Moderado por abajo</strong></div>
+                <div class="species-stat"><span>Atención</span><strong>No mojar el centro</strong></div>
+              </div>
+              <ul>
+                <li>Sus hojas carnosas atrapan mosquitos diminutos y regalan flores vistosas parecidas a violetas o pequeñas orquídeas.</li>
+                <li>Evitá mojar la roseta central al regar y reducí la humedad en invierno si entra en fase suculenta (dependiendo de la especie o híbrido).</li>
+              </ul>
+              <p class="care-species-card__note">Escribinos con el nombre o foto de tu ejemplar para confirmarte el sustrato exacto.</p>
+            </div>
           </article>
         </div>
       </section>
 
+      <!-- 5. SEMÁFORO RÁPIDO -->
+      <section class="care-guide__section" id="semaforo" aria-labelledby="semaforo-title">
+        <p class="eyebrow"><span class="eyebrow__line"></span> Checklist visual</p>
+        <h2 id="semaforo-title">Lo que <em>sí ayuda</em> vs. lo que <em>las daña.</em></h2>
+
+        <div class="do-dont-grid">
+          <div class="do-dont-card do-dont-card--yes">
+            <h3>✓ Sí hacer</h3>
+            <ul>
+              <li>Usar siempre agua de lluvia, destilada o de ósmosis inversa.</li>
+              <li>Ubicarlas donde reciban buena luz natural (aclimatando al sol de a poco).</li>
+              <li>Podar con tijera limpia las hojas totalmente negras para mantener aireación.</li>
+              <li>Dejar que cacen insectos por sí solas al aire libre o cerca de ventanas abiertas.</li>
+            </ul>
+          </div>
+          <div class="do-dont-card do-dont-card--no">
+            <h3>✕ Nunca hacer</h3>
+            <ul>
+              <li>No regar con agua de la canilla, agua mineral ni agua hervida (hervir concentra las sales).</li>
+              <li>No trasplantar a tierra de jardín, compost ni agregar fertilizantes de vivero común.</li>
+              <li>No darles carne, fiambre ni insectos muertos demasiado grandes para la trampa.</li>
+              <li>No cerrar las trampas de Venus con los dedos por diversión: cada hoja tiene cierres limitados.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. DIAGNÓSTICO RÁPIDO -->
+      <section class="care-guide__section" id="diagnostico" aria-labelledby="diagnostico-title">
+        <p class="eyebrow"><span class="eyebrow__line"></span> Primeros auxilios</p>
+        <h2 id="diagnostico-title">¿Notás algo raro? <em>Diagnóstico rápido.</em></h2>
+
+        <div class="diagnostic-grid">
+          <article class="diagnostic-card">
+            <span class="diagnostic-card__symptom">HOJAS VIEJAS NEGRAS</span>
+            <h3>Trampas viejas que se ponen negras</h3>
+            <p>Si el centro sigue sacando hojas nuevas sanas, es renovación natural o el final de una trampa que ya digirió varias presas. Cortá solo la parte negra seca.</p>
+          </article>
+          <article class="diagnostic-card">
+            <span class="diagnostic-card__symptom">DROSERA SIN GOTAS</span>
+            <h3>Hojas secas sin mucílago brillante</h3>
+            <p>Casi siempre es falta de luz o viento muy seco. Acercala gradualmente a un lugar más luminoso y verificá que su bandeja tenga agua pura.</p>
+          </article>
+          <article class="diagnostic-card">
+            <span class="diagnostic-card__symptom">VENUS VERDE Y LARGA</span>
+            <h3>Hojas muy altas y trampas chicas</h3>
+            <p>Señal de falta de luz (etiolación). Sumale horas de sol suave de mañana progresivamente hasta fortalecer los pecíolos.</p>
+          </article>
+          <article class="diagnostic-card">
+            <span class="diagnostic-card__symptom">NEPENTHES SIN JARROS</span>
+            <h3>Saca hojas nuevas, pero sin jarros</h3>
+            <p>Necesita más luz brillante filtrada y humedad ambiental estable. Recordá que cada hoja nueva tarda semanas en formar su jarro si el ambiente cambió.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- 7. PREGUNTAS FRECUENTES -->
       <section class="care-guide__section care-faq" id="preguntas" aria-labelledby="preguntas-title">
         <p class="eyebrow"><span class="eyebrow__line"></span> Dudas comunes</p>
         <h2 id="preguntas-title">Antes de <em>probar un consejo.</em></h2>
         <details>
-          <summary>¿Puedo usar agua de la canilla?</summary>
-          <p>Como pauta general, no. El U.S. Botanic Garden recomienda agua de lluvia, nieve derretida o destilada, y desaconseja el agua de red y mineral.</p>
+          <summary>¿Puedo usar agua de la canilla si la dejo reposar o la hiervo?</summary>
+          <p>No. El reposo solo evapora cloro, y hervir concentra aún más los minerales disueltos. El U.S. Botanic Garden recomienda agua de lluvia o destilada y desaconseja agua de red o mineral.</p>
         </details>
         <details>
-          <summary>¿Sirve la tierra que ya tengo en casa?</summary>
-          <p>La tierra de jardín no es adecuada. Consultá qué mezcla corresponde a tu especie antes de trasplantar o agregar fertilizantes.</p>
+          <summary>¿Sirve la tierra fértil que ya tengo en casa?</summary>
+          <p>No. La tierra común tiene minerales y nutrientes que queman las raíces de las carnívoras. Consultá qué mezcla inerte (musgo sphagnum, turba rubia o perlita) corresponde a tu especie antes de trasplantar.</p>
         </details>
         <details>
-          <summary>¿Les puedo dar carne?</summary>
-          <p>No. El U.S. Botanic Garden explica que estas plantas no pueden digerir proteínas complejas como la carne.</p>
+          <summary>¿Les puedo dar carne o comida de mascotas?</summary>
+          <p>No. El U.S. Botanic Garden explica que estas plantas no pueden digerir proteínas complejas ni grasas como la carne: pudren la trampa.</p>
         </details>
-        <p class="care-guide__source-line">Fuentes de las respuestas: <a href="https://www.usbg.gov/gardens-plants/cultivating-carnivorous-plants" target="_blank" rel="noopener noreferrer">U.S. Botanic Garden</a> e <a href="https://www.carnivorousplants.org/" target="_blank" rel="noopener noreferrer">International Carnivorous Plant Society</a>.</p>
+        <details>
+          <summary>¿Las tengo que alimentar a mano?</summary>
+          <p>No hace falta. La luz solar es su fuente principal de energía (fotosíntesis); las presas son solo un complemento mineral que consiguen solas si están en un lugar ventilado.</p>
+        </details>
+        <details>
+          <summary>¿Qué hago en verano con el calor intenso de Tucumán?</summary>
+          <p>En días extremos de sol de siesta tucumana, media sombra ligera o evitar el sol directo entre las 12 y las 16 h ayuda a que no hierva el agua de la bandeja. A Nepenthes y Pinguicula mantenelas siempre bajo sombra luminosa.</p>
+        </details>
+        <p class="care-guide__source-line">Fuentes botánicas consultadas: <a href="https://www.usbg.gov/gardens-plants/cultivating-carnivorous-plants" target="_blank" rel="noopener noreferrer">U.S. Botanic Garden</a> e <a href="https://www.carnivorousplants.org/" target="_blank" rel="noopener noreferrer">International Carnivorous Plant Society</a>.</p>
       </section>
 
       <aside class="care-guide__contact" aria-labelledby="contacto-cuidados-title">
         <div>
           <p class="eyebrow eyebrow--light"><span class="eyebrow__line"></span> Te acompañamos</p>
           <h2 id="contacto-cuidados-title">¿Querés confirmar el cuidado de <em>tu planta?</em></h2>
-          <p>Contanos qué especie tenés, cuántas horas de luz recibe y qué agua usás. Si podés, adjuntá una foto actual del ejemplar.</p>
+          <p>Contanos qué especie tenés, cuántas horas de luz recibe y qué agua usás. Si podés, adjuntá una foto actual del ejemplar por WhatsApp.</p>
         </div>
         <a class="button button--light" href="https://wa.me/5493816168898?text=Hola%2C%20quisiera%20consultar%20por%20los%20cuidados%20de%20mi%20planta%20carn%C3%ADvora." target="_blank" rel="noopener noreferrer">Consultar por WhatsApp <span aria-hidden="true">↗</span></a>
       </aside>
@@ -169,7 +513,7 @@
     <footer class="site-footer">
       <div class="page-shell site-footer__main">
         <a class="footer-brand" href="/" aria-label="Carnívoras Tucumán — volver al inicio">
-          <img src="/images/catalog/optimized/logo-dark.webp" alt="" class="footer-brand__logo" width="49" height="49" />
+          <img src="/images/catalog/optimized/logo-dark.webp" alt="" class="footer-brand__logo" width="50" height="50" />
           <span><strong>Carnívoras</strong><small>Tucumán · Argentina</small></span>
         </a>
         <p class="site-footer__line">Un rincón extraordinario de la naturaleza, cultivado con paciencia.</p>
@@ -177,15 +521,15 @@
           <a href="/#catalogo">Catálogo</a>
           <a href="/#galeria">Álbum</a>
           <a href="/#juegos">Juegos</a>
-          <a href="/cuidados.html">Cuidados</a>
+          <a href="/cuidados.html">Guía de cuidados</a>
           <a href="/#contacto">Contacto</a>
           <a href="https://www.instagram.com/carnivoras_tucuman/" target="_blank" rel="noopener noreferrer">@carnivoras_tucuman</a>
         </nav>
       </div>
       <section class="page-shell site-footer__marks" aria-label="Origen y desarrollo">
-        <figure class="site-footer__mark"><img src="/images/brand/hecho-en-argentina.svg" alt="" width="52" height="52" loading="lazy" /><figcaption><span>Hecho en</span><strong>Argentina</strong></figcaption></figure>
-        <figure class="site-footer__mark"><img src="/images/brand/codeado-en-argentina.svg" alt="" width="52" height="52" loading="lazy" /><figcaption><span>Codeado en</span><strong>Argentina</strong></figcaption></figure>
-        <figure class="site-footer__mark site-footer__mark--smlich"><img src="/images/brand/smlich-soluciones.svg" alt="" width="52" height="52" loading="lazy" /><figcaption><span>Desarrollo web</span><strong>SMlich Soluciones IT</strong></figcaption></figure>
+        <figure class="site-footer__mark"><img src="/images/brand/hecho-en-argentina.svg" alt="" width="48" height="48" loading="lazy" /><figcaption><span>Hecho en</span><strong>Argentina</strong></figcaption></figure>
+        <figure class="site-footer__mark"><img src="/images/brand/codeado-en-argentina.svg" alt="" width="48" height="48" loading="lazy" /><figcaption><span>Codeado en</span><strong>Argentina</strong></figcaption></figure>
+        <figure class="site-footer__mark site-footer__mark--smlich"><img src="/images/brand/smlich-soluciones.svg" alt="" width="48" height="48" loading="lazy" /><figcaption><span>Desarrollo web</span><strong>SMlich Soluciones IT</strong></figcaption></figure>
       </section>
       <div class="page-shell site-footer__bottom">
         <span>Carnívoras Tucumán · Tucumán, Argentina</span>

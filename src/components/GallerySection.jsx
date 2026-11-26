@@ -8,6 +8,16 @@ function getResponsiveSrcSet(item) {
   return `/images/gallery/optimized/${basename}-480w.jpg 480w, ${item.src} ${item.width}w`;
 }
 
+function getGenusKey(label) {
+  const text = String(label ?? '').toLowerCase();
+  if (text.includes('venus')) return 'venus';
+  if (text.includes('drosera')) return 'drosera';
+  if (text.includes('nepenthes')) return 'nepenthes';
+  if (text.includes('sarracenia')) return 'sarracenia';
+  if (text.includes('pinguicula')) return 'pinguicula';
+  return 'vivero';
+}
+
 export default function GallerySection() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
@@ -59,7 +69,7 @@ export default function GallerySection() {
 
         <div className="gallery-grid" id="gallery-grid">
           {visibleItems.map((item, index) => (
-            <figure className="gallery-card" key={item.src}>
+            <figure className="gallery-card" key={item.src} data-genus={getGenusKey(item.label)}>
               <button
                 className="gallery-card__open"
                 type="button"

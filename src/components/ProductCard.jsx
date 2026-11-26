@@ -1,9 +1,11 @@
 import { formatPrice } from '../utils/format-price';
 import CatalogImage from './CatalogImage';
 
-export default function ProductCard({ product, onAdd, onInspect }) {
+export default function ProductCard({ product, index = 0, onAdd, onInspect }) {
+  const specimenCode = 'CT-' + String(index + 1).padStart(2, '0');
+
   return (
-    <article className="product-card">
+    <article className="product-card" data-category={product.category}>
       <div className="product-card__image-wrap">
         <button
           className="product-card__image-trigger"
@@ -17,16 +19,19 @@ export default function ProductCard({ product, onAdd, onInspect }) {
             src={product.image}
             alt={product.imageAlt}
             pictureClassName="product-card__picture"
-            sizes="(max-width: 520px) 45vw, (max-width: 920px) 30vw, 24vw"
+            sizes="(max-width: 640px) 46vw, (max-width: 1080px) 30vw, 24vw"
             loading="lazy"
             decoding="async"
           />
-          <span className="product-card__zoom" aria-hidden="true">↗</span>
+          <span className="product-card__zoom" aria-hidden="true">Ampliar HD ↗</span>
         </button>
         <span className="product-card__badge">{product.categoryLabel}</span>
       </div>
       <div className="product-card__body">
-        <p className="product-card__species">{product.species}</p>
+        <div className="product-card__meta">
+          <span className="product-card__code">{specimenCode}</span>
+          <p className="product-card__species">{product.species}</p>
+        </div>
         <h3>{product.name}</h3>
         <p className="product-card__description">{product.description}</p>
         <p className="product-card__note">{product.note}</p>

@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 340" fill="none" role="img" aria-labelledby="t-title t-desc">
+  <title id="t-title">Diagrama didáctico del método de la bandeja</title>
+  <desc id="t-desc">Esquema científico de una maceta con sustrato para carnívoras apoyada sobre una bandeja con 1 a 2 cm de agua de lluvia o destilada, mostrando absorción por capilaridad hacia las raíces y luz solar superior.</desc>
+  <defs>
+    <linearGradient id="bg-lab" x1="0" y1="0" x2="680" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#051610" />
+      <stop offset="1" stop-color="#0E3024" />
+    </linearGradient>
+    <linearGradient id="water-grad" x1="150" y1="262" x2="150" y2="296" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#56E0CC" stop-opacity=".85" />
+      <stop offset="1" stop-color="#1A8F99" stop-opacity=".95" />
+    </linearGradient>
+    <linearGradient id="pot-grad" x1="255" y1="150" x2="405" y2="282" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#223D33" />
+      <stop offset="1" stop-color="#13251E" />
+    </linearGradient>
+    <linearGradient id="sun-ray" x1="115" y1="30" x2="260" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5C842" stop-opacity=".9" />
+      <stop offset="1" stop-color="#B7F43E" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo de cuadrícula científica -->
+  <rect width="680" height="340" rx="20" fill="url(#bg-lab)" />
+  <g stroke="#B7F43E" stroke-opacity=".07" stroke-width="1">
+    <path d="M40 0v340M80 0v340M120 0v340M160 0v340M200 0v340M240 0v340M280 0v340M320 0v340M360 0v340M400 0v340M440 0v340M480 0v340M520 0v340M560 0v340M600 0v340M640 0v340" />
+    <path d="M0 40h680M0 80h680M0 120h680M0 160h680M0 200h680M0 240h680M0 280h680M0 320h680" />
+  </g>
+
+  <!-- Sol y rayos -->
+  <circle cx="96" cy="64" r="24" fill="#F5C842" />
+  <circle cx="96" cy="64" r="34" stroke="#F5C842" stroke-opacity=".35" stroke-width="2" stroke-dasharray="5 5" />
+  <path d="M132 76 238 118M126 92 222 142M138 60 250 92" stroke="url(#sun-ray)" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Planta carnívora esquemática (roseta + trampas) -->
+  <g>
+    <path d="M332 150c-22-24-56-34-80-22 18 22 48 31 80 22Z" fill="#77D93D" />
+    <path d="M348 150c24-26 58-34 82-20-20 22-50 30-82 20Z" fill="#77D93D" />
+    <path d="M336 150c-10-38-34-60-58-62 4 30 24 52 58 62Z" fill="#B7F43E" />
+    <path d="M344 150c12-40 36-62 62-60-6 30-26 52-62 60Z" fill="#B7F43E" />
+    <ellipse cx="268" cy="88" rx="22" ry="13" transform="rotate(-24 268 88)" fill="#E04036" stroke="#B7F43E" stroke-width="3" />
+    <ellipse cx="412" cy="90" rx="22" ry="13" transform="rotate(24 412 90)" fill="#E04036" stroke="#B7F43E" stroke-width="3" />
+    <path d="M340 150c0-36 2-64 0-86" stroke="#8EE03B" stroke-width="4" stroke-linecap="round" />
+    <circle cx="340" cy="60" r="9" fill="#DF86F7" stroke="#F7D6FF" stroke-width="2" />
+  </g>
+
+  <!-- Bandeja inferior y nivel de agua -->
+  <path d="M214 252h252l-14 48H228l-14-48Z" fill="#0B231B" stroke="#56E0CC" stroke-opacity=".55" stroke-width="2.5" />
+  <path d="M220 264h240l-10 34H230l-10-34Z" fill="url(#water-grad)" />
+  <path d="M224 264c24-4 48 4 72 0s48 4 72 0 48 4 72 0" stroke="#C4FFF4" stroke-opacity=".8" stroke-width="2" />
+
+  <!-- Maceta en corte transversal -->
+  <path d="M254 150h172l-20 138H274l-20-138Z" fill="url(#pot-grad)" stroke="#9CC2AD" stroke-opacity=".6" stroke-width="2.5" />
+  <path d="M259 156h162l-18 126H277l-18-126Z" fill="#3D2B1F" />
+  <path d="M259 156h162l-3 18H262l-3-18Z" fill="#2E6B3E" />
+  <g fill="#E9EFE6" fill-opacity=".82">
+    <circle cx="290" cy="196" r="3" /><circle cx="322" cy="212" r="3.5" /><circle cx="368" cy="192" r="3" />
+    <circle cx="390" cy="224" r="3.2" /><circle cx="305" cy="245" r="3" /><circle cx="352" cy="252" r="3.5" />
+    <circle cx="382" cy="260" r="2.8" /><circle cx="286" cy="228" r="2.5" /><circle cx="340" cy="186" r="2.5" />
+  </g>
+  <g stroke="#C6B193" stroke-opacity=".75" stroke-width="2" stroke-linecap="round">
+    <path d="M332 162c-8 24-18 40-14 66" />
+    <path d="M340 162c2 28-4 46 6 72" />
+    <path d="M348 162c12 22 20 38 14 62" />
+  </g>
+  <rect x="294" y="283" width="16" height="6" rx="3" fill="#56E0CC" />
+  <rect x="332" y="283" width="16" height="6" rx="3" fill="#56E0CC" />
+  <rect x="370" y="283" width="16" height="6" rx="3" fill="#56E0CC" />
+
+  <!-- Flechas de capilaridad subiendo -->
+  <g stroke="#56E0CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M302 276v-26m-5 6 5-6 5 6" />
+    <path d="M340 276v-26m-5 6 5-6 5 6" />
+    <path d="M378 276v-26m-5 6 5-6 5 6" />
+  </g>
+
+  <!-- Etiquetas científicas -->
+  <g font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">
+    <text x="48" y="128" fill="#F5C842">LUZ INTENSA</text>
+    <text x="48" y="145" fill="#C6D9CC" font-size="11" font-weight="400">Sol gradual según especie</text>
+
+    <line x1="418" y1="192" x2="478" y2="176" stroke="#B7F43E" stroke-opacity=".7" stroke-width="1.5" />
+    <circle cx="418" cy="192" r="4" fill="#B7F43E" />
+    <text x="486" y="172" fill="#B7F43E">SUSTRATO INERTE</text>
+    <text x="486" y="189" fill="#C6D9CC" font-size="11" font-weight="400">Sphagnum o turba + perlita</text>
+    <text x="486" y="204" fill="#DF86F7" font-size="10" font-weight="500">SIN tierra común ni abono</text>
+
+    <line x1="454" y1="278" x2="484" y2="278" stroke="#56E0CC" stroke-width="1.5" />
+    <circle cx="454" cy="278" r="4" fill="#56E0CC" />
+    <text x="492" y="272" fill="#56E0CC">BANDEJA · 1 a 2 CM</text>
+    <text x="492" y="289" fill="#C6D9CC" font-size="11" font-weight="400">Lluvia o destilada (&lt;50 ppm)</text>
+    <text x="492" y="304" fill="#91BDB0" font-size="10" font-weight="400">Sube por capilaridad ↑</text>
+
+    <text x="48" y="274" fill="#E3F2E8" font-size="11">ORIFICIOS DE DRENAJE</text>
+    <text x="48" y="290" fill="#91BDB0" font-size="10" font-weight="400">La maceta absorbe desde abajo</text>
+    <line x1="208" y1="274" x2="270" y2="286" stroke="#91BDB0" stroke-opacity=".6" stroke-width="1.4" />
+  </g>
+</svg>

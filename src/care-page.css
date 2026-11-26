@@ -1,77 +1,682 @@
-.care-guide { padding-bottom: 96px; }
-
-.care-breadcrumb { display: flex; align-items: center; gap: 10px; padding-top: 24px; color: var(--color-muted); font-size: 11px; }
-.care-breadcrumb a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
-
-.care-guide__hero { max-width: 790px; padding-block: 72px 60px; }
-.care-guide__hero h1 { max-width: 760px; margin-bottom: 21px; font-size: clamp(46px, 6.5vw, 78px); line-height: 1.05; }
-.care-guide__hero h1 em, .care-guide__section h2 em { color: var(--color-orange); font-family: var(--marker); font-size: .64em; font-style: normal; font-weight: 400; letter-spacing: -.045em; text-transform: none; }
-.care-guide__contact h2 em { color: var(--color-lime); font-family: var(--marker); font-size: .64em; font-style: normal; font-weight: 400; letter-spacing: -.045em; text-transform: none; }
-.care-guide__lead { max-width: 650px; margin-bottom: 26px; color: var(--color-muted); font-size: 17px; line-height: 1.75; }
-.button--dark { color: var(--color-forest-deep); background: var(--color-lime); }
-.button--dark:hover { color: white; background: var(--color-forest); }
-.care-guide__note { max-width: 670px; margin: 27px 0 0; padding: 15px 18px; border-left: 3px solid var(--color-orange); color: #596d5b; background: #eeeee4; font-size: 12px; line-height: 1.75; }
-
-.care-toc { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 24px; padding: 16px 0; border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); }
-.care-toc span { color: var(--color-muted); font-size: 10px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
-.care-toc a { color: var(--color-forest); font-size: 12px; text-decoration-thickness: 1px; text-underline-offset: 4px; }
-
-.care-guide__section { padding-top: 86px; scroll-margin-top: 100px; }
-.care-guide__section > h2, .care-guide__contact h2 { max-width: 700px; margin-bottom: 28px; font-size: clamp(34px, 4.5vw, 53px); line-height: 1.12; }
-.care-principles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.care-principle { min-height: 240px; padding: 25px 22px; border: 1px solid #e1e4db; border-radius: 15px; background: var(--color-white); box-shadow: 0 10px 28px rgba(35, 58, 41, .035); }
-.care-principle__number { display: block; margin-bottom: 28px; color: var(--color-orange); font-family: var(--heading); font-size: 24px; }
-.care-principle h3, .care-species-card h3 { margin-bottom: 11px; color: var(--color-forest); font-family: var(--sans); font-size: 18px; font-weight: 700; line-height: 1.2; }
-.care-principle p, .care-species-card li { margin-bottom: 0; color: #657468; font-size: 12px; line-height: 1.75; }
-.care-guide__source-line { margin: 18px 0 0; color: var(--color-muted); font-size: 10px; line-height: 1.75; }
-.care-guide__source-line a { text-underline-offset: 3px; }
-
-.care-guide__species { padding-block: 86px 80px; background: linear-gradient(180deg, transparent, rgba(232, 235, 224, .64), transparent); }
-.care-species-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; }
-.care-species-card { display: flex; flex-direction: column; min-height: 340px; padding: 27px 25px; border: 1px solid #e0e4da; border-radius: 15px; background: var(--color-white); box-shadow: 0 12px 30px rgba(35, 58, 41, .045); }
-.care-species-card__latin { margin-bottom: 8px; color: #a54830; font-family: var(--sans); font-size: 13px; font-style: italic; }
-.care-species-card ul { display: grid; gap: 11px; margin: 8px 0 22px; padding-left: 18px; }
-.care-species-card li { padding-left: 2px; }
-.care-species-card > a { margin-top: auto; color: #385a3c; font-size: 11px; font-weight: 600; text-underline-offset: 4px; }
-.care-species-card > a span { padding-left: 4px; }
-
-.care-faq { max-width: 860px; margin-inline: auto; }
-.care-faq details { border-top: 1px solid var(--color-line); }
-.care-faq details:last-of-type { border-bottom: 1px solid var(--color-line); }
-.care-faq summary { padding: 20px 3px; color: var(--color-forest); cursor: pointer; font-family: var(--sans); font-size: 16px; font-weight: 700; }
-.care-faq details p { max-width: 700px; padding: 0 3px 17px; color: #667569; font-size: 13px; line-height: 1.75; }
-
-.care-guide__contact { display: flex; align-items: center; justify-content: space-between; gap: 32px; margin-top: 96px; padding: 46px clamp(24px, 5vw, 60px); border-radius: 18px; color: white; background: var(--color-forest-deep); }
-.care-guide__contact > div { max-width: 690px; }
-.care-guide__contact h2 { margin-bottom: 13px; color: white; }
-.care-guide__contact p:not(.eyebrow) { max-width: 590px; margin: 0; color: #c6d2c3; font-size: 13px; line-height: 1.7; }
-.care-guide__contact .button { flex: 0 0 auto; }
-
-/* Contraste de la página de cuidados: el hero es oscuro y el cuerpo usa papel claro. */
-.care-guide__hero .care-guide__lead { color: #d1ddcf; }
-.care-guide__hero h1 em { color: var(--color-lime); }
-.care-guide__section > h2 em { color: #a83e2c; }
-.care-guide__contact h2 em { color: #e2a5e7; }
-
-@media (max-width: 900px) {
-  .care-principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .care-principle { min-height: 205px; }
-  .care-species-grid { grid-template-columns: 1fr; }
-  .care-species-card { min-height: 0; }
-  .care-guide__contact { align-items: flex-start; flex-direction: column; }
+.care-page {
+  background:
+    linear-gradient(rgba(30, 122, 60, .03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 122, 60, .03) 1px, transparent 1px),
+    var(--paper);
+  background-size: 28px 28px, 28px 28px, 100% 100%;
 }
 
-@media (max-width: 600px) {
-  .care-guide { padding-bottom: 64px; }
-  .care-guide__hero { padding-block: 51px 43px; }
-  .care-guide__lead { font-size: 15px; }
-  .care-toc { gap: 12px 15px; }
-  .care-toc span { flex-basis: 100%; }
-  .care-guide__section { padding-top: 64px; }
+.care-guide { padding-bottom: 84px; }
+
+.care-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 22px;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.care-breadcrumb a {
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+/* HERO DE GUÍA ILUSTRADO */
+.care-guide__hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  align-items: center;
+  gap: clamp(24px, 4vw, 48px);
+  margin-top: 18px;
+  padding: clamp(28px, 5vw, 56px);
+  border: 1.5px solid rgba(183, 244, 62, .3);
+  border-radius: 26px;
+  color: #f6faee;
+  background:
+    radial-gradient(ellipse at 86% 6%, rgba(183, 244, 62, .2), transparent 40%),
+    radial-gradient(ellipse at 12% 95%, rgba(223, 134, 247, .16), transparent 42%),
+    linear-gradient(145deg, var(--bog-canopy) 0%, var(--bog-abyss) 100%);
+  box-shadow: 0 28px 65px rgba(5, 22, 16, .2);
+}
+
+.care-guide__hero-copy { position: relative; z-index: 2; }
+
+.care-guide__hero h1 {
+  max-width: 680px;
+  margin-bottom: 18px;
+  color: #fafdf4;
+  font-size: clamp(34px, 4.8vw, 58px);
+  line-height: 1.05;
+}
+
+.care-guide__hero h1 em { color: var(--lime); }
+
+.care-guide__lead {
+  max-width: 600px;
+  margin-bottom: 22px;
+  color: #cfe0d2;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.care-guide__note {
+  max-width: 620px;
+  margin: 22px 0 0;
+  padding: 15px 18px;
+  border-left: 3.5px solid var(--crimson);
+  border-radius: 0 12px 12px 0;
+  color: #e2ede0;
+  background: rgba(255, 255, 255, .075);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.care-guide__hero-photos {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.care-hero-card {
+  margin: 0;
+  overflow: hidden;
+  border: 1.5px solid rgba(183, 244, 62, .32);
+  border-radius: 16px;
+  background: rgba(5, 22, 16, .88);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, .35);
+}
+
+.care-hero-card--offset { margin-top: 22px; }
+
+.care-hero-card img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.care-hero-card figcaption {
+  padding: 9px 11px;
+  color: #d6e9d6;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.care-guide__ornament {
+  z-index: 1;
+  top: -54px;
+  right: -18px;
+  width: clamp(200px, 28vw, 330px);
+  opacity: .24;
+  transform: rotate(-10deg);
+}
+
+.care-guide__bloom {
+  z-index: 1;
+  bottom: -14px;
+  left: 38%;
+  width: 64px;
+  opacity: .65;
+}
+
+/* ÍNDICE RÁPIDO */
+.care-toc {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.care-toc span {
+  margin-right: 6px;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.care-toc a {
+  padding: 6px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.care-toc a:hover {
+  border-color: var(--bog-abyss);
+  color: var(--bog-abyss);
+  background: var(--lime);
+}
+
+/* SECCIONES */
+.care-guide__section {
+  padding-top: 68px;
+  scroll-margin-top: 104px;
+}
+
+.care-guide__section > h2,
+.care-guide__contact h2 {
+  max-width: 720px;
+  margin-bottom: 14px;
+  font-size: clamp(28px, 3.8vw, 44px);
+  line-height: 1.1;
+}
+
+.care-section-lead {
+  max-width: 660px;
+  margin-bottom: 28px;
+  color: var(--ink-muted);
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+
+/* REGLAS DE ORO */
+.care-principles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.care-principle {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 20px;
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 10px 26px rgba(5, 22, 16, .05);
+}
+
+.care-principle__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.care-principle__number {
+  color: var(--crimson-text);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.care-principle__badge {
+  padding: 4px 9px;
+  border-radius: 999px;
+  color: var(--bog-abyss);
+  background: var(--mist);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.care-principle h3 {
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.care-principle p {
+  margin-bottom: 0;
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.care-guide__source-line {
+  margin: 18px 0 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.care-guide__source-line a {
+  color: var(--lime-deep);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+/* CÓMO CAZAN (MECANISMOS CON FOTOS REALES) */
+.care-mechanisms {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.mechanism-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1.5px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 12px 30px rgba(5, 22, 16, .06);
+}
+
+.mechanism-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--bog-canopy);
+}
+
+.mechanism-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mechanism-card__pill {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  color: var(--bog-abyss);
+  background: var(--lime);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.mechanism-card__body { padding: 20px; }
+
+.mechanism-card h3 {
+  margin-bottom: 8px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.mechanism-card p {
+  margin-bottom: 10px;
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.mechanism-card__species {
+  margin: 0;
+  color: var(--lime-deep);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* MÉTODO DE LA BANDEJA (DIAGRAMA + PASOS) */
+.tray-guide {
+  display: grid;
+  grid-template-columns: 1.08fr .92fr;
+  align-items: center;
+  gap: 28px;
+  padding: clamp(20px, 3.5vw, 34px);
+  border: 1.5px solid rgba(183, 244, 62, .35);
+  border-radius: 24px;
+  color: #f4f7ec;
+  background: linear-gradient(155deg, var(--bog-canopy), var(--bog-abyss));
+  box-shadow: 0 22px 52px rgba(5, 22, 16, .16);
+}
+
+.tray-guide__diagram {
+  margin: 0;
+}
+
+.tray-guide__diagram img {
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(183, 244, 62, .25);
+  border-radius: 16px;
+}
+
+.tray-guide__diagram figcaption {
+  margin-top: 10px;
+  color: #bfd7c2;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.tray-steps {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tray-step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(183, 244, 62, .2);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .05);
+}
+
+.tray-step__num {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--bog-abyss);
+  background: var(--lime);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tray-step strong { display: block; margin-bottom: 3px; color: #fff; font-size: 15px; }
+.tray-step p { margin: 0; color: #cce0cd; font-size: 13.5px; line-height: 1.55; }
+
+/* FICHAS POR ESPECIE (5 ESPECIES CON FOTOS REALES) */
+.care-species-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+  gap: 18px;
+}
+
+.care-species-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1.5px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 12px 30px rgba(5, 22, 16, .06);
+}
+
+.care-species-card__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: center 45%;
+}
+
+.care-species-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 22px 22px;
+}
+
+.care-species-card__latin {
+  margin-bottom: 4px;
+  color: var(--orchid-text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.care-species-card h3 {
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.species-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.species-stat {
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.species-stat span {
+  display: block;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+}
+
+.species-stat strong {
+  display: block;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.care-species-card ul {
+  display: grid;
+  gap: 9px;
+  margin: 0 0 18px;
+  padding-left: 18px;
+}
+
+.care-species-card li {
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.care-species-card__link {
+  margin-top: auto;
+  color: var(--lime-deep);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-underline-offset: 4px;
+}
+
+.care-species-card__note {
+  margin: auto 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--mist);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* SEMÁFORO SÍ VS NUNCA */
+.do-dont-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.do-dont-card {
+  padding: 24px;
+  border-radius: 20px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+}
+
+.do-dont-card--yes {
+  border-color: rgba(30, 122, 60, .4);
+  background: linear-gradient(180deg, #f3faee 0%, var(--surface) 100%);
+}
+
+.do-dont-card--no {
+  border-color: rgba(224, 64, 54, .4);
+  background: linear-gradient(180deg, #fdf2f1 0%, var(--surface) 100%);
+}
+
+.do-dont-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.do-dont-card--yes h3 { color: var(--lime-deep); }
+.do-dont-card--no h3 { color: var(--crimson-text); }
+
+.do-dont-card ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.do-dont-card li {
+  color: var(--ink);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+/* DIAGNÓSTICO RÁPIDO */
+.diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.diagnostic-card {
+  padding: 22px;
+  border: 1.5px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.diagnostic-card__symptom {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: var(--bog-abyss);
+  background: rgba(245, 200, 66, .45);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.diagnostic-card h3 {
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.diagnostic-card p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* FAQ */
+.care-faq {
+  max-width: 860px;
+  margin-inline: auto;
+}
+
+.care-faq details {
+  border-top: 1px solid var(--line);
+}
+
+.care-faq details:last-of-type { border-bottom: 1px solid var(--line); }
+
+.care-faq summary {
+  padding: 20px 6px;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.care-faq details p {
+  max-width: 720px;
+  margin-bottom: 0;
+  padding: 0 6px 20px;
+  color: var(--ink-muted);
+  font-size: 14.5px;
+  line-height: 1.7;
+}
+
+/* CTA FINAL DE GUÍA */
+.care-guide__contact {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: 76px;
+  padding: clamp(28px, 5vw, 56px);
+  border: 1.5px solid rgba(183, 244, 62, .3);
+  border-radius: 24px;
+  color: #f6faee;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(183, 244, 62, .2), transparent 44%),
+    var(--bog-abyss);
+}
+
+.care-guide__contact::after {
+  position: absolute;
+  z-index: -1;
+  top: -80px;
+  right: -50px;
+  width: 240px;
+  height: 360px;
+  background: url('/images/botanical/hanging-pitcher-vine.svg') center / contain no-repeat;
+  content: '';
+  opacity: .2;
+  transform: rotate(-24deg);
+}
+
+.care-guide__contact > div { max-width: 660px; }
+.care-guide__contact h2 { margin-bottom: 12px; color: #fff; }
+.care-guide__contact h2 em { color: var(--orchid); }
+.care-guide__contact p:not(.eyebrow) { max-width: 580px; margin: 0; color: #cfe0d2; font-size: 15px; line-height: 1.65; }
+.care-guide__contact .button { flex: 0 0 auto; }
+
+/* RESPONSIVE */
+@media (max-width: 980px) {
+  .care-guide__hero { grid-template-columns: 1fr; }
+  .care-principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .care-mechanisms { grid-template-columns: 1fr; }
+  .tray-guide { grid-template-columns: 1fr; }
+  .care-guide__contact { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 640px) {
+  .care-guide { padding-bottom: 58px; }
+  .care-guide__section { padding-top: 52px; }
   .care-principles { grid-template-columns: 1fr; }
-  .care-principle { min-height: 0; }
-  .care-principle__number { margin-bottom: 16px; }
-  .care-guide__species { padding-block: 64px; }
-  .care-guide__contact { margin-top: 68px; padding: 28px 22px; }
+  .do-dont-grid { grid-template-columns: 1fr; }
+  .diagnostic-grid { grid-template-columns: 1fr; }
+  .species-stats { grid-template-columns: 1fr; }
   .care-guide__contact .button { width: 100%; }
 }
