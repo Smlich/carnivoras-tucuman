@@ -13,38 +13,46 @@
   from = "/catalogo"
   to = "/catalogo.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/vivero"
   to = "/vivero.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/cuidados"
   to = "/cuidados.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/juegos"
   to = "/juegos.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/contacto"
   to = "/contacto.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/admin"
   to = "/admin.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/privacidad"
   to = "/privacidad.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/terminos"
   to = "/terminos.html"
   status = 301
+  force = true

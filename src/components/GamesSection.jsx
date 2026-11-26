@@ -241,7 +241,7 @@ export default function GamesSection({ showHeading = true }) {
   return (
     <section className="games-section section-pad" id="juegos" aria-labelledby={showHeading ? 'games-title' : undefined} aria-label={showHeading ? undefined : 'Zona de juegos gratis'}>
       <div className="page-shell">
-        {showHeading && (
+        {showHeading ? (
           <div className="section-heading">
             <div>
               <p className="eyebrow"><span className="eyebrow__line" /> Zona de juegos gratis</p>
@@ -249,6 +249,8 @@ export default function GamesSection({ showHeading = true }) {
             </div>
             <p className="section-heading__aside">Un regalo para quienes inician sesión con Google: juegos gratuitos creados por nosotros.</p>
           </div>
+        ) : (
+          <h2 className="visually-hidden">Juegos disponibles</h2>
         )}
         {content}
       </div>

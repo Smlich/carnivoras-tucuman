@@ -2291,7 +2291,7 @@ h2 em {
 
 /* ANIMACIONES */
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slide-in { from { transform: translateX(24px); opacity: .7; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slide-in { from { transform: translateX(24px); } to { transform: translateX(0); } }
 
 /* RESPONSIVE TABLET Y MÓVIL */
 @media (max-width: 1080px) {
@@ -2413,6 +2413,19 @@ h2 em {
   .cart-drawer { padding: 18px 16px; }
   .cart-item { grid-template-columns: 56px 1fr auto; gap: 10px; }
   .cart-item__picture { width: 56px; height: 68px; }
+}
+
+@media (max-width: 390px) {
+  :root { --shell: calc(100% - 20px); }
+  .site-header__inner { gap: 6px; }
+  .brand { gap: 6px; }
+  .brand__logo { width: 32px; height: 32px; }
+  .brand__text strong { font-size: 14.5px; }
+  .brand__text span { font-size: 8.5px; letter-spacing: .08em; }
+  .site-header__actions { gap: 4px; }
+  .nav-toggle { width: 36px; height: 36px; border-radius: 10px; }
+  .cart-trigger,
+  .account-menu__trigger { min-height: 36px; padding: 0 8px; gap: 5px; }
 }
 
 @media (max-width: 350px) {

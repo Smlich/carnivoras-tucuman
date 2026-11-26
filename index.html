@@ -18,19 +18,33 @@
       property="og:description"
       content="Descubrí plantas carnívoras de nuestro vivero en Tucumán. Fotos reales y atención directa por WhatsApp."
     />
-    <meta property="og:image" content="https://carnivorastucuman.netlify.app/images/gallery/jarro-con-gotas.jpeg" />
+    <meta property="og:image" content="https://carnivorastucuman.netlify.app/images/og/og-home.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:alt" content="Detalle de una trampa de jarro con gotas de agua, fotografiada en el vivero." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Carnívoras Tucumán | Plantas únicas, cultivadas con cuidado" />
     <meta name="twitter:description" content="Plantas carnívoras cultivadas en Tucumán, con fotos reales y atención directa por WhatsApp." />
-    <meta name="twitter:image" content="https://carnivorastucuman.netlify.app/images/gallery/jarro-con-gotas.jpeg" />
+    <meta name="twitter:image" content="https://carnivorastucuman.netlify.app/images/og/og-home.jpg" />
     <meta name="twitter:image:alt" content="Detalle de una trampa de jarro con gotas de agua, fotografiada en el vivero." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@1,9..144,600&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preload" as="image" href="/images/gallery/optimized/jarro-con-gotas-480w.jpg" imagesrcset="/images/gallery/optimized/jarro-con-gotas-480w.jpg 480w, /images/gallery/jarro-con-gotas.jpeg 960w" imagesizes="(max-width: 860px) 90vw, 42vw" fetchpriority="high" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="icon" type="image/png" sizes="64x64" href="/images/catalog/optimized/favicon-64.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/images/catalog/optimized/apple-touch-icon.png" />
     <title>Carnívoras Tucumán | Plantas carnívoras en Tucumán</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Carnívoras Tucumán",
+        "url": "https://carnivorastucuman.netlify.app/",
+        "inLanguage": "es-AR"
+      }
+    </script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -38,12 +52,27 @@
         "name": "Carnívoras Tucumán",
         "description": "Vivero de plantas carnívoras cultivadas en Tucumán, Argentina.",
         "url": "https://carnivorastucuman.netlify.app/",
+        "image": "https://carnivorastucuman.netlify.app/images/og/og-home.jpg",
+        "logo": "https://carnivorastucuman.netlify.app/images/catalog/optimized/apple-touch-icon.png",
+        "priceRange": "$$",
         "telephone": "+5493816168898",
         "areaServed": "Tucumán, Argentina",
         "address": {
           "@type": "PostalAddress",
-          "addressLocality": "Tucumán",
+          "addressLocality": "San Miguel de Tucumán",
+          "addressRegion": "Tucumán",
           "addressCountry": "AR"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": -26.8083,
+          "longitude": -65.2176
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+5493816168898",
+          "contactType": "sales",
+          "availableLanguage": ["es"]
         },
         "sameAs": ["https://www.instagram.com/carnivoras_tucuman/"]
       }

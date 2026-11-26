@@ -61,7 +61,7 @@ export default function ProductCatalog({ products: catalogProducts, onAdd, showH
   return (
     <section className="catalog-section section-pad" id="catalogo" aria-labelledby={showHeading ? 'catalog-title' : undefined} aria-label={showHeading ? undefined : 'Catálogo de plantas carnívoras'}>
       <div className="page-shell">
-        {showHeading && (
+        {showHeading ? (
           <div className="section-heading section-heading--catalog">
             <div>
               <p className="eyebrow"><span className="eyebrow__line" /> Nuestro catálogo</p>
@@ -69,6 +69,8 @@ export default function ProductCatalog({ products: catalogProducts, onAdd, showH
             </div>
             <p className="section-heading__aside">Elegí tus favoritas y armá una consulta. Te confirmamos disponibilidad y entrega desde {settings.city}.</p>
           </div>
+        ) : (
+          <h2 className="visually-hidden">Lista de plantas y precios</h2>
         )}
 
         <div className="catalog-toolbar">
