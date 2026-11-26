@@ -1,4 +1,4 @@
-import { store } from '../config/store';
+import { store } from '../config/store.js';
 
 const argentinePeso = new Intl.NumberFormat('es-AR', {
   style: 'currency',

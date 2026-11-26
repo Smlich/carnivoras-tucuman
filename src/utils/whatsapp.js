@@ -1,5 +1,5 @@
-import { store } from '../config/store';
-import { formatPrice } from './format-price';
+import { store } from '../config/store.js';
+import { formatPrice } from './format-price.js';
 
 function normalizeCustomerInfo(customer) {
   if (typeof customer === 'string') {
