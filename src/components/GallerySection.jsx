@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { galleryItems } from '../data/gallery';
+import { useSiteContent } from '../context/SiteContentContext';
 
 const initialVisibleCount = 8;
 
 function getResponsiveSrcSet(item) {
-  const basename = item.src.split('/').pop().replace(/\.jpe?g$/i, '');
-  return `/images/gallery/optimized/${basename}-480w.jpg 480w, ${item.src} ${item.width}w`;
+  const match = /^\/images\/gallery\/([^/]+)\.jpe?g$/i.exec(item.src ?? '');
+  if (!match) return undefined;
+  return `/images/gallery/optimized/${match[1]}-480w.jpg 480w, ${item.src} ${item.width || 960}w`;
 }
 
 function getGenusKey(label) {
@@ -19,18 +20,19 @@ function getGenusKey(label) {
 }
 
 export default function GallerySection({ defaultExpanded = false, showHeading = true }) {
+  const { gallery: galleryItems } = useSiteContent();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [activeIndex, setActiveIndex] = useState(null);
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
-  const activeItem = activeIndex === null ? null : galleryItems[activeIndex];
+  const activeItem = activeIndex === null ? null : galleryItems[activeIndex] ?? null;
   const visibleItems = isExpanded ? galleryItems : galleryItems.slice(0, initialVisibleCount);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
-    if (activeIndex === null) {
+    if (!activeItem) {
       if (dialog.open) dialog.close();
       return;
     }
@@ -39,10 +41,10 @@ export default function GallerySection({ defaultExpanded = false, showHeading = 
       dialog.showModal();
       closeButtonRef.current?.focus();
     }
-  }, [activeIndex]);
+  }, [activeItem]);
 
   function handleViewerKeyDown(event) {
-    if (activeIndex === null) return;
+    if (activeIndex === null || galleryItems.length === 0) return;
 
     if (event.key === 'ArrowRight') {
       event.preventDefault();
@@ -71,7 +73,7 @@ export default function GallerySection({ defaultExpanded = false, showHeading = 
 
         <div className="gallery-grid" id="gallery-grid">
           {visibleItems.map((item, index) => (
-            <figure className="gallery-card" key={item.src} data-genus={getGenusKey(item.label)}>
+            <figure className="gallery-card" key={item.id || item.src} data-genus={getGenusKey(item.label)}>
               <button
                 className="gallery-card__open"
                 type="button"
@@ -84,8 +86,8 @@ export default function GallerySection({ defaultExpanded = false, showHeading = 
                   srcSet={getResponsiveSrcSet(item)}
                   sizes="(max-width: 460px) 46vw, (max-width: 760px) 46vw, (max-width: 1000px) 30vw, 23vw"
                   alt={item.alt}
-                  width={item.width}
-                  height={item.height}
+                  width={item.width || 960}
+                  height={item.height || 1280}
                   loading="lazy"
                   decoding="async"
                 />

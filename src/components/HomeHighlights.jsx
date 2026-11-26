@@ -1,13 +1,7 @@
 import { useState } from 'react';
+import { useSiteContent } from '../context/SiteContentContext';
 import CatalogLightbox from './CatalogLightbox';
 import ProductCard from './ProductCard';
-
-const FEATURED_PRODUCT_IDS = [
-  'combo-tres-carnivoras',
-  'venus-pequena',
-  'drosera-capensis-unidad',
-  'venus-red-piranha',
-];
 
 const SITE_DIRECTORY = [
   {
@@ -40,18 +34,19 @@ const SITE_DIRECTORY = [
   },
 ];
 
-function selectFeaturedProducts(products) {
+function selectFeaturedProducts(products, featuredIds) {
   const byId = new Map(products.map((product) => [product.id, product]));
-  const picked = FEATURED_PRODUCT_IDS.map((id) => byId.get(id)).filter(Boolean);
+  const picked = (featuredIds || []).map((id) => byId.get(id)).filter(Boolean);
   if (picked.length > 0) return picked;
   return products.slice(0, 4);
 }
 
 export default function HomeHighlights({ products, onAdd }) {
+  const { settings } = useSiteContent();
   const [activeProductId, setActiveProductId] = useState(null);
   const [addedProductId, setAddedProductId] = useState(null);
 
-  const featuredProducts = selectFeaturedProducts(products);
+  const featuredProducts = selectFeaturedProducts(products, settings.featuredProductIds);
   const activeProduct = activeProductId === null
     ? null
     : featuredProducts.find((product) => product.id === activeProductId) ?? null;

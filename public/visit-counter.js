@@ -31,11 +31,10 @@ function saveCount(count) {
   }
 }
 
-// La portada indica su endpoint (data-visit-endpoint). La guía estática no: allí se deduce por el dominio.
+// La portada indica su endpoint (data-visit-endpoint). La guía estática prueba primero /api/visits y cae a Netlify Function.
 function getEndpoints(element) {
   const configured = element.dataset.visitEndpoint;
-  if (configured) return [configured];
-  if (window.location.hostname.endsWith('.netlify.app')) return [netlifyEndpoint];
+  if (configured) return configured === '/api/visits' ? ['/api/visits', netlifyEndpoint] : [configured];
   return ['/api/visits', netlifyEndpoint];
 }
 

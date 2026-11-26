@@ -42,6 +42,12 @@ const environmentSchema = z.object({
   FACEBOOK_CLIENT_ID: optionalText(),
   FACEBOOK_CLIENT_SECRET: optionalText(),
   CORS_ORIGINS: optionalText(z.string()),
+  ADMIN_EMAIL: optionalText(z.string().email('ADMIN_EMAIL debe ser un correo válido.')),
+  ADMIN_EMAILS: optionalText(z.string()),
+  ADMIN_NAME: optionalText(z.string()),
+  ADMIN_PASSWORD: optionalText(z.string()),
+  ADMIN_PASSWORD_HASH: optionalText(z.string()),
+  ADMIN_SESSION_SECRET: optionalText(z.string().min(32, 'ADMIN_SESSION_SECRET debe tener al menos 32 caracteres.')),
 }).superRefine((values, context) => {
   const providerPairs = [
     ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'Google'],
@@ -105,7 +111,7 @@ const environmentSchema = z.object({
     context.addIssue({
       code: 'custom',
       path: ['CORS_ORIGINS'],
-      message: 'CORS_ORIGINS es obligatorio en producción: lista los orígenes HTTPS permitidos.',
+      message: 'CORS_ORIGINS es obligatorio en producción: lista los orígenes HTTPS públicos.',
     });
   } else if (!splitOrigins(values.CORS_ORIGINS).every(isPublicHttpsOrigin)) {
     context.addIssue({

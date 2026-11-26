@@ -1,33 +1,106 @@
+import { fromNodeHeaders } from 'better-auth/node';
 import { Router } from 'express';
 import { z } from 'zod';
-import { games } from '../../../src/data/games.js';
-import { createRequireAuth } from '../middleware/require-auth.js';
+import { defaultAdminGames } from '../../../src/data/site-defaults.js';
+import { isAdminConfigured } from '../auth/admin-session.js';
+import { isDatabaseConnected } from '../config/database.js';
+import { env } from '../config/env.js';
+import { getStoredAdminAccount, resolveAdminAccess } from '../middleware/require-admin.js';
+import { Game } from '../models/Game.js';
+import { sanitizeGamesForViewer } from '../utils/game-visibility.js';
 
-export function createGamesRouter({ auth = null } = {}) {
+async function loadGamesList() {
+  if (isDatabaseConnected()) {
+    const docs = await Game.find().sort({ sortOrder: 1, title: 1 }).lean();
+    if (docs.length > 0) return docs;
+  }
+  return defaultAdminGames;
+}
+
+export function createGamesRouter({ auth = null, appEnv = env } = {}) {
   const router = Router();
 
-  router.use(createRequireAuth(auth));
+  router.use(async (request, response, next) => {
+    response.set('Cache-Control', 'no-store');
 
-  router.get('/', (request, response) => {
+    try {
+      const adminUser = await resolveAdminAccess(request, { auth, appEnv });
+      if (adminUser) {
+        request.gameViewer = {
+          playerName: adminUser.name || 'Administrador',
+          role: 'admin',
+          isAdmin: true,
+        };
+        return next();
+      }
+
+      const overrideAccount = await getStoredAdminAccount();
+      const adminAvailable = isAdminConfigured(appEnv, overrideAccount);
+
+      if (!auth && !adminAvailable) {
+        return response.status(503).json({
+          error: {
+            code: 'AUTH_NOT_CONFIGURED',
+            message: 'El inicio de sesión estará disponible cuando se configure MongoDB y al menos un proveedor social.',
+          },
+        });
+      }
+
+      if (auth) {
+        const sessionData = await auth.api.getSession({ headers: fromNodeHeaders(request.headers) });
+        if (sessionData?.user) {
+          request.gameViewer = {
+            playerName: sessionData.user.name || 'Cliente',
+            role: 'player',
+            isAdmin: false,
+          };
+          return next();
+        }
+      }
+
+      return response.status(401).json({
+        error: {
+          code: 'AUTH_REQUIRED',
+          message: 'Iniciá sesión con Google para entrar a esta sección.',
+        },
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  router.get('/', async (request, response) => {
+    const viewer = request.gameViewer;
+    const allGames = await loadGamesList();
+    const visibleGames = sanitizeGamesForViewer(allGames, { isAdmin: viewer.isAdmin });
+
     response.status(200).json({
-      data: games,
+      data: visibleGames,
       meta: {
         unlocked: true,
-        playerName: request.authUser.name || 'Cliente',
-        total: games.length,
+        playerName: viewer.playerName,
+        role: viewer.role,
+        isAdmin: viewer.isAdmin,
+        total: visibleGames.length,
       },
     });
   });
 
-  router.get('/:slug', (request, response) => {
+  router.get('/:slug', async (request, response) => {
     const slug = z.string().regex(/^[a-z0-9-]+$/).parse(request.params.slug);
-    const game = games.find((item) => item.slug === slug);
+    const viewer = request.gameViewer;
+    const allGames = await loadGamesList();
+    const visibleGames = sanitizeGamesForViewer(allGames, { isAdmin: viewer.isAdmin });
+    const game = visibleGames.find((item) => item.slug === slug);
 
     if (!game) {
       return response.status(404).json({ error: { code: 'GAME_NOT_FOUND', message: 'No encontramos ese juego.' } });
     }
 
-    return response.status(200).json({ data: game, meta: { unlocked: true } });
+    return response.status(200).json({
+      data: game,
+      meta: { unlocked: true, role: viewer.role, isAdmin: viewer.isAdmin },
+    });
   });
 
   return router;

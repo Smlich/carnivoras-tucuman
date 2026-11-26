@@ -1,9 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSiteContent } from '../context/SiteContentContext';
 import { formatPrice } from '../utils/format-price';
 import { createWhatsAppUrl } from '../utils/whatsapp';
 import CatalogImage from './CatalogImage';
 
 export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, onClear }) {
+  const { settings } = useSiteContent();
+  const [customerName, setCustomerName] = useState('');
   const drawerRef = useRef(null);
   const emptyStateActionRef = useRef(null);
   const previousItemCount = useRef(items.length);
@@ -69,6 +72,26 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+  function logOrderInquiry() {
+    if (import.meta.env.VITE_STATIC_PREVIEW === 'true' || items.length === 0) return;
+
+    fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        customerName: customerName.trim(),
+        items: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        source: 'whatsapp-cart',
+      }),
+    }).catch(() => {});
+  }
+
   return (
     <div className="cart-layer">
       <button className="cart-layer__scrim" type="button" onClick={onClose} aria-label="Cerrar pedido" tabIndex={-1} />
@@ -113,9 +136,25 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
               ))}
             </ul>
             <div className="cart-summary">
+              <label className="cart-customer-field">
+                <span>Tu nombre (opcional, para agilizar la consulta)</span>
+                <input
+                  type="text"
+                  maxLength={80}
+                  value={customerName}
+                  onChange={(event) => setCustomerName(event.target.value)}
+                  placeholder="Ej. María o Facundo"
+                />
+              </label>
               <div><span>Total de referencia</span><strong>{formatPrice(total)}</strong></div>
               <p>El stock, el precio vigente y la entrega se confirman por WhatsApp.</p>
-              <a className="button button--dark button--full" href={createWhatsAppUrl(items)} target="_blank" rel="noreferrer">
+              <a
+                className="button button--dark button--full"
+                href={createWhatsAppUrl(items, settings, customerName.trim())}
+                target="_blank"
+                rel="noreferrer"
+                onClick={logOrderInquiry}
+              >
                 Enviar consulta por WhatsApp <span aria-hidden="true">↗</span>
               </a>
               <button className="clear-cart" type="button" onClick={onClear}>Vaciar pedido</button>

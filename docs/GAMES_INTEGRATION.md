@@ -1,44 +1,68 @@
 # Integrar un juego de Google AI Studio
 
-La web ya tiene una sección **Zona de juegos gratis** (`#juegos`). Está preparada para mostrar juegos solo a quienes inician sesión con Google. Hoy muestra el juego `vivero-carnivoro` como «Próximamente»; cuando esté listo, solo hay que publicarlo y cambiar su estado.
+La sección **Zona de juegos gratis** (`/juegos.html`) permite jugar gratis a clientes autenticados con Google (en backend MERN) y activa un **Modo Administrador** exclusivo cuando estás logueado como administrador (tanto en Netlify `/admin.html` como en Express MERN).
 
-## Cómo funciona
+## Cómo se comunica con tu juego (Jugador vs Administrador)
 
-```text
-Visitante → botón «Iniciar sesión con Google» (Better Auth)
-          → React pide GET /api/games (con la cookie de sesión)
-          → Express verifica la sesión en el servidor (401 si no hay)
-          → React muestra los juegos y, si están «playable», los abre en un iframe
+Cuando un usuario abre el juego desde `/juegos.html`:
+
+1. **Parámetros en la URL del `<iframe>`:**
+   - Para jugadores normales: `?role=player&isAdmin=0&player=<nombre>`
+   - Para el administrador: `?role=admin&isAdmin=1&player=<nombre>&adminProps=<JSON>`
+2. **Mensaje seguro `window.postMessage`:**
+   - Al cargar el `<iframe>` (o cuando tu juego envíe `window.parent.postMessage({ type: 'CARNIVORAS_REQUEST_CONTEXT' }, '*')`), la página responde con:
+
+```json
+{
+  "type": "CARNIVORAS_PLAYER_CONTEXT",
+  "version": 1,
+  "role": "admin",
+  "isAdmin": true,
+  "playerName": "Administrador",
+  "gameSlug": "vivero-carnivoro",
+  "adminProps": {
+    "adminMode": true,
+    "debugTools": true,
+    "unlockAll": true
+  }
+}
 ```
 
-- El registro de juegos vive en `src/data/games.js` y lo comparten React y Express.
-- La ruta `GET /api/games` y `GET /api/games/:slug` exigen sesión (`server/src/middleware/require-auth.js`). Sin base de datos o sin Google configurado responde `503`; sin sesión, `401`.
-- La sección solo se activa con el sitio completo (Express + Atlas + Google). En la vista estática de Netlify muestra la tarjeta «Próximamente» sin pedir nada.
+> Para visitantes y jugadores normales, el backend omite `adminEmbedUrl` y siempre entrega `role: "player"`, `isAdmin: false` y `adminProps: {}`. Además oculta los juegos en estado `admin-only`.
 
-## Publicar un juego
+## Fragmento listo para pegar en tu juego (Google AI Studio)
 
-1. Exportá o compilá el juego desde Google AI Studio como una carpeta web estática (HTML, JS y recursos).
-2. Copiá esa carpeta en `public/games/<slug>/` (por ejemplo `public/games/vivero-carnivoro/index.html`).
-3. En `src/data/games.js` cambiá la entrada del juego:
+```js
+// 1) Lectura inicial por URL (?role=admin&isAdmin=1&adminProps=...)
+const params = new URLSearchParams(window.location.search);
+let gameContext = {
+  role: params.get('role') || 'player',
+  isAdmin: params.get('isAdmin') === '1',
+  playerName: params.get('player') || 'Jugador',
+  adminProps: (() => {
+    try { return JSON.parse(params.get('adminProps') || '{}'); } catch { return {}; }
+  })(),
+};
 
-   ```js
-   status: 'playable',
-   embedUrl: '/games/vivero-carnivoro/index.html',
-   ```
+// 2) Escuchar actualización / respuesta por postMessage desde Carnívoras Tucumán
+window.addEventListener('message', (event) => {
+  if (event.data?.type !== 'CARNIVORAS_PLAYER_CONTEXT') return;
+  gameContext = event.data;
+  if (gameContext.isAdmin) {
+    // Activá paneles de prueba, niveles desbloqueados o controles de admin aquí
+    console.info('Modo Admin activado:', gameContext.adminProps);
+  }
+});
 
-4. Probalo en local con `npm run dev:all`, iniciá sesión con Google y abrí `http://localhost:5173/#juegos`.
+// 3) Avisar al sitio padre que el juego ya está listo para recibir el contexto
+if (window.parent !== window) {
+  window.parent.postMessage({ type: 'CARNIVORAS_REQUEST_CONTEXT' }, '*');
+}
+```
 
-La política de seguridad de Express ya permite incrustar contenido del mismo sitio (`frame-src 'self'`). Si el juego se aloja en otro dominio, hay que agregar ese dominio a `frame-src` en `server/src/app.js` y usarlo en `embedUrl`.
+## Publicar o configurar sin tocar código desde `/admin.html`
 
-> [!IMPORTANT]
-> Los archivos de `public/games/` se pueden descargar directamente por URL. Esta protección oculta y desbloquea la sección, pero no impide que alguien con el enlace exacto abra los archivos. Si el juego fuera de pago o secreto, habría que servirlo detrás de una ruta de Express que verifique la sesión.
-
-## Claves de Gemini
-
-Si el juego llama a la API de Gemini, **nunca** dejes la clave dentro del código del juego: cualquiera podría copiarla desde el navegador. Guardala en `.env` (por ejemplo `GEMINI_API_KEY`), llamala desde una ruta de Express protegida con `createRequireAuth` y que el juego use esa ruta. Verificá antes los límites y costos de la API; este proyecto mantiene la etapa en planes gratuitos.
-
-## Datos que faltan
-
-- El nombre final, la descripción y las imágenes del juego.
-- Cómo se exporta el juego desde Google AI Studio (carpeta estática o enlace compartido) para decidir entre `public/games/` y un `embedUrl` externo.
-- Si, además de Google, querés exigir otra condición (por ejemplo, correo verificado, que ya se exige en Better Auth).
+1. Iniciá sesión en `/admin.html`.
+2. Entrá a la pestaña **Juegos**.
+3. Cargá `embedUrl` (por ejemplo `/games/vivero-carnivoro/index.html` o una URL HTTPS publicada), elegí estado `admin-only` (para probar primero solo con tu cuenta) o `playable`, y ajustá las claves en **Propiedades del modo Administrador**.
+4. Pulsá **Probar en `/juegos.html`** para validar ambos modos al instante.

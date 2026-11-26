@@ -21,7 +21,9 @@ La tienda conserva WhatsApp como contacto del pedido. Una cuenta social todavía
 - Las cookies son `HttpOnly`, `SameSite=Lax` y `Secure` en producción.
 - Los tokens OAuth se cifran en MongoDB. El sitio solo necesita identificar a la persona; no llama APIs de Google o Meta en nombre del cliente.
 - Google exige correo verificado para abrir sesión. Facebook puede no entregar un correo válido; cuando falta, se guarda un marcador con dominio reservado `.invalid` basado en el ID de la cuenta. Ese marcador no es un contacto y no se usa para enviar mensajes.
-- El registro social no da permisos de administración. La autorización de inventario y pedidos requiere reglas separadas.
+- El registro social normal no da permisos de administración. Los clientes que inician sesión con Google juegan con rol estándar (`player`).
+- El panel `/admin.html` y las rutas `/api/admin/*` exigen autenticación explícita de administrador: sesión firmada `ct_admin_session` (`HttpOnly`, `SameSite=Lax`, `Secure` en HTTPS) con contraseña verificada vía PBKDF2 (`ADMIN_EMAIL` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET`), o en el servidor MERN un correo verificado de Google listado en `ADMIN_EMAILS`.
+- Para crear o restablecer el acceso de administración en MongoDB Atlas desde línea de comandos está disponible `npm run seed:admin`.
 
 ## Estado verificado en desarrollo
 

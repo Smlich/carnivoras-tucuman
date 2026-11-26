@@ -7,9 +7,11 @@ import { ZodError } from 'zod';
 import { toNodeHandler } from 'better-auth/node';
 import { env } from './config/env.js';
 import { createRateLimiter } from './middleware/rate-limit.js';
+import { createAdminRouter } from './routes/admin.js';
 import { createGamesRouter } from './routes/games.js';
 import { createHealthRouter } from './routes/health.js';
 import { createProductsRouter } from './routes/products.js';
+import { createPublicSiteRouter } from './routes/public-site.js';
 import { createVisitsRouter } from './routes/visits.js';
 
 const frontendDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../../dist');
@@ -61,14 +63,14 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
         'base-uri': ["'self'"],
         'form-action': ["'self'"],
         'frame-ancestors': ["'self'"],
-        // Permite incrustar juegos alojados en este mismo sitio (public/games/...).
-        'frame-src': ["'self'"],
+        // Permite incrustar juegos locales (public/games/...) y embeds HTTPS de Google AI Studio.
+        'frame-src': ["'self'", 'https:'],
         'object-src': ["'none'"],
         'script-src': ["'self'"],
         'script-src-attr': ["'none'"],
         'style-src': ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
         'font-src': ["'self'", 'https://fonts.gstatic.com', 'data:'],
-        'img-src': ["'self'", 'data:', 'https://lh3.googleusercontent.com', 'https://*.googleusercontent.com'],
+        'img-src': ["'self'", 'data:', 'blob:', 'https://lh3.googleusercontent.com', 'https://*.googleusercontent.com', 'https:'],
         'connect-src': ["'self'"],
         'upgrade-insecure-requests': isProduction ? [] : null,
       },
@@ -80,7 +82,8 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
       if (!origin || appEnv.corsOrigins.includes(origin)) return callback(null, true);
       return callback(null, false);
     },
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'X-Admin-Request', 'X-Counter-Request'],
     credentials: true,
     maxAge: 86400,
   }));
@@ -89,6 +92,7 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   const productsLimiter = createRateLimiter({ max: rateLimits.productsMax ?? 120 });
   const gamesLimiter = createRateLimiter({ max: rateLimits.gamesMax ?? 60 });
   const visitsLimiter = createRateLimiter({ max: rateLimits.visitsMax ?? 20 });
+  const adminLimiter = createRateLimiter({ max: rateLimits.adminMax ?? 120 });
 
   app.get('/api/auth/status', authStatusLimiter, (request, response) => {
     response.set('Cache-Control', 'no-store');
@@ -107,6 +111,8 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
     }));
   }
 
+  // Subida multimedia admite hasta 3 MB JSON; el resto de rutas queda acotado a 16 KB.
+  app.use('/api/admin/media', express.json({ limit: '3mb' }));
   app.use(express.json({ limit: '16kb' }));
 
   app.use('/api/health', createHealthRouter({
@@ -114,11 +120,13 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
     hasDatabaseUri: Boolean(appEnv.MONGODB_URI),
   }));
   app.use('/api/products', productsLimiter, createProductsRouter({ isProduction }));
-  app.use('/api/games', gamesLimiter, createGamesRouter({ auth }));
+  app.use('/api/games', gamesLimiter, createGamesRouter({ auth, appEnv }));
   app.use('/api/visits', visitsLimiter, createVisitsRouter());
+  app.use('/api/admin', adminLimiter, createAdminRouter({ auth, appEnv }));
+  app.use('/api', productsLimiter, createPublicSiteRouter({ isProduction }));
 
   if (isProduction) {
-    for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto']) {
+    for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin']) {
       app.get([`/${page}`, `/${page}/`], (request, response) => {
         response.redirect(301, `/${page}.html`);
       });

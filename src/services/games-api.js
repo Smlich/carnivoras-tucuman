@@ -15,5 +15,10 @@ export async function fetchUnlockedGames({ signal } = {}) {
     throw new Error('La respuesta de juegos no tiene el formato esperado.');
   }
 
-  return { games: payload.data, playerName: payload.meta?.playerName ?? 'Cliente' };
+  return {
+    games: payload.data,
+    playerName: payload.meta?.playerName ?? 'Cliente',
+    role: payload.meta?.role ?? 'player',
+    isAdmin: Boolean(payload.meta?.isAdmin),
+  };
 }

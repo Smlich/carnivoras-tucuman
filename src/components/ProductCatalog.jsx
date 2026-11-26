@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { store } from '../config/store';
+import { useSiteContent } from '../context/SiteContentContext';
 import { normalizeSearchText } from '../utils/normalize-text';
 import CatalogLightbox from './CatalogLightbox';
 import ProductCard from './ProductCard';
@@ -13,6 +13,7 @@ const filters = [
 ];
 
 export default function ProductCatalog({ products: catalogProducts, onAdd, showHeading = true }) {
+  const { settings } = useSiteContent();
   const [activeFilter, setActiveFilter] = useState('todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeProductId, setActiveProductId] = useState(null);
@@ -66,7 +67,7 @@ export default function ProductCatalog({ products: catalogProducts, onAdd, showH
               <p className="eyebrow"><span className="eyebrow__line" /> Nuestro catálogo</p>
               <h2 id="catalog-title">Pequeñas maravillas, <em>grandes personalidades.</em></h2>
             </div>
-            <p className="section-heading__aside">Elegí tus favoritas y armá una consulta. Te confirmamos disponibilidad y entrega desde {store.city}.</p>
+            <p className="section-heading__aside">Elegí tus favoritas y armá una consulta. Te confirmamos disponibilidad y entrega desde {settings.city}.</p>
           </div>
         )}
 

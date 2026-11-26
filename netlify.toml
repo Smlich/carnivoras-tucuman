@@ -7,7 +7,7 @@
 
 [build.environment]
   NODE_VERSION = "24"
-  VITE_STATIC_PREVIEW = "true"
+  VITE_STATIC_PREVIEW = "false"
 
 [[redirects]]
   from = "/catalogo"
@@ -32,4 +32,9 @@
 [[redirects]]
   from = "/contacto"
   to = "/contacto.html"
+  status = 301
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
   status = 301

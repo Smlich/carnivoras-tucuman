@@ -11,6 +11,12 @@ export const games = [
     requiredProviders: ['google'],
     platform: 'Google AI Studio',
     embedUrl: null,
+    adminEmbedUrl: null,
+    adminProps: {
+      adminMode: true,
+      debugTools: true,
+      unlockAll: true,
+    },
     aspectRatio: '16 / 9',
     badge: 'Gratis con Google',
   },

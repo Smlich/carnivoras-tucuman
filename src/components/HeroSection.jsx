@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { store } from '../config/store';
+import { useSiteContent } from '../context/SiteContentContext';
 import { formatFreezeUnit, getPriceFreezeDuration } from '../utils/price-freeze-duration';
 
 const speciesPalette = [
@@ -11,14 +11,15 @@ const speciesPalette = [
 ];
 
 export default function HeroSection() {
+  const { settings } = useSiteContent();
   const [isLatInfoOpen, setIsLatInfoOpen] = useState(false);
-  const [freezeDuration, setFreezeDuration] = useState(() => getPriceFreezeDuration());
+  const [now, setNow] = useState(() => new Date());
   const latWrapRef = useRef(null);
   const helpButtonRef = useRef(null);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
-      setFreezeDuration(getPriceFreezeDuration());
+      setNow(new Date());
     }, 60_000);
     return () => window.clearInterval(intervalId);
   }, []);
@@ -47,10 +48,11 @@ export default function HeroSection() {
     };
   }, [isLatInfoOpen]);
 
+  const freezeDuration = getPriceFreezeDuration(now, settings.priceFreezeStartDate);
   const yearsLabel = formatFreezeUnit(freezeDuration.years, 'año', 'años');
   const monthsLabel = formatFreezeUnit(freezeDuration.months, 'mes', 'meses');
   const daysLabel = formatFreezeUnit(freezeDuration.days, 'día', 'días');
-  const freezeSummary = `${freezeDuration.years} ${yearsLabel}, ${freezeDuration.months} ${monthsLabel} y ${freezeDuration.days} ${daysLabel} sin subir precios desde agosto de 2024`;
+  const freezeSummary = `${freezeDuration.years} ${yearsLabel}, ${freezeDuration.months} ${monthsLabel} y ${freezeDuration.days} ${daysLabel} sin subir precios`;
 
   return (
     <section className="hero-stage" id="inicio" aria-labelledby="hero-title">
@@ -62,13 +64,13 @@ export default function HeroSection() {
         <div className="hero__copy">
           <div className="hero__eyebrow-wrap" ref={latWrapRef}>
             <p className="eyebrow eyebrow--light">
-              <span className="eyebrow__line" /> Estación botánica · Tucumán 26.8° S
+              <span className="eyebrow__line" /> {settings.heroEyebrow}
             </p>
             <button
               ref={helpButtonRef}
               type="button"
               className="eyebrow__help"
-              aria-label="¿Qué significa Tucumán 26.8° S?"
+              aria-label={settings.heroLatInfoTitle}
               aria-expanded={isLatInfoOpen}
               aria-controls="lat-info-popover"
               onClick={() => setIsLatInfoOpen((open) => !open)}
@@ -76,40 +78,42 @@ export default function HeroSection() {
               ?
             </button>
             {isLatInfoOpen && (
-              <div className="eyebrow-popover" id="lat-info-popover" role="region" aria-label="Información sobre Tucumán 26.8° S">
-                <strong>¿Qué significa Tucumán 26.8° S?</strong>
-                <p>
-                  Es la latitud sur de San Miguel de Tucumán. Indica nuestra radiación solar subtropical e inviernos moderados: cultivamos al aire libre para que tu planta llegue sana y ya aclimatada.
-                </p>
+              <div className="eyebrow-popover" id="lat-info-popover" role="region" aria-label="Información sobre latitud">
+                <strong>{settings.heroLatInfoTitle}</strong>
+                <p>{settings.heroLatInfoText}</p>
               </div>
             )}
           </div>
 
-          <h1 id="hero-title">Plantas carnívoras <em>sanas</em> y al mismo precio desde 2024.</h1>
-          <p className="hero__lead">
-            Ejemplares vigorosos cultivados en vivero tucumano, con guía práctica de cuidado, asesoramiento por WhatsApp y precios congelados desde agosto de 2024.
-          </p>
+          <h1 id="hero-title">
+            {settings.heroTitlePrefix}
+            <em>{settings.heroTitleEmphasis}</em>
+            {settings.heroTitleSuffix}
+          </h1>
+          <p className="hero__lead">{settings.heroLead}</p>
 
-          <div className="price-freeze" aria-live="polite">
-            <div className="price-freeze__header">
-              <span className="price-freeze__tag">Precios congelados</span>
-              <span className="price-freeze__since">Tiempo sin aumentar desde agosto de 2024</span>
+          {settings.priceFreezeEnabled && (
+            <div className="price-freeze" aria-live="polite">
+              <div className="price-freeze__header">
+                <span className="price-freeze__tag">{settings.priceFreezeTag}</span>
+                <span className="price-freeze__since">{settings.priceFreezeLabel}</span>
+              </div>
+              <div className="price-freeze__counters" role="group" aria-label={freezeSummary}>
+                <div className="price-freeze__unit">
+                  <strong data-freeze-years>{String(freezeDuration.years).padStart(2, '0')}</strong>
+                  <span>{yearsLabel}</span>
+                </div>
+                <div className="price-freeze__unit">
+                  <strong data-freeze-months>{String(freezeDuration.months).padStart(2, '0')}</strong>
+                  <span>{monthsLabel}</span>
+                </div>
+                <div className="price-freeze__unit">
+                  <strong data-freeze-days>{String(freezeDuration.days).padStart(2, '0')}</strong>
+                  <span>{daysLabel}</span>
+                </div>
+              </div>
             </div>
-            <div className="price-freeze__counters" role="group" aria-label={freezeSummary}>
-              <div className="price-freeze__unit">
-                <strong data-freeze-years>{String(freezeDuration.years).padStart(2, '0')}</strong>
-                <span>{yearsLabel}</span>
-              </div>
-              <div className="price-freeze__unit">
-                <strong data-freeze-months>{String(freezeDuration.months).padStart(2, '0')}</strong>
-                <span>{monthsLabel}</span>
-              </div>
-              <div className="price-freeze__unit">
-                <strong data-freeze-days>{String(freezeDuration.days).padStart(2, '0')}</strong>
-                <span>{daysLabel}</span>
-              </div>
-            </div>
-          </div>
+          )}
 
           <ul className="hero__species-pills" aria-label="Géneros cultivados en el vivero">
             {speciesPalette.map((species) => (
@@ -121,15 +125,19 @@ export default function HeroSection() {
           </ul>
 
           <div className="hero__actions">
-            <a className="button button--dark" href="/catalogo.html">Ver catálogo y precios <span aria-hidden="true">↗</span></a>
-            <a className="button button--outline-light" href="/cuidados.html">Guía ilustrada de cuidados <span aria-hidden="true">→</span></a>
+            <a className="button button--dark" href="/catalogo.html">
+              {settings.heroPrimaryCtaLabel} <span aria-hidden="true">↗</span>
+            </a>
+            <a className="button button--outline-light" href="/cuidados.html">
+              {settings.heroSecondaryCtaLabel} <span aria-hidden="true">→</span>
+            </a>
           </div>
 
           <div className="hero__proof">
-            <div className="hero__proof-mark" aria-hidden="true">TUC</div>
+            <div className="hero__proof-mark" aria-hidden="true">{settings.heroProofTag}</div>
             <p>
-              <strong>Atención directa desde {store.city}</strong>
-              <span>Consultá stock vigente, envíos y cuidados personalizados por WhatsApp.</span>
+              <strong>{settings.heroProofTitle}</strong>
+              <span>{settings.heroProofSubtitle}</span>
             </p>
           </div>
         </div>

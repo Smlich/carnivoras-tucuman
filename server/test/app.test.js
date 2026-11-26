@@ -108,7 +108,7 @@ test('envía cabeceras CSP explícitas y respeta orígenes permitidos de CORS', 
 test('redirige secciones HTML y entrega 404 HTML o JSON según la ruta en producción', async (context) => {
   const origin = await startTestServer(createApp({ env: productionEnv }), context);
 
-  for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto']) {
+  for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'contacto', 'admin']) {
     const redirectResponse = await fetch(`${origin}/${page}`, { redirect: 'manual' });
     assert.equal(redirectResponse.status, 301);
     assert.equal(redirectResponse.headers.get('location'), `/${page}.html`);

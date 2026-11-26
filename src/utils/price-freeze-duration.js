@@ -15,25 +15,50 @@ function getTucumanCalendarDate(date) {
   };
 }
 
+function normalizeStartDate(startDate) {
+  if (!startDate) return PRICE_FREEZE_START;
+
+  if (typeof startDate === 'string') {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(startDate.trim());
+    if (!match) return PRICE_FREEZE_START;
+    return {
+      year: Number(match[1]),
+      month: Number(match[2]),
+      day: Number(match[3]),
+    };
+  }
+
+  if (
+    Number.isInteger(startDate.year)
+    && Number.isInteger(startDate.month)
+    && Number.isInteger(startDate.day)
+  ) {
+    return startDate;
+  }
+
+  return PRICE_FREEZE_START;
+}
+
 function isBeforeStartDate(current, start) {
   if (current.year !== start.year) return current.year < start.year;
   if (current.month !== start.month) return current.month < start.month;
   return current.day < start.day;
 }
 
-export function getPriceFreezeDuration(now = new Date()) {
+export function getPriceFreezeDuration(now = new Date(), startDate = PRICE_FREEZE_START) {
   if (!(now instanceof Date) || Number.isNaN(now.getTime())) {
     return { years: 0, months: 0, days: 0 };
   }
 
+  const start = normalizeStartDate(startDate);
   const current = getTucumanCalendarDate(now);
-  if (isBeforeStartDate(current, PRICE_FREEZE_START)) {
+  if (isBeforeStartDate(current, start)) {
     return { years: 0, months: 0, days: 0 };
   }
 
-  let years = current.year - PRICE_FREEZE_START.year;
-  let months = current.month - PRICE_FREEZE_START.month;
-  let days = current.day - PRICE_FREEZE_START.day;
+  let years = current.year - start.year;
+  let months = current.month - start.month;
+  let days = current.day - start.day;
 
   if (days < 0) {
     months -= 1;

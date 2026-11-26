@@ -13,6 +13,7 @@ export default defineConfig({
         cuidados: resolve(import.meta.dirname, 'cuidados.html'),
         juegos: resolve(import.meta.dirname, 'juegos.html'),
         contacto: resolve(import.meta.dirname, 'contacto.html'),
+        admin: resolve(import.meta.dirname, 'admin.html'),
       },
     },
   },

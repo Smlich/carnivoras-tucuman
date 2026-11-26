@@ -5,11 +5,18 @@ const isStaticPreview = import.meta.env.VITE_STATIC_PREVIEW === 'true';
 const fallbackValue = {
   isStaticPreview,
   isLoading: false,
+  isAdminLoading: false,
   enabled: false,
   providers: [],
   user: null,
   session: null,
+  admin: null,
+  isAdmin: false,
+  adminConfigured: false,
+  adminGoogleAllowed: false,
+  adminStorageMode: 'static',
   refreshSession: async () => null,
+  refreshAdminSession: async () => null,
 };
 
 const AuthContext = createContext(fallbackValue);
@@ -26,11 +33,39 @@ async function fetchSession(signal) {
   return payload?.user ? payload : null;
 }
 
-// Consulta una sola vez el estado de acceso y la sesión, sin descargar el cliente de Better Auth.
+async function fetchAdminSession(signal) {
+  const response = await fetch('/api/admin/auth/session', {
+    cache: 'no-store',
+    credentials: 'include',
+    signal,
+  });
+  if (!response.ok) return null;
+
+  const payload = await response.json().catch(() => null);
+  return payload?.data ?? null;
+}
+
 export function AuthProvider({ children }) {
   const [status, setStatus] = useState({ isLoading: !isStaticPreview, enabled: false, providers: [] });
   const [session, setSession] = useState(null);
+  const [adminState, setAdminState] = useState({
+    isAdminLoading: !isStaticPreview,
+    admin: null,
+    adminConfigured: false,
+    adminGoogleAllowed: false,
+    adminStorageMode: isStaticPreview ? 'static' : 'unknown',
+  });
   const enabledRef = useRef(false);
+
+  const applyAdminSession = useCallback((adminData) => {
+    setAdminState({
+      isAdminLoading: false,
+      admin: adminData?.authenticated ? adminData.user : null,
+      adminConfigured: Boolean(adminData?.configured),
+      adminGoogleAllowed: Boolean(adminData?.googleAllowed),
+      adminStorageMode: adminData?.storageMode || 'unknown',
+    });
+  }, []);
 
   useEffect(() => {
     if (isStaticPreview) return undefined;
@@ -38,6 +73,17 @@ export function AuthProvider({ children }) {
     const controller = new AbortController();
     let isActive = true;
     let retryTimer;
+
+    async function loadAdmin() {
+      try {
+        const adminData = await fetchAdminSession(controller.signal);
+        if (isActive) applyAdminSession(adminData);
+      } catch (error) {
+        if (isActive && error.name !== 'AbortError') {
+          applyAdminSession(null);
+        }
+      }
+    }
 
     async function loadAuth() {
       for (let attempt = 0; attempt < 4; attempt += 1) {
@@ -78,36 +124,57 @@ export function AuthProvider({ children }) {
     }
 
     loadAuth();
+    loadAdmin();
 
     return () => {
       isActive = false;
       controller.abort();
       window.clearTimeout(retryTimer);
     };
-  }, []);
+  }, [applyAdminSession]);
 
-  const refreshSession = useCallback(async () => {
-    if (!enabledRef.current) return null;
-
+  const refreshAdminSession = useCallback(async () => {
+    if (isStaticPreview) return null;
     try {
-      const currentSession = await fetchSession();
-      setSession(currentSession);
-      return currentSession;
+      const adminData = await fetchAdminSession();
+      applyAdminSession(adminData);
+      return adminData;
     } catch {
-      setSession(null);
+      applyAdminSession(null);
       return null;
     }
-  }, []);
+  }, [applyAdminSession]);
+
+  const refreshSession = useCallback(async () => {
+    let currentSession = null;
+    if (enabledRef.current) {
+      try {
+        currentSession = await fetchSession();
+        setSession(currentSession);
+      } catch {
+        setSession(null);
+      }
+    }
+    await refreshAdminSession();
+    return currentSession;
+  }, [refreshAdminSession]);
 
   const value = useMemo(() => ({
     isStaticPreview,
     isLoading: status.isLoading,
+    isAdminLoading: adminState.isAdminLoading,
     enabled: status.enabled,
     providers: status.providers,
     user: session?.user ?? null,
     session,
+    admin: adminState.admin,
+    isAdmin: Boolean(adminState.admin),
+    adminConfigured: adminState.adminConfigured,
+    adminGoogleAllowed: adminState.adminGoogleAllowed,
+    adminStorageMode: adminState.adminStorageMode,
     refreshSession,
-  }), [refreshSession, session, status]);
+    refreshAdminSession,
+  }), [adminState, refreshAdminSession, refreshSession, session, status]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

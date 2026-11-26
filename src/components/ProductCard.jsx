@@ -3,9 +3,10 @@ import CatalogImage from './CatalogImage';
 
 export default function ProductCard({ product, index = 0, onAdd, onInspect }) {
   const specimenCode = 'CT-' + String(index + 1).padStart(2, '0');
+  const isOutOfStock = product.stockStatus === 'unavailable';
 
   return (
-    <article className="product-card" data-category={product.category}>
+    <article className={'product-card' + (isOutOfStock ? ' is-unavailable' : '')} data-category={product.category}>
       <div className="product-card__image-wrap">
         <button
           className="product-card__image-trigger"
@@ -34,11 +35,19 @@ export default function ProductCard({ product, index = 0, onAdd, onInspect }) {
         </div>
         <h3>{product.name}</h3>
         <p className="product-card__description">{product.description}</p>
-        <p className="product-card__note">{product.note}</p>
+        <p className="product-card__note">
+          {isOutOfStock ? 'Sin stock momentáneo · Consultá próxima fecha' : product.note}
+        </p>
         <div className="product-card__footer">
           <strong className="product-card__price">{formatPrice(product.price)}</strong>
-          <button className="add-button" type="button" onClick={() => onAdd(product)} aria-label={'Agregar ' + product.name + ' al pedido'}>
-            <span aria-hidden="true">+</span> Agregar
+          <button
+            className="add-button"
+            type="button"
+            disabled={isOutOfStock}
+            onClick={() => onAdd(product)}
+            aria-label={isOutOfStock ? product.name + ' sin stock por ahora' : 'Agregar ' + product.name + ' al pedido'}
+          >
+            {isOutOfStock ? 'Sin stock' : (<><span aria-hidden="true">+</span> Agregar</>)}
           </button>
         </div>
       </div>

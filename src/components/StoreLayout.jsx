@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AuthProvider } from '../context/AuthContext';
+import { SiteContentProvider, useSiteContent } from '../context/SiteContentContext';
 import { useCart } from '../hooks/use-cart';
-import { useCatalog } from '../hooks/use-catalog';
 import AnnouncementBar from './AnnouncementBar';
 import CartDrawer from './CartDrawer';
 import PreviewBanner from './PreviewBanner';
@@ -9,8 +9,8 @@ import SiteFooter from './SiteFooter';
 import SiteHeader from './SiteHeader';
 
 function StorefrontShell({ currentPage, children }) {
-  const catalog = useCatalog();
-  const cart = useCart(catalog.products);
+  const { products } = useSiteContent();
+  const cart = useCart(products);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [announcement, setAnnouncement] = useState('');
   const announcementTimerRef = useRef(null);
@@ -35,7 +35,7 @@ function StorefrontShell({ currentPage, children }) {
       <PreviewBanner />
       <SiteHeader currentPage={currentPage} itemCount={cart.count} onOpenCart={() => setIsCartOpen(true)} />
       <main id="contenido" tabIndex={-1}>
-        {typeof children === 'function' ? children({ products: catalog.products, onAdd: handleAdd }) : children}
+        {typeof children === 'function' ? children({ products, onAdd: handleAdd }) : children}
       </main>
       <SiteFooter />
       <div className="live-announcement" role="status" aria-live="polite" aria-atomic="true">
@@ -55,7 +55,9 @@ function StorefrontShell({ currentPage, children }) {
 export default function StoreLayout({ currentPage = 'inicio', children }) {
   return (
     <AuthProvider>
-      <StorefrontShell currentPage={currentPage}>{children}</StorefrontShell>
+      <SiteContentProvider>
+        <StorefrontShell currentPage={currentPage}>{children}</StorefrontShell>
+      </SiteContentProvider>
     </AuthProvider>
   );
 }

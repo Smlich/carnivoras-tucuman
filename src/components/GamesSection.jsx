@@ -1,36 +1,126 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { games as previewGames } from '../data/games';
+import { useSiteContent } from '../context/SiteContentContext';
 import { fetchUnlockedGames } from '../services/games-api';
 
-function GameCard({ game, locked, isPlaying, onTogglePlay }) {
-  const isPlayable = game.status === 'playable' && Boolean(game.embedUrl);
+function resolveGameSrc(game, { role, isAdmin, playerName }) {
+  const targetUrl = isAdmin && game.adminEmbedUrl ? game.adminEmbedUrl : game.embedUrl;
+  if (!targetUrl) return null;
+
+  try {
+    const resolved = new URL(targetUrl, window.location.origin);
+    resolved.searchParams.set('role', role || 'player');
+    resolved.searchParams.set('isAdmin', isAdmin ? '1' : '0');
+    if (playerName) resolved.searchParams.set('player', playerName);
+    if (isAdmin && game.adminProps && Object.keys(game.adminProps).length > 0) {
+      resolved.searchParams.set('adminProps', JSON.stringify(game.adminProps));
+    }
+    return resolved.toString();
+  } catch {
+    return targetUrl;
+  }
+}
+
+function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onTogglePlay }) {
+  const iframeRef = useRef(null);
+  const iframeSrc = !locked ? resolveGameSrc(game, { role, isAdmin, playerName }) : null;
+  const isPlayable = Boolean(iframeSrc) && (game.status === 'playable' || isAdmin);
+  const statusLabel = game.status === 'playable'
+    ? 'Disponible'
+    : game.status === 'admin-only'
+      ? 'Solo administrador'
+      : 'Próximamente';
+
+  function sendPlayerContext() {
+    const frameWindow = iframeRef.current?.contentWindow;
+    if (!frameWindow || !iframeSrc) return;
+    let targetOrigin = window.location.origin;
+    try {
+      targetOrigin = new URL(iframeSrc, window.location.origin).origin;
+    } catch {
+      targetOrigin = window.location.origin;
+    }
+
+    frameWindow.postMessage({
+      type: 'CARNIVORAS_PLAYER_CONTEXT',
+      version: 1,
+      role: isAdmin ? 'admin' : 'player',
+      isAdmin: Boolean(isAdmin),
+      playerName: playerName || 'Jugador',
+      gameSlug: game.slug,
+      adminProps: isAdmin ? (game.adminProps ?? {}) : {},
+    }, targetOrigin);
+  }
+
+  useEffect(() => {
+    if (!isPlaying || !iframeSrc) return undefined;
+
+    let targetOrigin = window.location.origin;
+    try {
+      targetOrigin = new URL(iframeSrc, window.location.origin).origin;
+    } catch {
+      targetOrigin = window.location.origin;
+    }
+
+    function handleMessage(event) {
+      if (event.origin !== targetOrigin) return;
+      if (event.source !== iframeRef.current?.contentWindow) return;
+      if (event.data?.type === 'CARNIVORAS_REQUEST_CONTEXT') {
+        sendPlayerContext();
+      }
+    }
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  });
 
   return (
-    <article className={'game-card' + (locked ? ' is-locked' : '')}>
+    <article className={'game-card' + (locked ? ' is-locked' : '') + (isAdmin ? ' is-admin-view' : '')}>
       <div className="game-card__header">
         <span className="game-card__badge">{game.badge}</span>
-        <span className="game-card__status">{isPlayable ? 'Disponible' : 'Próximamente'}</span>
+        <div className="game-card__badges-right">
+          {isAdmin && <span className="game-card__admin-tag">Modo Administrador</span>}
+          <span className="game-card__status">{statusLabel}</span>
+        </div>
       </div>
       <h3>{game.title}</h3>
       <p>{game.description}</p>
       <p className="game-card__platform">Creado en {game.platform}</p>
 
+      {isAdmin && (
+        <details className="game-card__admin-props">
+          <summary>Propiedades del modo Administrador</summary>
+          <p>
+            Se envían automáticamente al juego por URL (<code>role=admin&amp;isAdmin=1</code>) y por <code>postMessage</code> (<code>CARNIVORAS_PLAYER_CONTEXT</code>).
+          </p>
+          <pre>{JSON.stringify(game.adminProps ?? {}, null, 2)}</pre>
+          <a className="game-card__admin-link" href="/admin.html">Editar propiedades en /admin.html →</a>
+        </details>
+      )}
+
       {!locked && isPlayable && (
         <button className="button button--dark" type="button" aria-expanded={isPlaying} onClick={() => onTogglePlay(game.slug)}>
-          {isPlaying ? 'Cerrar juego' : 'Jugar ahora'}
+          {isPlaying ? 'Cerrar juego' : (isAdmin && game.status !== 'playable' ? 'Probar vista Admin ahora' : 'Jugar ahora')}
         </button>
+      )}
+
+      {!locked && !isPlayable && isAdmin && (
+        <p className="game-card__admin-hint">
+          Cargá la URL exportada de Google AI Studio (<code>embedUrl</code> o <code>adminEmbedUrl</code>) desde <a href="/admin.html">el panel Admin</a> para probarlo acá en vivo.
+        </p>
       )}
 
       {!locked && isPlayable && isPlaying && (
         <div className="game-card__stage" style={{ aspectRatio: game.aspectRatio }}>
           <iframe
+            ref={iframeRef}
             title={game.title}
-            src={game.embedUrl}
+            src={iframeSrc}
             sandbox="allow-scripts allow-same-origin allow-pointer-lock"
             allow="fullscreen"
             allowFullScreen
             loading="lazy"
+            onLoad={sendPlayerContext}
           />
         </div>
       )}
@@ -39,33 +129,36 @@ function GameCard({ game, locked, isPlaying, onTogglePlay }) {
 }
 
 export default function GamesSection({ showHeading = true }) {
-  const { isStaticPreview, isLoading, enabled, providers, user } = useAuth();
-  const [unlocked, setUnlocked] = useState({ status: 'idle', games: [], playerName: '' });
+  const { isStaticPreview, isLoading, isAdminLoading, enabled, providers, user, isAdmin, admin } = useAuth();
+  const { gamesPreview } = useSiteContent();
+  const [unlocked, setUnlocked] = useState({ status: 'idle', games: [], playerName: '', role: 'player', isAdmin: false });
   const [playingSlug, setPlayingSlug] = useState(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [signInError, setSignInError] = useState('');
 
   const googleAvailable = enabled && providers.includes('google');
-  const userId = user?.id ?? user?.email ?? null;
+  const viewerKey = isAdmin ? 'admin:' + (admin?.email || '') : (user?.id ?? user?.email ?? null);
 
   useEffect(() => {
-    if (!userId || !googleAvailable) {
-      setUnlocked({ status: 'idle', games: [], playerName: '' });
+    if (!viewerKey) {
+      setUnlocked({ status: 'idle', games: [], playerName: '', role: 'player', isAdmin: false });
       setPlayingSlug(null);
       return undefined;
     }
 
     const controller = new AbortController();
-    setUnlocked({ status: 'loading', games: [], playerName: '' });
+    setUnlocked({ status: 'loading', games: [], playerName: '', role: 'player', isAdmin: false });
 
     fetchUnlockedGames({ signal: controller.signal })
       .then((result) => setUnlocked({ status: 'ready', ...result }))
       .catch((error) => {
-        if (error.name !== 'AbortError') setUnlocked({ status: 'error', games: [], playerName: '' });
+        if (error.name !== 'AbortError') {
+          setUnlocked({ status: 'error', games: [], playerName: '', role: 'player', isAdmin: false });
+        }
       });
 
     return () => controller.abort();
-  }, [googleAvailable, userId]);
+  }, [viewerKey]);
 
   async function handleGoogleSignIn() {
     setSignInError('');
@@ -90,22 +183,57 @@ export default function GamesSection({ showHeading = true }) {
 
   let content;
 
-  if (isStaticPreview || (!isLoading && !googleAvailable)) {
+  if (!viewerKey && (isLoading || isAdminLoading)) {
+    content = <p className="games-section__note" role="status">Comprobando tu acceso…</p>;
+  } else if (viewerKey) {
+    if (unlocked.status === 'error') {
+      content = <p className="games-section__error" role="alert">No pudimos cargar los juegos. Recargá la página para volver a intentarlo.</p>;
+    } else if (unlocked.status !== 'ready') {
+      content = <p className="games-section__note" role="status">Cargando tus juegos…</p>;
+    } else {
+      content = (
+        <>
+          <p className={'games-section__welcome' + (unlocked.isAdmin ? ' is-admin' : '')} role="status">
+            {unlocked.isAdmin
+              ? `Modo Administrador activo (${unlocked.playerName}): los juegos reciben role=admin, isAdmin=true y tus propiedades configuradas.`
+              : `¡Hola, ${unlocked.playerName}! Estos son tus juegos gratis.`}
+          </p>
+          <div className="games-section__grid">
+            {unlocked.games.map((game) => (
+              <GameCard
+                key={game.id || game.slug}
+                game={game}
+                locked={false}
+                isAdmin={unlocked.isAdmin}
+                playerName={unlocked.playerName}
+                role={unlocked.role}
+                isPlaying={playingSlug === game.slug}
+                onTogglePlay={togglePlay}
+              />
+            ))}
+          </div>
+        </>
+      );
+    }
+  } else if (isStaticPreview || !googleAvailable) {
     content = (
       <>
         <div className="games-section__grid">
-          {previewGames.map((game) => <GameCard key={game.id} game={game} locked />)}
+          {gamesPreview.map((game) => <GameCard key={game.id || game.slug} game={game} locked />)}
         </div>
-        <p className="games-section__note">Gratis al iniciar sesión con Google. Esta función se activa cuando el sitio completo esté publicado.</p>
+        <div className="games-section__cta">
+          <p className="games-section__note">
+            Gratis para clientes al iniciar sesión con Google cuando OAuth esté conectado en el backend. Si sos administrador del vivero, podés desbloquear el modo de pruebas iniciando sesión en el panel.
+          </p>
+          <a className="text-link" href="/admin.html">Entrar como administrador <span aria-hidden="true">→</span></a>
+        </div>
       </>
     );
-  } else if (isLoading) {
-    content = <p className="games-section__note" role="status">Comprobando tu acceso…</p>;
-  } else if (!user) {
+  } else {
     content = (
       <>
         <div className="games-section__grid">
-          {previewGames.map((game) => <GameCard key={game.id} game={game} locked />)}
+          {gamesPreview.map((game) => <GameCard key={game.id || game.slug} game={game} locked />)}
         </div>
         <div className="games-section__cta">
           <p>Iniciá sesión con tu cuenta de Google para desbloquear los juegos gratis.</p>
@@ -113,21 +241,6 @@ export default function GamesSection({ showHeading = true }) {
             {isSigningIn ? 'Conectando con Google…' : 'Iniciar sesión con Google para entrar'}
           </button>
           {signInError && <p className="games-section__error" role="alert">{signInError}</p>}
-        </div>
-      </>
-    );
-  } else if (unlocked.status === 'error') {
-    content = <p className="games-section__error" role="alert">No pudimos cargar los juegos. Recargá la página para volver a intentarlo.</p>;
-  } else if (unlocked.status !== 'ready') {
-    content = <p className="games-section__note" role="status">Cargando tus juegos…</p>;
-  } else {
-    content = (
-      <>
-        <p className="games-section__welcome" role="status">¡Hola, {unlocked.playerName}! Estos son tus juegos gratis.</p>
-        <div className="games-section__grid">
-          {unlocked.games.map((game) => (
-            <GameCard key={game.id} game={game} locked={false} isPlaying={playingSlug === game.slug} onTogglePlay={togglePlay} />
-          ))}
         </div>
       </>
     );

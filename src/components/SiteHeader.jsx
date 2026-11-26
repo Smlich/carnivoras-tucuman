@@ -1,4 +1,5 @@
-import { store } from '../config/store';
+import { useAuth } from '../context/AuthContext';
+import { useSiteContent } from '../context/SiteContentContext';
 import AccountMenu from './AccountMenu';
 import CatalogImage from './CatalogImage';
 
@@ -21,10 +22,13 @@ function BagIcon() {
 }
 
 export default function SiteHeader({ currentPage = 'inicio', itemCount, onOpenCart }) {
+  const { isAdmin } = useAuth();
+  const { settings } = useSiteContent();
+
   return (
     <header className="site-header">
       <div className="site-header__inner page-shell">
-        <a className="brand" href="/" aria-label={store.name + ' — inicio'}>
+        <a className="brand" href="/" aria-label={settings.storeName + ' — inicio'}>
           <CatalogImage src="/images/catalog/logo-light.png" alt="" className="brand__logo" sizes="48px" />
           <span className="brand__text">
             <strong>Carnívoras</strong>
@@ -45,6 +49,11 @@ export default function SiteHeader({ currentPage = 'inicio', itemCount, onOpenCa
         </nav>
 
         <div className="site-header__actions">
+          {isAdmin && (
+            <a className="admin-pill-link" href="/admin.html" aria-label="Abrir panel de administración">
+              Admin
+            </a>
+          )}
           <AccountMenu />
           <button className="cart-trigger" type="button" onClick={onOpenCart} aria-label={'Abrir pedido, ' + itemCount + ' productos'}>
             <BagIcon />
