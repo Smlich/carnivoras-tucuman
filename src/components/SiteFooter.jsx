@@ -9,6 +9,8 @@ const footerPages = [
   { label: 'Guía de cuidados', href: '/cuidados.html' },
   { label: 'Juegos gratis', href: '/juegos.html' },
   { label: 'Contacto', href: '/contacto.html' },
+  { label: 'Privacidad', href: '/privacidad.html' },
+  { label: 'Términos y entregas', href: '/terminos.html' },
 ];
 
 export default function SiteFooter() {
@@ -25,7 +27,13 @@ export default function SiteFooter() {
       <div className="page-shell site-footer__main">
         <a className="footer-brand" href="/" aria-label={settings.storeName + ' — volver al inicio'}>
           <CatalogImage src="/images/catalog/logo-dark.png" alt="" className="footer-brand__logo" sizes="49px" />
-          <span><strong>Carnívoras</strong><small>Tucumán · Argentina</small></span>
+          <span>
+            {settings.storeName === 'Carnívoras Tucumán' ? (
+              <><strong>Carnívoras</strong><small>Tucumán · Argentina</small></>
+            ) : (
+              <><strong>{settings.storeName}</strong><small>{settings.city}</small></>
+            )}
+          </span>
         </a>
         <p className="site-footer__line">Un rincón extraordinario de la naturaleza, cultivado con paciencia.</p>
         <div className="site-footer__links">

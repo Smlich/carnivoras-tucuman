@@ -14,6 +14,8 @@ export default defineConfig({
         juegos: resolve(import.meta.dirname, 'juegos.html'),
         contacto: resolve(import.meta.dirname, 'contacto.html'),
         admin: resolve(import.meta.dirname, 'admin.html'),
+        privacidad: resolve(import.meta.dirname, 'privacidad.html'),
+        terminos: resolve(import.meta.dirname, 'terminos.html'),
       },
     },
   },
