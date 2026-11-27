@@ -13,7 +13,7 @@
     "dev:all": "concurrently -k -n web,api -c green,blue \"vite --host 127.0.0.1\" \"node --watch server/src/index.js\"",
     "start": "node server/src/index.js",
     "start:server": "node server/src/index.js",
-    "test": "node --test \"server/test/**/*.test.js\" && tsx --test \"src/games/dionaea-strike/game/fusionRules.test.ts\"",
+    "test": "node --test \"server/test/**/*.test.js\" && tsx --test \"src/games/dionaea-strike/game/*.test.ts\"",
     "lint:game": "tsc --noEmit -p tsconfig.game.json",
     "test:integration:mongo": "node --test server/test/integration/mongodb-products.integration.js",
     "seed:products": "node server/src/scripts/seed-products.js",
