@@ -3,6 +3,7 @@ import App from '../App.jsx';
 import CatalogoPage from '../pages/CatalogoPage.jsx';
 import ContactoPage from '../pages/ContactoPage.jsx';
 import JuegosPage from '../pages/JuegosPage.jsx';
+import SpeciesLandingPage from '../pages/SpeciesLandingPage.jsx';
 import ViveroPage from '../pages/ViveroPage.jsx';
 
 export const PRERENDER_TARGETS = [
@@ -11,6 +12,11 @@ export const PRERENDER_TARGETS = [
   'vivero.html',
   'contacto.html',
   'juegos.html',
+  'venus-atrapamoscas.html',
+  'drosera.html',
+  'sarracenia.html',
+  'nepenthes.html',
+  'pinguicula.html',
 ];
 
 const PAGE_FACTORIES = {
@@ -19,6 +25,11 @@ const PAGE_FACTORIES = {
   'vivero.html': () => <ViveroPage />,
   'contacto.html': () => <ContactoPage />,
   'juegos.html': () => <JuegosPage />,
+  'venus-atrapamoscas.html': () => <SpeciesLandingPage slug="venus-atrapamoscas" />,
+  'drosera.html': () => <SpeciesLandingPage slug="drosera" />,
+  'sarracenia.html': () => <SpeciesLandingPage slug="sarracenia" />,
+  'nepenthes.html': () => <SpeciesLandingPage slug="nepenthes" />,
+  'pinguicula.html': () => <SpeciesLandingPage slug="pinguicula" />,
 };
 
 /** Renderiza en servidor el HTML inicial de cada página React pública para SEO. */

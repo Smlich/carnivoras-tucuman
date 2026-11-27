@@ -13,6 +13,14 @@ const footerPages = [
   { label: 'Términos y entregas', href: '/terminos.html' },
 ];
 
+const speciesPages = [
+  { label: 'Venus atrapamoscas', href: '/venus-atrapamoscas.html' },
+  { label: 'Drosera capensis', href: '/drosera.html' },
+  { label: 'Sarracenia', href: '/sarracenia.html' },
+  { label: 'Nepenthes', href: '/nepenthes.html' },
+  { label: 'Pinguicula', href: '/pinguicula.html' },
+];
+
 export default function SiteFooter() {
   const { isAdmin } = useAuth();
   const { settings } = useSiteContent();
@@ -46,6 +54,12 @@ export default function SiteFooter() {
           ))}
         </div>
       </div>
+      <nav className="page-shell site-footer__species" aria-label="Fichas por especie">
+        <span className="site-footer__species-label">Especies en Tucumán:</span>
+        {speciesPages.map((item) => (
+          <a key={item.href} href={item.href}>{item.label}</a>
+        ))}
+      </nav>
       <section className="page-shell site-footer__marks" aria-label="Origen y desarrollo">
         <figure className="site-footer__mark">
           <img src="/images/brand/hecho-en-argentina.svg" alt="" width="52" height="52" loading="lazy" />

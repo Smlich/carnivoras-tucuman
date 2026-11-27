@@ -24,7 +24,7 @@ const SITE_DIRECTORY = [
   },
   {
     title: 'Zona de juegos gratis',
-    description: 'Espacio recreativo para jugar gratis en línea al iniciar sesión con Google, próximo a estrenarse.',
+    description: 'Jugá gratis en línea a Dionaea Strike — Carnívora vs Moscas Alien con tu cuenta de Google.',
     href: '/juegos.html',
     cta: 'Explorar juegos',
   },

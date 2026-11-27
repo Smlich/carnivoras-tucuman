@@ -362,8 +362,10 @@ img { display: block; max-width: 100%; height: auto; }
   z-index: 40;
   top: calc(100% + 10px);
   right: 0;
-  width: min(296px, calc(100vw - 28px));
-  padding: 20px;
+  width: min(312px, calc(100vw - 24px));
+  max-height: min(82dvh, 560px);
+  overflow-y: auto;
+  padding: 18px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--surface);
@@ -486,6 +488,105 @@ img { display: block; max-width: 100%; height: auto; }
   font-size: 12px;
   line-height: 1.5;
 }
+
+.account-menu__divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 12px;
+  color: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.account-menu__divider::before,
+.account-menu__divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--line);
+}
+
+.account-menu__email-auth { display: grid; gap: 10px; }
+
+.account-menu__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--mist);
+}
+
+.account-menu__tab {
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--ink-muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: background .16s ease, color .16s ease;
+}
+
+.account-menu__tab.is-active {
+  color: var(--bog-abyss);
+  background: var(--paper);
+  box-shadow: 0 1px 3px rgba(5, 22, 16, .1);
+}
+
+.account-menu__form { display: grid; gap: 8px; }
+
+.account-menu__field {
+  display: grid;
+  gap: 4px;
+}
+
+.account-menu__field span {
+  color: var(--ink-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.account-menu__field input {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+  font-size: 13px;
+}
+
+.account-menu__submit {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 2px;
+  padding: 0 14px;
+  border: 1.5px solid var(--bog-abyss);
+  border-radius: 10px;
+  color: var(--bog-abyss);
+  background: var(--lime);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background .18s ease, color .18s ease;
+}
+
+.account-menu__submit:hover {
+  color: #fff;
+  background: var(--bog-abyss);
+}
+
+.account-menu__submit:disabled { cursor: wait; opacity: .65; }
 
 /* Tipografía y elementos compartidos */
 h1,
@@ -2301,6 +2402,73 @@ h2 em {
   cursor: pointer;
 }
 
+.games-auth-panel {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 440px);
+  margin: 0 auto;
+}
+
+.games-auth-panel__providers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.games-auth-email {
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.games-auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--mist);
+}
+
+.games-auth-tab {
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--ink-muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.games-auth-tab.is-active {
+  color: var(--bog-abyss);
+  background: var(--paper);
+  box-shadow: 0 1px 4px rgba(5, 22, 16, .12);
+}
+
+.games-auth-form {
+  display: grid;
+  gap: 10px;
+}
+
+.games-auth-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+  font-size: 14px;
+}
+
 /* ANIMACIONES */
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slide-in { from { transform: translateX(24px); } to { transform: translateX(0); } }
@@ -2663,3 +2831,156 @@ h2 em {
 @media (max-width: 560px) {
   .catalog-ai-row { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   FICHAS SEO POR ESPECIE Y ENLACES DEL PIE DE PÁGINA
+   ========================================================================== */
+
+.site-footer__species {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+  padding: 14px 0 6px;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+  font-size: 13px;
+}
+
+.site-footer__species-label {
+  color: rgba(244, 245, 235, .64);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 11px;
+}
+
+.site-footer__species a {
+  color: rgba(244, 245, 235, .86);
+  text-decoration: none;
+}
+
+.site-footer__species a:hover,
+.site-footer__species a:focus-visible {
+  color: var(--lime);
+  text-decoration: underline;
+}
+
+.species-seasonal-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  padding: 24px;
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.species-seasonal-card__img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+}
+
+.species-seasonal-card__body h3 {
+  margin: 10px 0 8px;
+  font-family: var(--font-display);
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--bog-abyss);
+}
+
+.species-seasonal-card__body p {
+  margin: 0 0 18px;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.species-seasonal-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+}
+
+.species-care-section {
+  background: var(--mist);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.species-care-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.species-care-card {
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.species-care-card dt {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--bog-abyss);
+}
+
+.species-care-card dd {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+.species-faq-list {
+  display: grid;
+  gap: 12px;
+  max-width: 860px;
+}
+
+.species-faq-item {
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 16px 20px;
+}
+
+.species-faq-item summary {
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16.5px;
+  color: var(--bog-abyss);
+  list-style-position: inside;
+}
+
+.species-faq-item p {
+  margin: 10px 0 0;
+  color: var(--ink-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+@media (max-width: 960px) {
+  .species-care-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .species-seasonal-card {
+    grid-template-columns: 1fr;
+  }
+
+  .species-care-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

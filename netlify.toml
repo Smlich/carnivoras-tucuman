@@ -63,6 +63,36 @@
   status = 301
   force = true
 
+[[redirects]]
+  from = "/venus-atrapamoscas"
+  to = "/venus-atrapamoscas.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/drosera"
+  to = "/drosera.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/sarracenia"
+  to = "/sarracenia.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/nepenthes"
+  to = "/nepenthes.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/pinguicula"
+  to = "/pinguicula.html"
+  status = 301
+  force = true
+
 # Al conectar un dominio propio en Netlify, definí la variable de entorno
 # SITE_URL=https://tudominio.com.ar y opcionalmente descomenta este 301:
 # [[redirects]]

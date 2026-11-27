@@ -135,7 +135,7 @@ export function createApp({ auth = null, authProviders = [], env: appEnv = env, 
   app.use('/api', productsLimiter, createPublicSiteRouter({ isProduction, auth, appEnv, fetchImpl }));
 
   if (isProduction) {
-    for (const page of ['catalogo', 'vivero', 'cuidados', 'juegos', 'jugar-dionaea', 'contacto', 'admin', 'privacidad', 'terminos']) {
+    for (const page of ['catalogo', 'vivero', 'cuidados', 'venus-atrapamoscas', 'drosera', 'sarracenia', 'nepenthes', 'pinguicula', 'juegos', 'jugar-dionaea', 'contacto', 'admin', 'privacidad', 'terminos']) {
       app.get([`/${page}`, `/${page}/`], (request, response) => {
         response.redirect(301, `/${page}.html`);
       });
