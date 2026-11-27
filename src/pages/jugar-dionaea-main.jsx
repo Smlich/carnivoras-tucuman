@@ -17,7 +17,7 @@ function GameAccessGate({ children }) {
     enabled,
     providers,
     user,
-    isAdmin,
+    hasAdminAccess,
     signInWithProvider,
     signInWithEmail,
     registerWithEmail,
@@ -40,7 +40,7 @@ function GameAccessGate({ children }) {
     );
   }
 
-  const hasAccess = Boolean(user || isAdmin);
+  const hasAccess = Boolean(user || hasAdminAccess);
   if (!hasAccess) {
     const googleAvailable = !isStaticPreview && enabled && providers.includes('google');
     const facebookAvailable = !isStaticPreview && enabled && providers.includes('facebook');
@@ -219,11 +219,12 @@ function GameAccessGate({ children }) {
 }
 
 function DionaeaPlayerWorkspace() {
-  const { isAdmin } = useAuth();
+  const { hasAdminAccess, adminModeEnabled, toggleAdminMode } = useAuth();
   const [serverConfig, setServerConfig] = useState(undefined);
   const [serverIsAdmin, setServerIsAdmin] = useState(false);
   const [saveNotice, setSaveNotice] = useState('');
-  const effectiveIsAdmin = Boolean(isAdmin || serverIsAdmin);
+  const canUseAdmin = Boolean(hasAdminAccess || serverIsAdmin);
+  const effectiveIsAdmin = Boolean(canUseAdmin && adminModeEnabled);
 
   useEffect(() => {
     let active = true;
@@ -285,12 +286,35 @@ function DionaeaPlayerWorkspace() {
 
   return (
     <div className="relative w-full h-dvh overflow-hidden">
-      <a
-        href="/juegos.html"
-        className="dionaea-back-link fixed left-3 bottom-3 z-40 inline-flex items-center gap-1.5 rounded-xl border border-slate-700/80 bg-[#0B1422]/88 px-3 py-1.5 text-xs font-bold text-slate-200 shadow-lg backdrop-blur hover:border-lime-400/60 hover:text-white"
-      >
-        ← Volver a la tienda
-      </a>
+      <div className="fixed left-3 bottom-3 z-40 flex flex-wrap items-center gap-2">
+        <a
+          href="/juegos.html"
+          className="dionaea-back-link inline-flex items-center gap-1.5 rounded-xl border border-slate-700/80 bg-[#0B1422]/88 px-3 py-1.5 text-xs font-bold text-slate-200 shadow-lg backdrop-blur hover:border-lime-400/60 hover:text-white"
+        >
+          ← Volver a la tienda
+        </a>
+
+        {canUseAdmin && (
+          <button
+            type="button"
+            role="switch"
+            aria-checked={adminModeEnabled}
+            aria-label={adminModeEnabled ? 'Desactivar modo administrador' : 'Activar modo administrador'}
+            onClick={toggleAdminMode}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-extrabold shadow-lg backdrop-blur cursor-pointer transition-colors ${
+              adminModeEnabled
+                ? 'border-lime-400/70 bg-lime-400/20 text-lime-200 hover:bg-lime-400/30'
+                : 'border-slate-600/80 bg-[#0B1422]/88 text-slate-300 hover:border-slate-400 hover:text-white'
+            }`}
+          >
+            <span
+              aria-hidden="true"
+              className={`h-2 w-2 rounded-full ${adminModeEnabled ? 'bg-lime-400 shadow-[0_0_8px_#a3e635]' : 'bg-slate-500'}`}
+            />
+            <span>Modo Admin: {adminModeEnabled ? 'ON' : 'OFF'}</span>
+          </button>
+        )}
+      </div>
 
       {saveNotice && (
         <div

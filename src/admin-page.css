@@ -150,6 +150,31 @@
   cursor: pointer;
 }
 
+.admin-topbar__mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1.5px solid var(--lime);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-topbar__mode-toggle.is-on {
+  color: var(--bog-abyss);
+  background: var(--lime);
+}
+
+.admin-topbar__mode-toggle.is-off {
+  border-color: rgba(255, 255, 255, .3);
+  color: #dbe7dc;
+  background: rgba(11, 38, 28, .75);
+}
+
 .admin-topbar__logout {
   border-color: rgba(224, 64, 54, .5);
   background: rgba(143, 29, 44, .35);

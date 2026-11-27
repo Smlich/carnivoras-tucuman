@@ -8,7 +8,7 @@ import { AuthProvider, useAuth } from '../context/AuthContext';
 import { SiteContentProvider } from '../context/SiteContentContext';
 
 function AdminGate() {
-  const { isAdmin, isAdminLoading } = useAuth();
+  const { hasAdminAccess, isAdminLoading } = useAuth();
 
   if (isAdminLoading) {
     return (
@@ -18,7 +18,7 @@ function AdminGate() {
     );
   }
 
-  return isAdmin ? <AdminDashboard /> : <AdminLogin />;
+  return hasAdminAccess ? <AdminDashboard /> : <AdminLogin />;
 }
 
 createRoot(document.getElementById('root')).render(

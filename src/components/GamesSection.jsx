@@ -157,6 +157,9 @@ export default function GamesSection({ showHeading = true }) {
     providers,
     user,
     isAdmin,
+    hasAdminAccess,
+    adminModeEnabled,
+    toggleAdminMode,
     admin,
     signInWithProvider,
     signInWithEmail,
@@ -176,7 +179,7 @@ export default function GamesSection({ showHeading = true }) {
   const facebookAvailable = enabled && providers.includes('facebook');
   const emailAvailable = enabled && providers.includes('email');
   const anyAuthAvailable = googleAvailable || facebookAvailable || emailAvailable;
-  const viewerKey = isAdmin ? 'admin:' + (admin?.email || '') : (user?.id ?? user?.email ?? null);
+  const viewerKey = hasAdminAccess ? 'admin:' + (admin?.email || '') : (user?.id ?? user?.email ?? null);
 
   useEffect(() => {
     if (!viewerKey) {
@@ -242,22 +245,41 @@ export default function GamesSection({ showHeading = true }) {
     } else if (unlocked.status !== 'ready') {
       content = <p className="games-section__note" role="status">Cargando tus juegos…</p>;
     } else {
+      const effectiveIsAdmin = Boolean(isAdmin && unlocked.isAdmin);
+      const visibleGames = effectiveIsAdmin
+        ? unlocked.games
+        : unlocked.games.filter((game) => game.status !== 'admin-only');
+
       content = (
         <>
-          <p className={'games-section__welcome' + (unlocked.isAdmin ? ' is-admin' : '')} role="status">
-            {unlocked.isAdmin
-              ? `Modo Administrador activo (${unlocked.playerName}): los juegos reciben role=admin, isAdmin=true y tus propiedades configuradas.`
-              : `¡Hola, ${unlocked.playerName}! Estos son tus juegos gratis.`}
-          </p>
+          <div className="games-admin-bar">
+            <p className={'games-section__welcome' + (effectiveIsAdmin ? ' is-admin' : '')} role="status">
+              {effectiveIsAdmin
+                ? `Modo Administrador activo (${unlocked.playerName}): los juegos reciben role=admin, isAdmin=true y tus propiedades configuradas.`
+                : `¡Hola, ${unlocked.playerName}! Estos son tus juegos gratis.`}
+            </p>
+            {hasAdminAccess && (
+              <button
+                type="button"
+                role="switch"
+                aria-checked={adminModeEnabled}
+                className={'games-admin-toggle' + (adminModeEnabled ? ' is-on' : ' is-off')}
+                onClick={toggleAdminMode}
+              >
+                <span className="admin-mode-toggle__dot" aria-hidden="true" />
+                <span>{adminModeEnabled ? 'Modo Admin: ON' : 'Modo Admin: OFF'}</span>
+              </button>
+            )}
+          </div>
           <div className="games-section__grid">
-            {unlocked.games.map((game) => (
+            {visibleGames.map((game) => (
               <GameCard
                 key={game.id || game.slug}
                 game={game}
                 locked={false}
-                isAdmin={unlocked.isAdmin}
+                isAdmin={effectiveIsAdmin}
                 playerName={unlocked.playerName}
-                role={unlocked.role}
+                role={effectiveIsAdmin ? 'admin' : 'player'}
                 isPlaying={playingSlug === game.slug}
                 onTogglePlay={togglePlay}
               />

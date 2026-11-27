@@ -28,7 +28,7 @@ const TABS = [
 ];
 
 export default function AdminDashboard() {
-  const { admin, user, enabled, providers, refreshAdminSession, signOut } = useAuth();
+  const { admin, user, enabled, providers, adminModeEnabled, toggleAdminMode, refreshAdminSession, signOut } = useAuth();
   const { reloadSiteData } = useSiteContent();
   const [activeTab, setActiveTab] = useState('overview');
   const [status, setStatus] = useState(null);
@@ -108,6 +108,16 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="admin-topbar__actions">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={adminModeEnabled}
+              className={'admin-topbar__mode-toggle' + (adminModeEnabled ? ' is-on' : ' is-off')}
+              onClick={toggleAdminMode}
+            >
+              <span className="admin-mode-toggle__dot" aria-hidden="true" />
+              <span>Modo Admin: {adminModeEnabled ? 'ON' : 'OFF'}</span>
+            </button>
             <a className="admin-topbar__link" href="/">Ver tienda ↗</a>
             <a className="admin-topbar__link" href="/juegos.html">Probar juegos ↗</a>
             <button type="button" className="admin-topbar__logout" onClick={handleLogout}>

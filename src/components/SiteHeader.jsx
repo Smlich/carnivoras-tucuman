@@ -39,7 +39,7 @@ function MenuIcon({ isOpen }) {
 }
 
 export default function SiteHeader({ currentPage = 'inicio', itemCount, onOpenCart }) {
-  const { isAdmin } = useAuth();
+  const { isAdmin, hasAdminAccess, adminModeEnabled, toggleAdminMode } = useAuth();
   const { settings } = useSiteContent();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const headerRef = useRef(null);
@@ -122,9 +122,34 @@ export default function SiteHeader({ currentPage = 'inicio', itemCount, onOpenCa
               Panel Admin
             </a>
           )}
+          {hasAdminAccess && (
+            <button
+              type="button"
+              className={'main-nav__admin-toggle' + (adminModeEnabled ? ' is-on' : ' is-off')}
+              role="switch"
+              aria-checked={adminModeEnabled}
+              onClick={toggleAdminMode}
+            >
+              <span>Modo Admin: {adminModeEnabled ? 'ON' : 'OFF'}</span>
+            </button>
+          )}
         </nav>
 
         <div className="site-header__actions">
+          {hasAdminAccess && (
+            <button
+              type="button"
+              className={'admin-mode-toggle' + (adminModeEnabled ? ' is-on' : ' is-off')}
+              role="switch"
+              aria-checked={adminModeEnabled}
+              aria-label={adminModeEnabled ? 'Desactivar modo administrador' : 'Activar modo administrador'}
+              title={adminModeEnabled ? 'Modo Admin activo (clic para desactivar)' : 'Modo Admin desactivado (clic para activar)'}
+              onClick={toggleAdminMode}
+            >
+              <span className="admin-mode-toggle__dot" aria-hidden="true" />
+              <span>{adminModeEnabled ? 'Admin ON' : 'Admin OFF'}</span>
+            </button>
+          )}
           {isAdmin && (
             <a className="admin-pill-link" href="/admin.html" aria-label="Abrir panel de administración">
               Admin

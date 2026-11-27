@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { logoutAdmin } from '../services/admin-api';
 
 const providerLabels = {
   google: 'Google',
@@ -37,7 +38,19 @@ function FacebookIcon() {
 }
 
 export default function AccountMenuPanel({ providers }) {
-  const { user, isAdmin, isLoading, signInWithProvider, signInWithEmail, registerWithEmail, signOut } = useAuth();
+  const {
+    user,
+    admin,
+    hasAdminAccess,
+    adminModeEnabled,
+    toggleAdminMode,
+    isLoading,
+    refreshAdminSession,
+    signInWithProvider,
+    signInWithEmail,
+    registerWithEmail,
+    signOut,
+  } = useAuth();
   const [message, setMessage] = useState('');
   const [progress, setProgress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,7 +103,14 @@ export default function AccountMenuPanel({ providers }) {
     setIsSubmitting(true);
 
     try {
-      await signOut();
+      if (hasAdminAccess) {
+        await logoutAdmin().catch(() => {});
+      }
+      if (user) {
+        await signOut();
+      } else {
+        await refreshAdminSession();
+      }
     } catch {
       setMessage('No pudimos cerrar la sesión. Volvé a intentarlo.');
     } finally {
@@ -101,13 +121,15 @@ export default function AccountMenuPanel({ providers }) {
 
   if (isLoading) return <p className="account-menu__status" role="status">Cargando tu cuenta…</p>;
 
-  if (user) {
-    const eyebrow = providerEyebrows[user.provider] || 'Cuenta activa';
+  if (user || hasAdminAccess) {
+    const eyebrow = user ? (providerEyebrows[user.provider] || 'Cuenta activa') : 'Cuenta de administrador';
+    const displayName = user?.name || admin?.name || 'Administrador';
+    const displayEmail = user?.email || admin?.email || '';
     return (
       <>
         <p className="account-menu__eyebrow">{eyebrow}</p>
         <div className="account-menu__profile">
-          {user.image && (
+          {user?.image && (
             <img
               className="account-menu__avatar"
               src={user.image}
@@ -118,14 +140,27 @@ export default function AccountMenuPanel({ providers }) {
             />
           )}
           <div className="account-menu__profile-text">
-            <p className="account-menu__name">{user.name || 'Cliente'}</p>
-            {user.email && <p className="account-menu__email">{user.email}</p>}
+            <p className="account-menu__name">{displayName}</p>
+            {displayEmail && <p className="account-menu__email">{displayEmail}</p>}
           </div>
         </div>
-        {isAdmin && (
-          <a className="account-menu__admin-link" href="/admin.html">
-            Panel de administración ↗
-          </a>
+        {hasAdminAccess && (
+          <>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={adminModeEnabled}
+              className={'account-menu__admin-toggle' + (adminModeEnabled ? ' is-on' : ' is-off')}
+              onClick={toggleAdminMode}
+              disabled={isSubmitting}
+            >
+              <span>Modo Admin</span>
+              <strong>{adminModeEnabled ? 'Activado' : 'Desactivado'}</strong>
+            </button>
+            <a className="account-menu__admin-link" href="/admin.html">
+              Panel de administración ↗
+            </a>
+          </>
         )}
         <button className="account-menu__secondary" type="button" onClick={handleSignOut} disabled={isSubmitting}>
           Cerrar sesión

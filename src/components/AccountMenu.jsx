@@ -25,12 +25,12 @@ class AccountMenuErrorBoundary extends Component {
 }
 
 export default function AccountMenu() {
-  const { enabled, providers: availableProviders, user } = useAuth();
+  const { enabled, providers: availableProviders, user, admin, hasAdminAccess } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const detailsRef = useRef(null);
 
   const providers = availableProviders.filter((provider) => providerLabels[provider]);
-  const accountName = user?.name || 'Ingresar';
+  const accountName = user?.name || admin?.name || 'Ingresar';
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -57,11 +57,11 @@ export default function AccountMenu() {
     };
   }, [isOpen]);
 
-  if (!enabled || providers.length === 0) return null;
+  if (!hasAdminAccess && (!enabled || providers.length === 0)) return null;
 
   return (
     <details ref={detailsRef} className="account-menu" onToggle={(event) => setIsOpen(event.currentTarget.open)}>
-      <summary className="account-menu__trigger" aria-label={user?.name ? `Cuenta de ${user.name}` : 'Ingresar o crear cuenta'}>
+      <summary className="account-menu__trigger" aria-label={user?.name || admin?.name ? `Cuenta de ${user?.name || admin?.name}` : 'Ingresar o crear cuenta'}>
         <svg viewBox="0 0 24 24" aria-hidden="true" className="account-icon">
           <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
           <path d="M5.5 20c.5-3.4 2.7-5.2 6.5-5.2s6 1.8 6.5 5.2" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />

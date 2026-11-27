@@ -1,4 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ADMIN_MODE_STORAGE_KEY,
+  readAdminModePreference,
+  resolveEffectiveAdminMode,
+  writeAdminModePreference,
+} from '../utils/admin-mode.js';
 
 const isStaticPreview = import.meta.env.VITE_STATIC_PREVIEW === 'true';
 const isServer = typeof window === 'undefined';
@@ -13,12 +19,16 @@ const fallbackValue = {
   user: null,
   session: null,
   admin: null,
+  hasAdminAccess: false,
+  adminModeEnabled: true,
   isAdmin: false,
   adminConfigured: false,
   adminGoogleAllowed: false,
   adminStorageMode: 'static',
   refreshSession: async () => null,
   refreshAdminSession: async () => null,
+  setAdminModeEnabled: () => {},
+  toggleAdminMode: () => {},
   signInWithProvider: async () => {},
   signInWithEmail: async () => null,
   registerWithEmail: async () => null,
@@ -74,6 +84,9 @@ export function AuthProvider({ children, includeAdminMeta = false }) {
     adminGoogleAllowed: false,
     adminStorageMode: isStaticPreview ? 'static' : 'unknown',
   });
+  const [adminModeEnabled, setAdminModeEnabledState] = useState(() => (
+    isServer ? true : readAdminModePreference(window.localStorage)
+  ));
   const enabledRef = useRef(false);
   const authFlowRef = useRef('better-auth');
 
@@ -260,6 +273,39 @@ export function AuthProvider({ children, includeAdminMeta = false }) {
     await refreshSession();
   }, [refreshAdminSession, refreshSession]);
 
+  useEffect(() => {
+    if (isServer || isStaticPreview) return undefined;
+
+    function handleStorageChange(event) {
+      if (event.key === ADMIN_MODE_STORAGE_KEY || event.key === null) {
+        setAdminModeEnabledState(readAdminModePreference(window.localStorage));
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const hasAdminAccess = Boolean(adminState.admin);
+
+  const setAdminModeEnabled = useCallback((nextValue) => {
+    if (!hasAdminAccess) return;
+    const normalized = Boolean(nextValue);
+    if (!isServer) writeAdminModePreference(normalized, window.localStorage);
+    setAdminModeEnabledState(normalized);
+  }, [hasAdminAccess]);
+
+  const toggleAdminMode = useCallback(() => {
+    if (!hasAdminAccess) return;
+    setAdminModeEnabledState((prev) => {
+      const next = !prev;
+      if (!isServer) writeAdminModePreference(next, window.localStorage);
+      return next;
+    });
+  }, [hasAdminAccess]);
+
+  const effectiveIsAdmin = resolveEffectiveAdminMode({ hasAdminAccess, adminModeEnabled });
+
   const value = useMemo(() => ({
     isStaticPreview,
     isLoading: status.isLoading,
@@ -270,26 +316,35 @@ export function AuthProvider({ children, includeAdminMeta = false }) {
     user: session?.user ?? null,
     session,
     admin: adminState.admin,
-    isAdmin: Boolean(adminState.admin),
+    hasAdminAccess,
+    adminModeEnabled,
+    isAdmin: effectiveIsAdmin,
     adminConfigured: adminState.adminConfigured,
     adminGoogleAllowed: adminState.adminGoogleAllowed,
     adminStorageMode: adminState.adminStorageMode,
     refreshSession,
     refreshAdminSession,
+    setAdminModeEnabled,
+    toggleAdminMode,
     signInWithProvider,
     signInWithEmail,
     registerWithEmail,
     signOut,
   }), [
+    adminModeEnabled,
     adminState,
+    effectiveIsAdmin,
+    hasAdminAccess,
     refreshAdminSession,
     refreshSession,
     registerWithEmail,
     session,
+    setAdminModeEnabled,
     signInWithEmail,
     signInWithProvider,
     signOut,
     status,
+    toggleAdminMode,
   ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
