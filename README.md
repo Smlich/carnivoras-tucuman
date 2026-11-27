@@ -95,9 +95,12 @@ Lee `docs/ROADMAP.md`, `docs/API.md`, [la guía de autenticación](docs/AUTHENTI
 - Confirmar precios y disponibilidad actual (`stockStatus`).
 - Definir zonas, costos y condiciones de entrega en `/terminos.html`.
 - Completar datos legales del titular en `/privacidad.html`.
-- Decidir si se publica un juego jugable en `/juegos.html` o se oculta esa sección del menú.
 - Cuenta oficial de Instagram confirmada: `@carnivoras_tucuman`; compartir Facebook si se decide usarlo.
-- Definir dominio propio, actualizar URLs canónicas/sitemap y configurar Facebook OAuth cuando corresponda.
+
+### SEO y cambio a dominio propio
+
+- `npm run build` ejecuta Vite y luego [el prerenderizado SEO](scripts/prerender-seo.mjs), que inyecta el HTML inicial de `index.html`, `catalogo.html`, `vivero.html`, `contacto.html` y `juegos.html`, valida los bloques JSON-LD y genera `dist/sitemap.xml` y `dist/robots.txt`.
+- El día que conectes un dominio propio en Netlify, alcanza con configurar `SITE_URL=https://tudominio.com.ar` en las variables de entorno del build (opcionalmente activando la redirección 301 en `netlify.toml`) y reconstruir para actualizar automáticamente `canonical`, Open Graph, JSON-LD, `sitemap.xml` y `robots.txt`.
 
 ## Fuentes técnicas
 

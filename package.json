@@ -20,7 +20,7 @@
     "seed:admin": "node server/src/scripts/seed-admin.js",
     "images:optimize": "node scripts/optimize-catalog-images.mjs",
     "images:optimize:gallery": "node scripts/optimize-gallery-images.mjs",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-seo.mjs",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {

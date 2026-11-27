@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 const isStaticPreview = import.meta.env.VITE_STATIC_PREVIEW === 'true';
+const isServer = typeof window === 'undefined';
 
 const fallbackValue = {
   isStaticPreview,
@@ -58,15 +59,14 @@ async function fetchAdminSession(signal, includeAdminMeta = false) {
 }
 
 export function AuthProvider({ children, includeAdminMeta = false }) {
-  const [status, setStatus] = useState({
-    isLoading: !isStaticPreview,
-    enabled: false,
-    providers: [],
-    authFlow: 'better-auth',
-  });
+  const [status, setStatus] = useState(() => (
+    isServer
+      ? { isLoading: false, enabled: true, providers: ['google'], authFlow: 'redirect' }
+      : { isLoading: !isStaticPreview, enabled: false, providers: [], authFlow: 'better-auth' }
+  ));
   const [session, setSession] = useState(null);
   const [adminState, setAdminState] = useState({
-    isAdminLoading: !isStaticPreview,
+    isAdminLoading: !isStaticPreview && !isServer,
     admin: null,
     adminConfigured: false,
     adminGoogleAllowed: false,

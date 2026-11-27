@@ -12,6 +12,7 @@ function sanitizeQuantity(value) {
 }
 
 function readStoredObject(key) {
+  if (typeof window === 'undefined') return null;
   try {
     const saved = window.localStorage.getItem(key);
     const parsed = saved ? JSON.parse(saved) : null;

@@ -3,12 +3,18 @@ import { useAuth } from '../context/AuthContext';
 import { useSiteContent } from '../context/SiteContentContext';
 import { fetchUnlockedGames } from '../services/games-api';
 
+const SSR_ORIGIN_FALLBACK = 'https://carnivorastucuman.netlify.app';
+
+function getCurrentOrigin() {
+  return typeof window !== 'undefined' ? window.location.origin : SSR_ORIGIN_FALLBACK;
+}
+
 function resolveGameSrc(game, { role, isAdmin, playerName }) {
   const targetUrl = isAdmin && game.adminEmbedUrl ? game.adminEmbedUrl : game.embedUrl;
   if (!targetUrl) return null;
 
   try {
-    const resolved = new URL(targetUrl, window.location.origin);
+    const resolved = new URL(targetUrl, getCurrentOrigin());
     resolved.searchParams.set('role', role || 'player');
     resolved.searchParams.set('isAdmin', isAdmin ? '1' : '0');
     if (playerName) resolved.searchParams.set('player', playerName);
@@ -23,32 +29,33 @@ function resolveGameSrc(game, { role, isAdmin, playerName }) {
 
 function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onTogglePlay }) {
   const iframeRef = useRef(null);
+  const currentOrigin = getCurrentOrigin();
   const iframeSrc = !locked ? resolveGameSrc(game, { role, isAdmin, playerName }) : null;
   const isPlayable = Boolean(iframeSrc) && (game.status === 'playable' || isAdmin);
   const isDedicatedLauncher = Boolean(iframeSrc) && (() => {
     try {
-      const parsed = new URL(iframeSrc, window.location.origin);
-      return parsed.origin === window.location.origin && parsed.pathname.startsWith('/jugar-');
+      const parsed = new URL(iframeSrc, currentOrigin);
+      return parsed.origin === currentOrigin && parsed.pathname.startsWith('/jugar-');
     } catch {
       return false;
     }
   })();
-  const launchHref = isDedicatedLauncher ? new URL(iframeSrc, window.location.origin).pathname : iframeSrc;
+  const launchHref = isDedicatedLauncher ? new URL(iframeSrc, currentOrigin).pathname : iframeSrc;
   const statusLabel = game.status === 'playable'
     ? 'Disponible'
     : game.status === 'admin-only'
       ? 'Solo administrador'
       : 'Próximamente';
 
-  let resolvedOrigin = window.location.origin;
+  let resolvedOrigin = currentOrigin;
   if (iframeSrc) {
     try {
-      resolvedOrigin = new URL(iframeSrc, window.location.origin).origin;
+      resolvedOrigin = new URL(iframeSrc, currentOrigin).origin;
     } catch {
-      resolvedOrigin = window.location.origin;
+      resolvedOrigin = currentOrigin;
     }
   }
-  const isSameOriginFrame = resolvedOrigin === window.location.origin;
+  const isSameOriginFrame = resolvedOrigin === currentOrigin;
 
   const sendPlayerContext = useCallback(() => {
     const frameWindow = iframeRef.current?.contentWindow;

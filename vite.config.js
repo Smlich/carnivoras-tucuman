@@ -2,9 +2,21 @@ import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { DEFAULT_SITE_URL, resolveSiteUrl } from './scripts/seo-config.mjs';
+
+function rewriteSiteUrlPlugin() {
+  const targetOrigin = resolveSiteUrl(process.env);
+  return {
+    name: 'rewrite-site-url-html',
+    transformIndexHtml(html) {
+      if (targetOrigin === DEFAULT_SITE_URL) return html;
+      return html.replaceAll(DEFAULT_SITE_URL, targetOrigin);
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), rewriteSiteUrlPlugin()],
   build: {
     rolldownOptions: {
       input: {

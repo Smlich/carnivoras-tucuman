@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /jugar-dionaea
+Disallow: /jugar-dionaea.html
 Sitemap: https://carnivorastucuman.netlify.app/sitemap.xml

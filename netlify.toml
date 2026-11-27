@@ -62,3 +62,11 @@
   to = "/jugar-dionaea.html"
   status = 301
   force = true
+
+# Al conectar un dominio propio en Netlify, definí la variable de entorno
+# SITE_URL=https://tudominio.com.ar y opcionalmente descomenta este 301:
+# [[redirects]]
+#   from = "https://carnivorastucuman.netlify.app/*"
+#   to = "https://tudominio.com.ar/:splat"
+#   status = 301
+#   force = true
