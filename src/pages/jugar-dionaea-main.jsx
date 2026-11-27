@@ -287,7 +287,7 @@ function DionaeaPlayerWorkspace() {
     <div className="relative w-full h-dvh overflow-hidden">
       <a
         href="/juegos.html"
-        className="fixed left-3 bottom-3 z-40 inline-flex items-center gap-1.5 rounded-xl border border-slate-700/80 bg-[#0B1422]/88 px-3 py-1.5 text-xs font-bold text-slate-200 shadow-lg backdrop-blur hover:border-lime-400/60 hover:text-white"
+        className="dionaea-back-link fixed left-3 bottom-3 z-40 inline-flex items-center gap-1.5 rounded-xl border border-slate-700/80 bg-[#0B1422]/88 px-3 py-1.5 text-xs font-bold text-slate-200 shadow-lg backdrop-blur hover:border-lime-400/60 hover:text-white"
       >
         ← Volver a la tienda
       </a>

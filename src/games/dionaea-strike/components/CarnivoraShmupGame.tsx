@@ -1,13 +1,15 @@
-import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   Check,
   Gamepad2,
   Lock,
+  Maximize2,
   Music,
   Settings2,
   Shield,
   SlidersHorizontal,
+  Smartphone,
   Sparkles,
   Trophy,
   Volume2,
@@ -19,9 +21,11 @@ import { preloadStageBackgrounds } from '../game/backgroundAssets';
 import {
   computeGamepadEdges,
   computeLogicalViewport,
+  computeRelativeTouchTarget,
   getControlPrompts,
   parseGamepadInput,
   SECONDARY_ABILITY_META,
+  shouldRequireLandscape,
   type GamepadMappedInput,
 } from '../game/fusionRules';
 import {
@@ -44,15 +48,12 @@ import {
 } from '../game/highScoreStore';
 import { GameSimulation } from '../game/simulation';
 import type { GameConfig, GameStatus, GlobalHighScoreState, HudSnapshot, PetId } from '../game/types';
+import { AdminConfigModal } from './AdminConfigModal';
 import { CreatorIntroOverlay } from './CreatorIntroOverlay';
 import { GameHud } from './GameHud';
 import { HighScoreModal } from './HighScoreModal';
 import { PetEmblem, SpeciesEmblem, TitleLogoLockup } from './SpeciesIcons';
 import titleHeroBg from '../assets/images/hero_title_dionaea_biplane_1795699672875.webp';
-
-const AdminConfigModal = lazy(() =>
-  import('./AdminConfigModal').then((module) => ({ default: module.AdminConfigModal })),
-);
 
 export interface GameSessionResult {
   score: number;
@@ -177,6 +178,21 @@ export function CarnivoraShmupGame({
   const [showAudioPopover, setShowAudioPopover] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [bgFailed, setBgFailed] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const coarse = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    return coarse || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0);
+  });
+  const [requiresLandscape, setRequiresLandscape] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const coarse = typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
+    const touch = coarse || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0);
+    return shouldRequireLandscape(window.innerWidth, window.innerHeight, touch);
+  });
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(() =>
+    typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : false
+  );
+  const [orientationHint, setOrientationHint] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -188,6 +204,22 @@ export function CarnivoraShmupGame({
   const showRecordsRef = useRef<boolean>(false);
   const onScoreSubmitRef = useRef(onScoreSubmit);
   const submittedRunRef = useRef<boolean>(false);
+  const touchMoveRef = useRef<{
+    pointerId: number;
+    anchorPlayerX: number;
+    anchorPlayerY: number;
+    anchorPointerX: number;
+    anchorPointerY: number;
+  } | null>(null);
+
+  type FullscreenDocEl = HTMLElement & {
+    webkitRequestFullscreen?: () => Promise<void> | void;
+  };
+  const docEl = typeof document !== 'undefined' ? (document.documentElement as FullscreenDocEl) : null;
+  const canFullscreen = Boolean(docEl && (docEl.requestFullscreen || docEl.webkitRequestFullscreen));
+  const canOrientationLock =
+    typeof screen !== 'undefined' &&
+    Boolean(screen.orientation && 'lock' in screen.orientation);
 
   statusRef.current = status;
   hudRef.current = hud;
@@ -292,19 +324,132 @@ export function CarnivoraShmupGame({
     simRef.current?.setStatus('title');
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncOrientationGate = () => {
+      const w = window.visualViewport?.width ?? window.innerWidth;
+      const h = window.visualViewport?.height ?? window.innerHeight;
+      const nextRequires = shouldRequireLandscape(w, h, isTouchDevice);
+      setRequiresLandscape(nextRequires);
+      if (!nextRequires) {
+        setOrientationHint(null);
+      }
+    };
+    const syncFullscreen = () => {
+      const docWithWebkit = document as Document & { webkitFullscreenElement?: Element | null };
+      setIsFullscreen(Boolean(document.fullscreenElement || docWithWebkit.webkitFullscreenElement));
+      syncOrientationGate();
+    };
+    syncOrientationGate();
+    window.addEventListener('resize', syncOrientationGate);
+    window.addEventListener('orientationchange', syncOrientationGate);
+    window.visualViewport?.addEventListener('resize', syncOrientationGate);
+    screen.orientation?.addEventListener?.('change', syncOrientationGate);
+    document.addEventListener('fullscreenchange', syncFullscreen);
+    return () => {
+      window.removeEventListener('resize', syncOrientationGate);
+      window.removeEventListener('orientationchange', syncOrientationGate);
+      window.visualViewport?.removeEventListener('resize', syncOrientationGate);
+      screen.orientation?.removeEventListener?.('change', syncOrientationGate);
+      document.removeEventListener('fullscreenchange', syncFullscreen);
+    };
+  }, [isTouchDevice]);
+
+  useEffect(() => {
+    if (requiresLandscape && statusRef.current === 'playing') {
+      touchMoveRef.current = null;
+      simRef.current?.clearInputs();
+      simRef.current?.setStatus('paused');
+    }
+  }, [requiresLandscape]);
+
+  const requestMobileLandscapeFullscreen = useCallback(
+    async (showFeedback = false) => {
+      if (showFeedback) {
+        setOrientationHint(null);
+      }
+      const targetEl = (typeof document !== 'undefined'
+        ? document.documentElement
+        : containerRef.current) as FullscreenDocEl | null;
+      const docWithWebkit = typeof document !== 'undefined'
+        ? (document as Document & { webkitFullscreenElement?: Element | null })
+        : null;
+      const alreadyFullscreen = Boolean(docWithWebkit?.fullscreenElement || docWithWebkit?.webkitFullscreenElement);
+
+      if (targetEl && !alreadyFullscreen) {
+        try {
+          if (targetEl.requestFullscreen) {
+            try {
+              await targetEl.requestFullscreen({ navigationUI: 'hide' } as FullscreenOptions);
+            } catch {
+              await targetEl.requestFullscreen();
+            }
+          } else if (targetEl.webkitRequestFullscreen) {
+            await targetEl.webkitRequestFullscreen();
+          }
+        } catch {
+          // Ignore fullscreen denial (e.g. iOS Safari or blocked gesture)
+        }
+      }
+
+      const orientation = typeof screen !== 'undefined'
+        ? (screen.orientation as ScreenOrientation & { lock?: (mode: string) => Promise<void> })
+        : null;
+      if (orientation?.lock) {
+        try {
+          await orientation.lock('landscape');
+        } catch {
+          try {
+            await orientation.lock('landscape-primary');
+          } catch {
+            // Ignore orientation lock denial when unsupported or blocked by OS setting
+          }
+        }
+      }
+
+      if (showFeedback && typeof window !== 'undefined') {
+        await new Promise((resolve) => window.setTimeout(resolve, 180));
+        const w = window.visualViewport?.width ?? window.innerWidth;
+        const h = window.visualViewport?.height ?? window.innerHeight;
+        if (shouldRequireLandscape(w, h, isTouchDevice)) {
+          setOrientationHint(
+            'Tu navegador no permitió girar automáticamente. Activá "Giro automático" en tu teléfono y ponelo horizontal.'
+          );
+        }
+      }
+    },
+    [isTouchDevice]
+  );
+
+  const handleToggleFullscreen = useCallback(async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await requestMobileLandscapeFullscreen();
+      }
+    } catch {
+      // Ignore fullscreen toggle errors
+    }
+  }, [requestMobileLandscapeFullscreen]);
+
   const handleStart = useCallback(() => {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
     setIntroOverlayMounted(false);
     setIntroExitRequested(false);
+    if (isTouchDevice) {
+      void requestMobileLandscapeFullscreen();
+    }
+    touchMoveRef.current = null;
     setShowAdmin(false);
     setShowRecordsModal(false);
     simRef.current?.startNewGame();
     setGlobalRecords(loadGlobalHighScoreState());
     soundEngine.restartLevelMusic(1);
     canvasRef.current?.focus();
-  }, []);
+  }, [isTouchDevice, requestMobileLandscapeFullscreen]);
 
   const handleTogglePause = useCallback(() => {
     const sim = simRef.current;
@@ -705,14 +850,20 @@ export function CarnivoraShmupGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const screenToCanvas = (clientX: number, clientY: number, isTouch = false) => {
+  const screenToCanvas = (clientX: number, clientY: number) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     const ws = worldScaleRef.current || 1;
     if (!rect) return { x: 480, y: 360 };
     const x = (clientX - rect.left) / ws;
-    const rawY = (clientY - rect.top) / ws;
-    const y = isTouch ? rawY - 26 / ws : rawY;
+    const y = (clientY - rect.top) / ws;
     return { x, y };
+  };
+
+  const releaseTouchPointer = (pointerId: number) => {
+    if (touchMoveRef.current && touchMoveRef.current.pointerId === pointerId) {
+      touchMoveRef.current = null;
+      simRef.current?.setPointerTarget(false, 0, 0);
+    }
   };
 
   const activeMutationsCount = ALL_SPECIES_IDS.filter((id) => hud.speciesLevels[id] > 0).length;
@@ -735,24 +886,78 @@ export function CarnivoraShmupGame({
           }
         }}
         onPointerDown={(e) => {
-          if (status !== 'playing') return;
+          if (status !== 'playing' || requiresLandscape) return;
           soundEngine.unlockMusicOnGesture();
+          if (e.pointerType === 'touch') {
+            if (!isTouchDevice) setIsTouchDevice(true);
+            if (touchMoveRef.current === null && simRef.current) {
+              const pt = screenToCanvas(e.clientX, e.clientY);
+              const playerPos = simRef.current.getPlayerPosition();
+              touchMoveRef.current = {
+                pointerId: e.pointerId,
+                anchorPlayerX: playerPos.x,
+                anchorPlayerY: playerPos.y,
+                anchorPointerX: pt.x,
+                anchorPointerY: pt.y,
+              };
+              try {
+                e.currentTarget.setPointerCapture?.(e.pointerId);
+              } catch {
+                // Ignore pointer capture errors
+              }
+              simRef.current.setPointerTarget(true, playerPos.x, playerPos.y);
+            }
+            return;
+          }
           if (e.button === 2) {
             simRef.current?.fireSecondaryAbility();
             return;
           }
-          const pt = screenToCanvas(e.clientX, e.clientY, e.pointerType === 'touch');
+          const pt = screenToCanvas(e.clientX, e.clientY);
           simRef.current?.setPointerTarget(true, pt.x, pt.y);
         }}
         onPointerMove={(e) => {
-          if (status !== 'playing') return;
-          if ((e.buttons & 1) !== 0 || e.pointerType === 'touch') {
-            const pt = screenToCanvas(e.clientX, e.clientY, e.pointerType === 'touch');
+          if (status !== 'playing' || requiresLandscape) return;
+          if (e.pointerType === 'touch') {
+            const activeTouch = touchMoveRef.current;
+            if (!activeTouch || activeTouch.pointerId !== e.pointerId) return;
+            const pt = screenToCanvas(e.clientX, e.clientY);
+            const target = computeRelativeTouchTarget(
+              activeTouch.anchorPlayerX,
+              activeTouch.anchorPlayerY,
+              activeTouch.anchorPointerX,
+              activeTouch.anchorPointerY,
+              pt.x,
+              pt.y,
+              1.18
+            );
+            simRef.current?.setPointerTarget(true, target.x, target.y);
+            return;
+          }
+          if ((e.buttons & 1) !== 0) {
+            const pt = screenToCanvas(e.clientX, e.clientY);
             simRef.current?.setPointerTarget(true, pt.x, pt.y);
           }
         }}
-        onPointerUp={() => simRef.current?.setPointerTarget(false, 0, 0)}
-        onPointerCancel={() => simRef.current?.setPointerTarget(false, 0, 0)}
+        onPointerUp={(e) => {
+          if (e.pointerType === 'touch') {
+            releaseTouchPointer(e.pointerId);
+            return;
+          }
+          simRef.current?.setPointerTarget(false, 0, 0);
+        }}
+        onPointerCancel={(e) => {
+          if (e.pointerType === 'touch') {
+            releaseTouchPointer(e.pointerId);
+            return;
+          }
+          simRef.current?.setPointerTarget(false, 0, 0);
+        }}
+        onLostPointerCapture={(e) => {
+          if (e.pointerType === 'touch') {
+            releaseTouchPointer(e.pointerId);
+          }
+        }}
         className="block w-full h-full touch-none outline-none"
       />
 
@@ -814,18 +1019,6 @@ export function CarnivoraShmupGame({
               </div>
 
               <div className="relative flex items-center gap-1.5">
-                {isAdmin && (
-                  <button
-                    type="button"
-                    data-testid="admin-top-btn"
-                    onClick={() => setShowAdmin(true)}
-                    className="touch-manipulation inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 rounded-xl bg-emerald-950/95 hover:bg-emerald-900 text-emerald-100 text-xs font-bold border-2 border-emerald-400/70 shadow-[0_3px_0_#050810] cursor-pointer whitespace-nowrap"
-                  >
-                    <Settings2 className="w-4 h-4 text-emerald-300" />
-                    <span>Modo Admin · Configurar</span>
-                  </button>
-                )}
-
                 <button
                   type="button"
                   onClick={() => {
@@ -960,7 +1153,7 @@ export function CarnivoraShmupGame({
               {/* Reworked Co-Pilot Pet Hangar Deck */}
               <div
                 data-testid="pet-hangar-panel"
-                className="w-full max-w-2xl rounded-2xl bg-[#091220]/90 border-2 border-[#050810] shadow-[0_6px_0_#050810] p-3 sm:p-3.5 space-y-2.5"
+                className="w-full max-w-2xl rounded-2xl bg-[#091220]/90 border-2 border-[#050810] shadow-[0_6px_0_#050810] p-3 sm:p-3.5 [@media(max-height:480px)]:p-2 space-y-2.5 [@media(max-height:480px)]:space-y-1.5"
               >
                 <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                   <div className="text-[11px] font-display font-black uppercase tracking-wider text-sky-300">
@@ -981,7 +1174,7 @@ export function CarnivoraShmupGame({
                 </div>
 
                 {/* Responsive Pet Selector Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 [@media(max-height:480px)]:grid-cols-3 gap-1.5 sm:gap-2 [@media(max-height:480px)]:gap-1.5">
                   {PET_CATALOG.map((pet) => {
                     const isPlayable =
                       pet.implemented && (pet.id === 'batricio' || hud.unlockedPets.includes(pet.id as PetId));
@@ -992,7 +1185,7 @@ export function CarnivoraShmupGame({
                         <div
                           key={pet.id}
                           title={pet.specialDesc}
-                          className="overflow-hidden min-h-[46px] flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-[#0B1525] border border-slate-800 text-slate-400"
+                          className="overflow-hidden min-h-[46px] [@media(max-height:480px)]:min-h-[38px] flex items-center gap-2 px-2.5 py-1.5 [@media(max-height:480px)]:py-1 rounded-xl bg-[#0B1525] border border-slate-800 text-slate-400"
                         >
                           <div className="w-5 h-5 rounded-md bg-slate-900 border border-slate-700/80 flex items-center justify-center shrink-0">
                             <Lock className="w-3 h-3 text-slate-400" />
@@ -1016,7 +1209,7 @@ export function CarnivoraShmupGame({
                             ? `${pet.name} · Cerca: ${pet.closeRangeLabel} · Especial: ${pet.specialName}`
                             : `Derrota al Jefe del Nivel ${pet.unlockLevel} para desbloquear a ${pet.name}`
                         }
-                        className={`touch-manipulation overflow-hidden min-h-[46px] flex items-center gap-2 px-2.5 py-1.5 rounded-xl border-2 text-left transition-colors ${
+                        className={`touch-manipulation overflow-hidden min-h-[46px] [@media(max-height:480px)]:min-h-[38px] flex items-center gap-2 px-2.5 py-1.5 [@media(max-height:480px)]:py-1 rounded-xl border-2 text-left transition-colors ${
                           isSelected
                             ? 'bg-[#122840] border-sky-400 text-white shadow-[0_3px_0_#050810] cursor-pointer'
                             : isPlayable
@@ -1089,9 +1282,9 @@ export function CarnivoraShmupGame({
                   <button
                     type="button"
                     onClick={() => setShowAdmin(true)}
-                    className="touch-manipulation inline-flex items-center gap-2 px-4 py-3 sm:py-3.5 rounded-xl bg-emerald-950/95 hover:bg-emerald-900 text-emerald-100 font-bold text-xs sm:text-sm border-2 border-emerald-400/70 shadow-[0_4px_0_#050810] transition-colors cursor-pointer whitespace-nowrap"
+                    className="touch-manipulation inline-flex items-center gap-2 px-4 py-3 sm:py-3.5 rounded-xl bg-[#0F172A]/95 hover:bg-[#1E293B] text-slate-100 font-semibold text-xs sm:text-sm border-2 border-[#050810] shadow-[0_4px_0_#050810] transition-colors cursor-pointer whitespace-nowrap"
                   >
-                    <Settings2 className="w-4 h-4 text-emerald-300" />
+                    <Settings2 className="w-4 h-4 text-emerald-400" />
                     <span>Administrar</span>
                   </button>
                 )}
@@ -1216,8 +1409,14 @@ export function CarnivoraShmupGame({
                 </div>
               ) : (
                 <div className="text-[11px] sm:text-xs text-slate-200/90 font-medium tracking-wide">
-                  <span className="sm:hidden">Arrastrar Mover · Auto Principal · Secundaria [E] · Rotar [Q]</span>
-                  <span className="hidden sm:inline">{prompts.footerSummary}</span>
+                  {isTouchDevice ? (
+                    <span>Pulgar izq.: Arrastrar nave · Auto Principal · Pulgar der.: Secundaria, Rotar y Especial</span>
+                  ) : (
+                    <>
+                      <span className="sm:hidden">Arrastrar Mover · Auto Principal · Secundaria [E] · Rotar [Q]</span>
+                      <span className="hidden sm:inline">{prompts.footerSummary}</span>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -1231,12 +1430,10 @@ export function CarnivoraShmupGame({
           hud={hud}
           config={config}
           muted={muted}
-          isAdmin={isAdmin}
-          onOpenAdmin={() => {
-            simRef.current?.clearInputs();
-            simRef.current?.setStatus('paused');
-            setShowAdmin(true);
-          }}
+          isTouchDevice={isTouchDevice}
+          isFullscreen={isFullscreen}
+          canFullscreen={canFullscreen}
+          onToggleFullscreen={handleToggleFullscreen}
           onToggleMute={handleToggleMute}
           onPause={handleTogglePause}
           onRestart={handleStart}
@@ -1609,14 +1806,62 @@ export function CarnivoraShmupGame({
 
       {/* ADMIN / CUSTOMIZATION PANEL — Strictly gated behind isAdmin */}
       {isAdmin && showAdmin && (
-        <Suspense fallback={null}>
-          <AdminConfigModal
-            config={config}
-            onSave={handleSaveConfig}
-            onUnlocksChanged={handleUnlocksUpdated}
-            onClose={() => setShowAdmin(false)}
-          />
-        </Suspense>
+        <AdminConfigModal
+          config={config}
+          onSave={handleSaveConfig}
+          onUnlocksChanged={handleUnlocksUpdated}
+          onClose={() => setShowAdmin(false)}
+        />
+      )}
+
+      {/* MANDATORY LANDSCAPE ORIENTATION GATE FOR PORTRAIT MOBILE/TABLET */}
+      {requiresLandscape && (
+        <div
+          data-testid="rotate-landscape-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Girá tu teléfono a modo horizontal para jugar"
+          className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-5 px-6 text-center bg-[#08101C]/96 backdrop-blur-md"
+        >
+          <div className="w-24 h-24 rounded-3xl bg-[#0F1C30] border-2 border-emerald-400/50 shadow-[0_6px_0_#050810] flex items-center justify-center">
+            <Smartphone className="w-12 h-12 text-emerald-400 animate-rotate-phone" />
+          </div>
+
+          <div className="space-y-2 max-w-xs">
+            <div className="text-[11px] font-mono font-bold uppercase tracking-[0.18em] text-amber-300">
+              Modo Horizontal Requerido
+            </div>
+            <h2 className="text-2xl font-display font-black text-white leading-tight">
+              Girá tu teléfono a horizontal
+            </h2>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Dionaea Strike está diseñado para jugar con dos pulgares en pantalla apaisada y ver mejor los ataques enemigos.
+            </p>
+          </div>
+
+          {status === 'paused' && (
+            <div className="px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-400/50 text-xs font-bold text-amber-200">
+              Partida en pausa automática — girá para continuar
+            </div>
+          )}
+
+          {(canFullscreen || canOrientationLock) && (
+            <button
+              type="button"
+              onClick={() => void requestMobileLandscapeFullscreen(true)}
+              className="touch-manipulation inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-display font-bold text-sm border-2 border-[#050810] shadow-[0_4px_0_#050810] cursor-pointer"
+            >
+              <Maximize2 className="w-4 h-4" />
+              <span>Pasar a pantalla horizontal</span>
+            </button>
+          )}
+
+          {orientationHint && (
+            <p className="max-w-xs px-3 py-2 rounded-xl bg-amber-500/15 border border-amber-400/50 text-[11px] font-medium text-amber-200 leading-relaxed">
+              {orientationHint}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
