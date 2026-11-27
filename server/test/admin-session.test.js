@@ -16,6 +16,8 @@ import {
   isAdminGoogleEmail,
   isAdminTokenVersionValid,
   isAllowedAdminEmail,
+  isEmailAuthConfigured,
+  isFacebookOAuthConfigured,
   isGoogleOAuthConfigured,
   parseCookies,
   sanitizeReturnTo,
@@ -206,4 +208,21 @@ test('isAdminTokenVersionValid invalida tokens de contraseña viejos tras cambio
   assert.equal(isAdminTokenVersionValid(oldPasswordToken, { tokenVersion: 1 }), true);
   assert.equal(isAdminTokenVersionValid(oldPasswordToken, { tokenVersion: 2 }), false);
   assert.equal(isAdminTokenVersionValid(googleToken, { tokenVersion: 2 }), true);
+});
+
+test('isFacebookOAuthConfigured e isEmailAuthConfigured validan secretos y credenciales', () => {
+  const signingSecret = 'signing-secret-with-at-least-32-chars';
+  assert.equal(isEmailAuthConfigured({ USER_SESSION_SECRET: signingSecret }), true);
+  assert.equal(isEmailAuthConfigured({ USER_SESSION_SECRET: 'corto' }), false);
+
+  assert.equal(isFacebookOAuthConfigured({
+    FACEBOOK_CLIENT_ID: 'fb-id',
+    FACEBOOK_CLIENT_SECRET: 'fb-secret',
+    USER_SESSION_SECRET: signingSecret,
+  }), true);
+
+  assert.equal(isFacebookOAuthConfigured({
+    FACEBOOK_CLIENT_ID: 'fb-id',
+    USER_SESSION_SECRET: signingSecret,
+  }), false);
 });

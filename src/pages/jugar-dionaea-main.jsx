@@ -10,9 +10,24 @@ const CarnivoraShmupGame = lazy(() =>
 );
 
 function GameAccessGate({ children }) {
-  const { isStaticPreview, isLoading, isAdminLoading, enabled, providers, user, isAdmin, signInWithProvider } = useAuth();
+  const {
+    isStaticPreview,
+    isLoading,
+    isAdminLoading,
+    enabled,
+    providers,
+    user,
+    isAdmin,
+    signInWithProvider,
+    signInWithEmail,
+    registerWithEmail,
+  } = useAuth();
   const [signingIn, setSigningIn] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [emailMode, setEmailMode] = useState('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   if (isLoading || isAdminLoading) {
     return (
@@ -28,33 +43,165 @@ function GameAccessGate({ children }) {
   const hasAccess = Boolean(user || isAdmin);
   if (!hasAccess) {
     const googleAvailable = !isStaticPreview && enabled && providers.includes('google');
+    const facebookAvailable = !isStaticPreview && enabled && providers.includes('facebook');
+    const emailAvailable = !isStaticPreview && enabled && providers.includes('email');
+    const anyAuthAvailable = googleAvailable || facebookAvailable || emailAvailable;
+
     return (
       <main className="min-h-dvh grid place-items-center bg-[#08101C] text-slate-100 p-6">
         <section className="w-full max-w-md rounded-2xl border-2 border-lime-300/30 bg-[#0d1a2c] p-7 text-center shadow-2xl space-y-4">
           <p className="text-xs font-mono uppercase tracking-widest text-lime-300">Zona de juegos gratis</p>
           <h1 className="text-2xl font-display font-extrabold text-white">Dionaea Strike</h1>
           <p className="text-sm text-slate-300 leading-relaxed">
-            Iniciá sesión con tu cuenta de Google para jugar gratis desde cualquier dispositivo.
+            Iniciá sesión con tu cuenta o creá una gratis con tu correo para jugar desde cualquier dispositivo.
           </p>
-          {googleAvailable ? (
-            <button
-              type="button"
-              disabled={signingIn}
-              onClick={() => {
-                setAuthError('');
-                setSigningIn(true);
-                signInWithProvider('google', '/jugar-dionaea.html').catch(() => {
-                  setAuthError('No pudimos conectar con Google. Probá nuevamente.');
-                  setSigningIn(false);
-                });
-              }}
-              className="w-full rounded-xl bg-[#b7f43e] px-5 py-3 text-sm font-extrabold text-[#051610] hover:bg-[#c8f451] cursor-pointer disabled:opacity-60"
-            >
-              {signingIn ? 'Conectando con Google…' : 'Iniciar sesión con Google para jugar'}
-            </button>
+          {anyAuthAvailable ? (
+            <div className="space-y-3 text-left">
+              {googleAvailable && (
+                <button
+                  type="button"
+                  disabled={signingIn}
+                  onClick={() => {
+                    setAuthError('');
+                    setSigningIn(true);
+                    signInWithProvider('google', '/jugar-dionaea.html').catch(() => {
+                      setAuthError('No pudimos conectar con Google. Probá nuevamente.');
+                      setSigningIn(false);
+                    });
+                  }}
+                  className="w-full rounded-xl bg-[#b7f43e] px-5 py-3 text-sm font-extrabold text-[#051610] hover:bg-[#c8f451] cursor-pointer disabled:opacity-60"
+                >
+                  {signingIn ? 'Conectando con Google…' : 'Continuar con Google'}
+                </button>
+              )}
+              {facebookAvailable && (
+                <button
+                  type="button"
+                  disabled={signingIn}
+                  onClick={() => {
+                    setAuthError('');
+                    setSigningIn(true);
+                    signInWithProvider('facebook', '/jugar-dionaea.html').catch(() => {
+                      setAuthError('No pudimos conectar con Facebook. Probá nuevamente.');
+                      setSigningIn(false);
+                    });
+                  }}
+                  className="w-full rounded-xl bg-[#1877F2] px-5 py-3 text-sm font-extrabold text-white hover:bg-[#166fe5] cursor-pointer disabled:opacity-60"
+                >
+                  Continuar con Facebook
+                </button>
+              )}
+              {emailAvailable && (
+                <div className="pt-2 border-t border-slate-700/70 space-y-3">
+                  <div className="grid grid-cols-2 gap-2" role="tablist" aria-label="Acceso con correo">
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={emailMode === 'login'}
+                      onClick={() => {
+                        setEmailMode('login');
+                        setAuthError('');
+                      }}
+                      className={`rounded-lg px-3 py-2 text-xs font-bold cursor-pointer ${
+                        emailMode === 'login'
+                          ? 'bg-lime-300/20 text-lime-200 border border-lime-300/60'
+                          : 'bg-slate-900/60 text-slate-300 border border-slate-700'
+                      }`}
+                    >
+                      Ingresar
+                    </button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={emailMode === 'register'}
+                      onClick={() => {
+                        setEmailMode('register');
+                        setAuthError('');
+                      }}
+                      className={`rounded-lg px-3 py-2 text-xs font-bold cursor-pointer ${
+                        emailMode === 'register'
+                          ? 'bg-lime-300/20 text-lime-200 border border-lime-300/60'
+                          : 'bg-slate-900/60 text-slate-300 border border-slate-700'
+                      }`}
+                    >
+                      Crear cuenta
+                    </button>
+                  </div>
+                  <form
+                    className="space-y-2.5"
+                    onSubmit={async (event) => {
+                      event.preventDefault();
+                      setAuthError('');
+                      setSigningIn(true);
+                      try {
+                        if (emailMode === 'register') {
+                          await registerWithEmail({ name, email, password });
+                        } else {
+                          await signInWithEmail({ email, password });
+                        }
+                      } catch (error) {
+                        setAuthError(error?.message || 'No pudimos completar el ingreso.');
+                        setSigningIn(false);
+                      }
+                    }}
+                  >
+                    {emailMode === 'register' && (
+                      <input
+                        type="text"
+                        name="name"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        placeholder="Tu nombre"
+                        aria-label="Tu nombre"
+                        autoComplete="name"
+                        minLength={2}
+                        maxLength={80}
+                        required
+                        disabled={signingIn}
+                        className="w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-400"
+                      />
+                    )}
+                    <input
+                      type="email"
+                      name="email"
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      placeholder="tu@correo.com"
+                      aria-label="Correo electrónico"
+                      autoComplete="email"
+                      maxLength={160}
+                      required
+                      disabled={signingIn}
+                      className="w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-400"
+                    />
+                    <input
+                      type="password"
+                      name="password"
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      placeholder={emailMode === 'register' ? 'Contraseña (mín. 8 caracteres)' : 'Tu contraseña'}
+                      aria-label="Contraseña"
+                      autoComplete={emailMode === 'register' ? 'new-password' : 'current-password'}
+                      minLength={emailMode === 'register' ? 8 : 1}
+                      maxLength={200}
+                      required
+                      disabled={signingIn}
+                      className="w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3.5 py-2.5 text-sm text-white placeholder:text-slate-400"
+                    />
+                    <button
+                      type="submit"
+                      disabled={signingIn}
+                      className="w-full rounded-xl border border-lime-300/60 bg-slate-900 px-5 py-2.5 text-sm font-bold text-lime-200 hover:bg-slate-800 cursor-pointer disabled:opacity-60"
+                    >
+                      {emailMode === 'register' ? 'Crear cuenta gratis y jugar' : 'Entrar con correo'}
+                    </button>
+                  </form>
+                </div>
+              )}
+            </div>
           ) : (
             <p className="text-xs text-slate-400">
-              El acceso con Google está temporalmente deshabilitado en este entorno.
+              El acceso está temporalmente deshabilitado en este entorno.
             </p>
           )}
           {authError && <p className="text-xs font-semibold text-rose-300">{authError}</p>}

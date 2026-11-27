@@ -20,6 +20,8 @@ const fallbackValue = {
   refreshSession: async () => null,
   refreshAdminSession: async () => null,
   signInWithProvider: async () => {},
+  signInWithEmail: async () => null,
+  registerWithEmail: async () => null,
   signOut: async () => {},
 };
 
@@ -187,10 +189,10 @@ export function AuthProvider({ children, includeAdminMeta = false }) {
     const safeReturnTo = normalizeReturnPath(returnTo);
 
     if (authFlowRef.current === 'redirect') {
-      if (provider !== 'google') {
+      if (provider !== 'google' && provider !== 'facebook') {
         throw new Error('Proveedor no disponible.');
       }
-      window.location.assign('/api/auth/google/start?returnTo=' + encodeURIComponent(safeReturnTo));
+      window.location.assign(`/api/auth/${provider}/start?returnTo=${encodeURIComponent(safeReturnTo)}`);
       return;
     }
 
@@ -203,6 +205,36 @@ export function AuthProvider({ children, includeAdminMeta = false }) {
       throw new Error('Inicio de sesión rechazado.');
     }
   }, []);
+
+  const submitEmailAuth = useCallback(async (endpoint, payload) => {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      const message = data?.error?.message || 'No pudimos completar la operación.';
+      throw new Error(message);
+    }
+    const nextSession = data?.user
+      ? { user: data.user, session: data.session ?? null }
+      : await fetchSession();
+    setSession(nextSession);
+    await refreshAdminSession();
+    return nextSession;
+  }, [refreshAdminSession]);
+
+  const signInWithEmail = useCallback(
+    async ({ email, password }) => submitEmailAuth('/api/auth/login', { email, password }),
+    [submitEmailAuth],
+  );
+
+  const registerWithEmail = useCallback(
+    async ({ name, email, password }) => submitEmailAuth('/api/auth/register', { name, email, password }),
+    [submitEmailAuth],
+  );
 
   const signOut = useCallback(async () => {
     if (authFlowRef.current === 'redirect') {
@@ -245,8 +277,20 @@ export function AuthProvider({ children, includeAdminMeta = false }) {
     refreshSession,
     refreshAdminSession,
     signInWithProvider,
+    signInWithEmail,
+    registerWithEmail,
     signOut,
-  }), [adminState, refreshAdminSession, refreshSession, session, signInWithProvider, signOut, status]);
+  }), [
+    adminState,
+    refreshAdminSession,
+    refreshSession,
+    registerWithEmail,
+    session,
+    signInWithEmail,
+    signInWithProvider,
+    signOut,
+    status,
+  ]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

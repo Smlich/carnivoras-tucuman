@@ -174,21 +174,28 @@ export default function AdminDashboard() {
                     <small>Almacenamiento: {data.overview?.storageMode || 'activo'}</small>
                   </article>
                   <article className="admin-kpi">
-                    <span>Clientes con Google</span>
+                    <span>Clientes registrados</span>
                     <strong>{data.overview?.usersTotal ?? data.users.length}</strong>
-                    <small>{googleActive ? 'Registro con Google activo' : 'Falta activar credenciales OAuth'}</small>
+                    <small>
+                      {providers.length > 0
+                        ? `Activos: ${providers.map((p) => (p === 'google' ? 'Google' : p === 'facebook' ? 'Facebook' : 'Correo')).join(', ')}`
+                        : 'Falta configurar acceso de clientes'}
+                    </small>
                   </article>
                 </div>
 
                 <div className="admin-panel admin-oauth-status">
-                  <h2>Registro de clientes con Google</h2>
+                  <h2>Acceso y registro de clientes</h2>
                   {googleActive ? (
                     <p>
-                      El inicio de sesión con Google está <strong>activo</strong>. Los clientes pueden registrarse desde el botón «Ingresar» o en «Juegos gratis», y sus pedidos por WhatsApp informan su nombre y cuenta verificada.
+                      El inicio de sesión con <strong>Google</strong> y el registro con <strong>correo electrónico</strong> están activos.
+                      {providers.includes('facebook')
+                        ? ' También tenés activo el ingreso con Facebook.'
+                        : ' Si sumás FACEBOOK_CLIENT_ID y FACEBOOK_CLIENT_SECRET en Netlify, también se habilita Facebook.'}
                     </p>
                   ) : (
                     <p>
-                      Todavía faltan las variables <code>GOOGLE_CLIENT_ID</code> y <code>GOOGLE_CLIENT_SECRET</code> en Netlify (y autorizar el URI <code>{`${window.location.origin}/api/auth/callback/google`}</code> en Google Cloud Console). Si también cargás tu Gmail en <code>ADMIN_EMAILS</code>, entrar con Google te activará el modo Admin automáticamente.
+                      Todavía faltan las variables <code>GOOGLE_CLIENT_ID</code> y <code>GOOGLE_CLIENT_SECRET</code> en Netlify (y autorizar el URI <code>{`${window.location.origin}/api/auth/callback/google`}</code> en Google Cloud Console). El registro gratuito con correo funciona automáticamente con <code>USER_SESSION_SECRET</code>.
                     </p>
                   )}
                 </div>

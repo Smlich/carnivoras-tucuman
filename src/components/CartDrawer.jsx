@@ -19,9 +19,12 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
   const emptyStateActionRef = useRef(null);
   const previousItemCount = useRef(items.length);
 
-  const isGoogleRegistered = Boolean(user);
-  const googleEmail = user?.email || '';
+  const isSignedIn = Boolean(user);
+  const authProvider = user?.provider || '';
+  const isGoogleRegistered = Boolean(user && authProvider === 'google');
+  const userEmail = user?.email || '';
   const googleAvailable = enabled && providers.includes('google');
+  const facebookAvailable = enabled && providers.includes('facebook');
   const hasUnavailableItems = items.some((item) => item.stockStatus === 'unavailable');
 
   useEffect(() => {
@@ -106,8 +109,9 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
       keepalive: true,
       body: JSON.stringify({
         customerName: trimmedName,
-        customerEmail: googleEmail,
+        customerEmail: userEmail,
         googleRegistered: isGoogleRegistered,
+        authProvider,
         notes: trimmedNotes,
         items: items.map((item) => ({
           id: item.id,
@@ -125,7 +129,8 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
   const whatsappUrl = createWhatsAppUrl(items, settings, {
     name: trimmedName,
     googleRegistered: isGoogleRegistered,
-    email: googleEmail,
+    provider: authProvider,
+    email: userEmail,
     notes: trimmedNotes,
   });
 
@@ -199,23 +204,31 @@ export default function CartDrawer({ isOpen, items, onClose, onQuantityChange, o
               ))}
             </ul>
             <div className="cart-summary">
-              <div className={'cart-google-status' + (isGoogleRegistered ? ' is-registered' : '')}>
+              <div className={'cart-google-status' + (isSignedIn ? ' is-registered' : '')}>
                 <div>
-                  <span>Estado de cuenta Google</span>
-                  <strong>{isGoogleRegistered ? 'Registrado con Google' : 'Sin cuenta de Google'}</strong>
+                  <span>Estado de cuenta</span>
+                  <strong>
+                    {authProvider === 'facebook'
+                      ? 'Registrado con Facebook'
+                      : authProvider === 'email'
+                        ? 'Cuenta con correo'
+                        : isSignedIn
+                          ? 'Registrado con Google'
+                          : 'Sin cuenta iniciada'}
+                  </strong>
                   <small>
-                    {isGoogleRegistered
-                      ? (googleEmail || 'Cuenta verificada para tu pedido')
+                    {isSignedIn
+                      ? (userEmail || 'Cuenta activa para tu pedido')
                       : 'Se informará automáticamente en tu mensaje de WhatsApp.'}
                   </small>
                 </div>
-                {!isGoogleRegistered && googleAvailable && (
+                {!isSignedIn && (googleAvailable || facebookAvailable) && (
                   <button
                     type="button"
                     className="cart-google-status__btn"
-                    onClick={() => signInWithProvider('google', `${window.location.pathname || '/'}${window.location.search || ''}`).catch(() => {})}
+                    onClick={() => signInWithProvider(googleAvailable ? 'google' : 'facebook', `${window.location.pathname || '/'}${window.location.search || ''}`).catch(() => {})}
                   >
-                    Ingresar con Google
+                    {googleAvailable ? 'Ingresar con Google' : 'Ingresar con Facebook'}
                   </button>
                 )}
               </div>

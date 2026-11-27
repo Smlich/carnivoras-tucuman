@@ -58,10 +58,16 @@ function OrderRow({ order, onChanged, onStatus }) {
           <strong>{order.id}</strong>
           <span>{order.customerName ? ` · ${order.customerName}` : ''}</span>
           <small> · {new Date(order.createdAt).toLocaleString('es-AR')}</small>
-          <span className={'admin-tag ' + (order.googleRegistered ? 'admin-tag--google' : 'admin-tag--muted')}>
-            {order.googleRegistered
-              ? `Registrado con Google${order.customerEmail ? ` (${order.customerEmail})` : ''}`
-              : 'Sin cuenta de Google'}
+          <span className={'admin-tag ' + ((order.googleRegistered || order.accountRegistered) ? 'admin-tag--google' : 'admin-tag--muted')}>
+            {order.authProvider === 'facebook'
+              ? `Registrado con Facebook${order.customerEmail ? ` (${order.customerEmail})` : ''}`
+              : order.authProvider === 'email'
+                ? `Cuenta con correo${order.customerEmail ? ` (${order.customerEmail})` : ''}`
+                : order.googleRegistered
+                  ? `Registrado con Google${order.customerEmail ? ` (${order.customerEmail})` : ''}`
+                  : order.accountRegistered
+                    ? `Cuenta activa${order.customerEmail ? ` (${order.customerEmail})` : ''}`
+                    : 'Sin cuenta iniciada'}
           </span>
         </div>
         <strong>{formatPrice(order.totalARS)}</strong>
@@ -184,27 +190,34 @@ export default function AdminOrdersAccountTab({ adminUser, orders, users = [], o
         </section>
 
         <section className="admin-panel">
-          <h2>Clientes registrados con Google ({users.length})</h2>
-          <p>Personas que ingresaron con su cuenta de Google en el sitio o desde la zona de juegos.</p>
+          <h2>Clientes registrados ({users.length})</h2>
+          <p>Personas que ingresaron con Google, Facebook o correo en el sitio o desde la zona de juegos.</p>
 
           {users.length === 0 ? (
-            <p className="admin-empty">Todavía no hay clientes registrados con Google.</p>
+            <p className="admin-empty">Todavía no hay clientes registrados.</p>
           ) : (
             <div className="admin-list">
-              {users.map((customer) => (
-                <article className="admin-item-row" key={customer.id || customer.email}>
-                  <div className="admin-item-row__info">
-                    <div className="admin-item-row__title">
-                      <strong>{customer.name || 'Cliente'}</strong>
-                      <span className="admin-tag admin-tag--google">Google</span>
+              {users.map((customer) => {
+                const providerLabel = customer.provider === 'facebook'
+                  ? 'Facebook'
+                  : customer.provider === 'email'
+                    ? 'Correo'
+                    : 'Google';
+                return (
+                  <article className="admin-item-row" key={customer.id || customer.email}>
+                    <div className="admin-item-row__info">
+                      <div className="admin-item-row__title">
+                        <strong>{customer.name || 'Cliente'}</strong>
+                        <span className="admin-tag admin-tag--google">{providerLabel}</span>
+                      </div>
+                      <small>{customer.email}</small>
+                      {customer.lastLoginAt && (
+                        <small>Último acceso: {new Date(customer.lastLoginAt).toLocaleString('es-AR')}</small>
+                      )}
                     </div>
-                    <small>{customer.email}</small>
-                    {customer.lastLoginAt && (
-                      <small>Último acceso: {new Date(customer.lastLoginAt).toLocaleString('es-AR')}</small>
-                    )}
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>

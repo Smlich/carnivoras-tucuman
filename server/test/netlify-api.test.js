@@ -705,3 +705,153 @@ test('fallos >= 500 de Gemini reembolsan cuota, /scores aplica rate limit y /aut
   assert.ok(Number(limitedScore.headers.get('retry-after')) >= 1);
   assert.equal((await limitedScore.json()).error.code, 'RATE_LIMIT_EXCEEDED');
 });
+
+function extractCookieValue(setCookieHeaders, cookieName) {
+  for (const header of setCookieHeaders) {
+    const firstPart = header.split(';')[0] || '';
+    if (firstPart.startsWith(`${cookieName}=`)) {
+      return firstPart;
+    }
+  }
+  return '';
+}
+
+test('registro e ingreso con correo funciona, bloquea duplicados/rate-limit y nunca eleva a Admin', async () => {
+  const { call, store } = setup(testEnv, { customerAuthMax: 2, customerAuthWindowMs: 60_000 });
+
+  const statusBefore = await (await call('/api/auth/status')).json();
+  assert.equal(statusBefore.enabled, true);
+  assert.ok(statusBefore.providers.includes('email'));
+
+  const regRes = await call('/api/auth/register', {
+    method: 'POST',
+    body: {
+      name: 'Intento Admin Email',
+      email: testEnv.ADMIN_EMAIL,
+      password: 'ClaveClienteSegura2026',
+    },
+    headers: { 'x-nf-client-connection-ip': '198.51.100.10' },
+  });
+  assert.equal(regRes.status, 201);
+  const regCookies = regRes.headers.getSetCookie();
+  const userCookie = extractCookieValue(regCookies, 'ct_user_session');
+  assert.ok(userCookie);
+  assert.equal(extractCookieValue(regCookies, 'ct_admin_session'), '');
+
+  const regBody = await regRes.json();
+  assert.equal(regBody.user.provider, 'email');
+  assert.equal(regBody.user.email, testEnv.ADMIN_EMAIL);
+
+  const usersStored = store.data.get('registered-users')?.value || [];
+  assert.equal(usersStored[0].passwordHash, undefined);
+  assert.equal(usersStored[0].provider, 'email');
+  assert.ok(store.data.get('user-credentials')?.value?.[testEnv.ADMIN_EMAIL]?.passwordHash);
+
+  const dupRes = await call('/api/auth/register', {
+    method: 'POST',
+    body: {
+      name: 'Otro',
+      email: testEnv.ADMIN_EMAIL,
+      password: 'ClaveClienteSegura2026',
+    },
+    headers: { 'x-nf-client-connection-ip': '198.51.100.11' },
+  });
+  assert.equal(dupRes.status, 409);
+
+  // Sesión por correo desbloquea /api/games pero JAMÁS desbloquea rutas Admin
+  const gamesRes = await call('/api/games', { headers: { cookie: userCookie } });
+  assert.equal(gamesRes.status, 200);
+  const adminBlocked = await call('/api/admin/orders', { headers: { cookie: userCookie } });
+  assert.equal(adminBlocked.status, 401);
+
+  // Pedidos con sesión de correo registran proveedor sin marcar googleRegistered
+  const orderRes = await call('/api/orders', {
+    method: 'POST',
+    body: validOrder('Intento Admin Email'),
+    headers: { cookie: userCookie },
+  });
+  assert.equal(orderRes.status, 201);
+  const savedOrder = (await orderRes.json()).data;
+  assert.equal(savedOrder.accountRegistered, true);
+  assert.equal(savedOrder.googleRegistered, false);
+  assert.equal(savedOrder.authProvider, 'email');
+
+  // Login correcto e incorrecto + rate limit en una IP separada
+  const loginOk = await call('/api/auth/login', {
+    method: 'POST',
+    body: { email: testEnv.ADMIN_EMAIL, password: 'ClaveClienteSegura2026' },
+    headers: { 'x-nf-client-connection-ip': '198.51.100.20' },
+  });
+  assert.equal(loginOk.status, 200);
+
+  const loginBad = await call('/api/auth/login', {
+    method: 'POST',
+    body: { email: testEnv.ADMIN_EMAIL, password: 'IncorrectaPassword' },
+    headers: { 'x-nf-client-connection-ip': '198.51.100.20' },
+  });
+  assert.equal(loginBad.status, 401);
+
+  const loginRateLimited = await call('/api/auth/login', {
+    method: 'POST',
+    body: { email: testEnv.ADMIN_EMAIL, password: 'ClaveClienteSegura2026' },
+    headers: { 'x-nf-client-connection-ip': '198.51.100.20' },
+  });
+  assert.equal(loginRateLimited.status, 429);
+  assert.ok(Number(loginRateLimited.headers.get('retry-after')) >= 1);
+});
+
+test('Facebook OAuth inicia flujo, valida state, registra cliente y nunca eleva a Admin', async () => {
+  const fbEnv = {
+    ...testEnv,
+    FACEBOOK_CLIENT_ID: 'fb-app-123',
+    FACEBOOK_CLIENT_SECRET: 'fb-secret-xyz',
+  };
+  const mockFetch = async (targetUrl) => {
+    const href = String(targetUrl);
+    if (href.startsWith('https://graph.facebook.com/v20.0/oauth/access_token')) {
+      return { ok: true, json: async () => ({ access_token: 'fb-token-abc' }) };
+    }
+    if (href.startsWith('https://graph.facebook.com/me')) {
+      return {
+        ok: true,
+        json: async () => ({
+          id: '987654321',
+          name: 'Facu Meta',
+          email: testEnv.ADMIN_EMAIL,
+          picture: { data: { url: 'https://fbcdn.test/avatar.jpg' } },
+        }),
+      };
+    }
+    return { ok: false, json: async () => ({}) };
+  };
+
+  const { call, store } = setup(fbEnv, {}, mockFetch);
+  const statusJson = await (await call('/api/auth/status')).json();
+  assert.ok(statusJson.providers.includes('facebook'));
+
+  const startRes = await call('/api/auth/facebook/start?returnTo=/admin.html');
+  assert.equal(startRes.status, 302);
+  const locationUrl = new URL(startRes.headers.get('location'));
+  assert.equal(locationUrl.origin, 'https://www.facebook.com');
+  const state = locationUrl.searchParams.get('state');
+  const stateCookie = extractCookieValue(startRes.headers.getSetCookie(), 'ct_oauth_state');
+  assert.ok(state && stateCookie);
+
+  const cbRes = await call(`/api/auth/callback/facebook?code=fb-code-1&state=${encodeURIComponent(state)}`, {
+    headers: { cookie: stateCookie },
+  });
+  assert.equal(cbRes.status, 302);
+  assert.equal(cbRes.headers.get('location'), '/admin.html?auth_error=not_admin');
+
+  const cbCookies = cbRes.headers.getSetCookie();
+  const userCookie = extractCookieValue(cbCookies, 'ct_user_session');
+  assert.ok(userCookie);
+  assert.equal(extractCookieValue(cbCookies, 'ct_admin_session'), '');
+
+  const users = store.data.get('registered-users')?.value || [];
+  assert.equal(users[0].provider, 'facebook');
+  assert.equal(users[0].image, 'https://fbcdn.test/avatar.jpg');
+
+  const adminCheck = await call('/api/admin/orders', { headers: { cookie: userCookie } });
+  assert.equal(adminCheck.status, 401);
+});

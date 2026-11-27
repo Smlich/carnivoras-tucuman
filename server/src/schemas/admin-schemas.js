@@ -23,6 +23,24 @@ export const adminLoginSchema = z.object({
   password: z.string().min(1, 'Ingresá la contraseña.').max(200),
 });
 
+export const customerRegisterSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Ingresá tu nombre (mínimo 2 caracteres).')
+    .max(80, 'El nombre no puede superar 80 caracteres.'),
+  email: z.string().trim().toLowerCase().email('Ingresá un correo válido.').max(160),
+  password: z
+    .string()
+    .min(8, 'La contraseña debe tener al menos 8 caracteres.')
+    .max(200, 'La contraseña es demasiado larga.'),
+});
+
+export const customerLoginSchema = z.object({
+  email: z.string().trim().toLowerCase().email('Ingresá un correo válido.').max(160),
+  password: z.string().min(1, 'Ingresá tu contraseña.').max(200),
+});
+
 export const adminAccountUpdateSchema = z.object({
   email: z.string().trim().email('Ingresá un correo válido.').max(160),
   name: z.string().trim().min(2, 'Ingresá un nombre de al menos 2 caracteres.').max(80),
@@ -136,6 +154,7 @@ export const orderCreateSchema = z.object({
   customerName: z.string().trim().max(80).optional().default(''),
   customerEmail: z.string().trim().max(160).optional().default(''),
   googleRegistered: z.boolean().optional().default(false),
+  authProvider: z.enum(['', 'google', 'facebook', 'email']).optional().default(''),
   notes: z.string().trim().max(300).optional().default(''),
   items: z.array(orderItemSchema).min(1).max(40),
   source: z.string().trim().max(40).optional().default('whatsapp-cart'),

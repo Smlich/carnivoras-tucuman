@@ -59,3 +59,28 @@ test('createOrderMessage incluye nombre y registro Google del cliente para Whats
   });
   assert.match(notedMessage, /• Nota: Barrio Norte, después de las 17 h/);
 });
+
+test('formatGoogleStatusLabel y createOrderMessage soportan cuentas con Facebook y correo', () => {
+  assert.equal(
+    formatGoogleStatusLabel({ provider: 'facebook', email: 'sol@fb.test' }),
+    'Registrado con Facebook (sol@fb.test)',
+  );
+  assert.equal(
+    formatGoogleStatusLabel({ provider: 'email', email: 'lucia@correo.test' }),
+    'Cuenta con correo (lucia@correo.test)',
+  );
+
+  const emailMessage = createOrderMessage(sampleItems, sampleSettings, {
+    name: 'Lucía',
+    provider: 'email',
+    email: 'lucia@correo.test',
+  });
+  assert.match(emailMessage, /• Cuenta: Cuenta con correo \(lucia@correo\.test\)/);
+
+  const facebookMessage = createOrderMessage(sampleItems, sampleSettings, {
+    name: 'Sol',
+    provider: 'facebook',
+    email: 'sol@fb.test',
+  });
+  assert.match(facebookMessage, /• Cuenta: Registrado con Facebook \(sol@fb\.test\)/);
+});

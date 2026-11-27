@@ -6,21 +6,35 @@ function normalizeCustomerInfo(customer) {
     return {
       name: customer.trim(),
       googleRegistered: false,
+      provider: '',
       email: '',
       notes: '',
     };
   }
+  const googleRegistered = Boolean(customer?.googleRegistered);
+  const rawProvider = String(customer?.provider || customer?.authProvider || '').trim().toLowerCase();
+  const provider = rawProvider || (googleRegistered ? 'google' : '');
   return {
     name: String(customer?.name || '').trim(),
-    googleRegistered: Boolean(customer?.googleRegistered),
+    googleRegistered,
+    provider,
     email: String(customer?.email || '').trim(),
     notes: String(customer?.notes || '').trim(),
   };
 }
 
-export function formatGoogleStatusLabel({ googleRegistered = false, email = '' } = {}) {
-  if (!googleRegistered) return 'No registrado (sin cuenta de Google)';
-  return email ? `Registrado con Google (${email})` : 'Registrado con Google';
+export function formatGoogleStatusLabel({ googleRegistered = false, email = '', provider = '' } = {}) {
+  const normalizedProvider = String(provider || (googleRegistered ? 'google' : '')).trim().toLowerCase();
+  if (normalizedProvider === 'facebook') {
+    return email ? `Registrado con Facebook (${email})` : 'Registrado con Facebook';
+  }
+  if (normalizedProvider === 'email') {
+    return email ? `Cuenta con correo (${email})` : 'Cuenta con correo';
+  }
+  if (googleRegistered || normalizedProvider === 'google') {
+    return email ? `Registrado con Google (${email})` : 'Registrado con Google';
+  }
+  return 'No registrado (sin cuenta de Google)';
 }
 
 export function createOrderMessage(items, storeSettings = store, customer = {}) {
@@ -35,10 +49,14 @@ export function createOrderMessage(items, storeSettings = store, customer = {}) 
     ? `Hola, soy ${info.name} y quiero consultar este pedido en ${businessName}:`
     : `Hola, quiero consultar este pedido en ${businessName}:`;
 
+  const accountPrefix = info.provider === 'facebook' || info.provider === 'email'
+    ? '• Cuenta: '
+    : '• Cuenta de Google: ';
+
   const customerLines = [
     'Datos del cliente:',
     '• Nombre: ' + (info.name || 'No indicado'),
-    '• Cuenta de Google: ' + formatGoogleStatusLabel(info),
+    accountPrefix + formatGoogleStatusLabel(info),
     ...(info.notes ? ['• Nota: ' + info.notes] : []),
   ];
 

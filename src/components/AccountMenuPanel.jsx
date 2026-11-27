@@ -4,6 +4,13 @@ import { useAuth } from '../context/AuthContext';
 const providerLabels = {
   google: 'Google',
   facebook: 'Facebook',
+  email: 'Correo',
+};
+
+const providerEyebrows = {
+  google: 'Registrado con Google',
+  facebook: 'Registrado con Facebook',
+  email: 'Cuenta con correo',
 };
 
 function GoogleIcon() {
@@ -17,11 +24,30 @@ function GoogleIcon() {
   );
 }
 
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <circle cx="12" cy="12" r="11" fill="#1877F2" />
+      <path
+        fill="#FFFFFF"
+        d="M15.1 12.9l.45-2.85h-2.74V8.2c0-.78.38-1.54 1.6-1.54h1.24V4.23s-1.12-.19-2.2-.19c-2.25 0-3.72 1.36-3.72 3.83v2.18H7.2v2.85h2.53v6.89a10.2 10.2 0 0 0 3.08 0v-6.89h2.29z"
+      />
+    </svg>
+  );
+}
+
 export default function AccountMenuPanel({ providers }) {
-  const { user, isAdmin, isLoading, signInWithProvider, signOut } = useAuth();
+  const { user, isAdmin, isLoading, signInWithProvider, signInWithEmail, registerWithEmail, signOut } = useAuth();
   const [message, setMessage] = useState('');
   const [progress, setProgress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailMode, setEmailMode] = useState('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const oauthProviders = providers.filter((provider) => provider === 'google' || provider === 'facebook');
+  const hasEmailAuth = providers.includes('email');
 
   async function handleSignIn(provider) {
     setMessage('');
@@ -33,6 +59,27 @@ export default function AccountMenuPanel({ providers }) {
     } catch {
       setMessage('No pudimos iniciar sesión. Volvé a intentarlo.');
       setProgress('');
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleEmailSubmit(event) {
+    event.preventDefault();
+    setMessage('');
+    setProgress(emailMode === 'register' ? 'Creando tu cuenta…' : 'Ingresando…');
+    setIsSubmitting(true);
+
+    try {
+      if (emailMode === 'register') {
+        await registerWithEmail({ name, email, password });
+      } else {
+        await signInWithEmail({ email, password });
+      }
+      setProgress('');
+    } catch (error) {
+      setMessage(error?.message || 'No pudimos completar el ingreso con correo.');
+      setProgress('');
+    } finally {
       setIsSubmitting(false);
     }
   }
@@ -55,9 +102,10 @@ export default function AccountMenuPanel({ providers }) {
   if (isLoading) return <p className="account-menu__status" role="status">Cargando tu cuenta…</p>;
 
   if (user) {
+    const eyebrow = providerEyebrows[user.provider] || 'Cuenta activa';
     return (
       <>
-        <p className="account-menu__eyebrow">Registrado con Google</p>
+        <p className="account-menu__eyebrow">{eyebrow}</p>
         <div className="account-menu__profile">
           {user.image && (
             <img
@@ -92,22 +140,117 @@ export default function AccountMenuPanel({ providers }) {
     <>
       <p className="account-menu__eyebrow">Cuenta de cliente</p>
       <p className="account-menu__description">
-        Registrate o iniciá sesión con Google para jugar gratis y agilizar tus pedidos por WhatsApp.
+        Registrate o iniciá sesión para jugar gratis y agilizar tus pedidos por WhatsApp.
       </p>
-      <div className="account-menu__providers">
-        {providers.map((provider) => (
-          <button
-            className="account-menu__provider"
-            key={provider}
-            type="button"
-            onClick={() => handleSignIn(provider)}
-            disabled={isSubmitting}
-          >
-            {provider === 'google' && <GoogleIcon />}
-            <span>Continuar con {providerLabels[provider] || provider}</span>
-          </button>
-        ))}
-      </div>
+      {oauthProviders.length > 0 && (
+        <div className="account-menu__providers">
+          {oauthProviders.map((provider) => (
+            <button
+              className="account-menu__provider"
+              key={provider}
+              type="button"
+              onClick={() => handleSignIn(provider)}
+              disabled={isSubmitting}
+            >
+              {provider === 'google' && <GoogleIcon />}
+              {provider === 'facebook' && <FacebookIcon />}
+              <span>Continuar con {providerLabels[provider] || provider}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {oauthProviders.length > 0 && hasEmailAuth && (
+        <div className="account-menu__divider" aria-hidden="true">
+          <span>o con tu correo</span>
+        </div>
+      )}
+
+      {hasEmailAuth && (
+        <div className="account-menu__email-auth">
+          <div className="account-menu__tabs" role="tablist" aria-label="Acceso con correo">
+            <button
+              className={`account-menu__tab${emailMode === 'login' ? ' is-active' : ''}`}
+              type="button"
+              role="tab"
+              aria-selected={emailMode === 'login'}
+              onClick={() => {
+                setEmailMode('login');
+                setMessage('');
+              }}
+              disabled={isSubmitting}
+            >
+              Ingresar
+            </button>
+            <button
+              className={`account-menu__tab${emailMode === 'register' ? ' is-active' : ''}`}
+              type="button"
+              role="tab"
+              aria-selected={emailMode === 'register'}
+              onClick={() => {
+                setEmailMode('register');
+                setMessage('');
+              }}
+              disabled={isSubmitting}
+            >
+              Crear cuenta
+            </button>
+          </div>
+
+          <form className="account-menu__form" onSubmit={handleEmailSubmit}>
+            {emailMode === 'register' && (
+              <label className="account-menu__field">
+                <span>Nombre</span>
+                <input
+                  type="text"
+                  name="name"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="Tu nombre"
+                  autoComplete="name"
+                  minLength={2}
+                  maxLength={80}
+                  required
+                  disabled={isSubmitting}
+                />
+              </label>
+            )}
+            <label className="account-menu__field">
+              <span>Correo</span>
+              <input
+                type="email"
+                name="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="tu@correo.com"
+                autoComplete="email"
+                maxLength={160}
+                required
+                disabled={isSubmitting}
+              />
+            </label>
+            <label className="account-menu__field">
+              <span>Contraseña</span>
+              <input
+                type="password"
+                name="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder={emailMode === 'register' ? 'Mínimo 8 caracteres' : 'Tu contraseña'}
+                autoComplete={emailMode === 'register' ? 'new-password' : 'current-password'}
+                minLength={emailMode === 'register' ? 8 : 1}
+                maxLength={200}
+                required
+                disabled={isSubmitting}
+              />
+            </label>
+            <button className="account-menu__submit" type="submit" disabled={isSubmitting}>
+              {emailMode === 'register' ? 'Crear cuenta gratis' : 'Entrar con correo'}
+            </button>
+          </form>
+        </div>
+      )}
+
       {progress && <p className="account-menu__status" role="status" aria-live="polite">{progress}</p>}
       {message && <p className="account-menu__error" role="alert">{message}</p>}
     </>

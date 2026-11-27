@@ -149,14 +149,33 @@ function GameCard({ game, locked, isPlaying, isAdmin, playerName, role, onToggle
 }
 
 export default function GamesSection({ showHeading = true }) {
-  const { isStaticPreview, isLoading, isAdminLoading, enabled, providers, user, isAdmin, admin, signInWithProvider } = useAuth();
+  const {
+    isStaticPreview,
+    isLoading,
+    isAdminLoading,
+    enabled,
+    providers,
+    user,
+    isAdmin,
+    admin,
+    signInWithProvider,
+    signInWithEmail,
+    registerWithEmail,
+  } = useAuth();
   const { gamesPreview } = useSiteContent();
   const [unlocked, setUnlocked] = useState({ status: 'idle', games: [], playerName: '', role: 'player', isAdmin: false });
   const [playingSlug, setPlayingSlug] = useState(null);
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [signInError, setSignInError] = useState('');
+  const [emailMode, setEmailMode] = useState('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const googleAvailable = enabled && providers.includes('google');
+  const facebookAvailable = enabled && providers.includes('facebook');
+  const emailAvailable = enabled && providers.includes('email');
+  const anyAuthAvailable = googleAvailable || facebookAvailable || emailAvailable;
   const viewerKey = isAdmin ? 'admin:' + (admin?.email || '') : (user?.id ?? user?.email ?? null);
 
   useEffect(() => {
@@ -180,14 +199,31 @@ export default function GamesSection({ showHeading = true }) {
     return () => controller.abort();
   }, [viewerKey]);
 
-  async function handleGoogleSignIn() {
+  async function handleProviderSignIn(provider) {
     setSignInError('');
     setIsSigningIn(true);
 
     try {
-      await signInWithProvider('google', '/juegos.html');
+      await signInWithProvider(provider, '/juegos.html');
     } catch {
-      setSignInError('No pudimos iniciar sesión con Google. Volvé a intentarlo.');
+      setSignInError(`No pudimos iniciar sesión con ${provider === 'facebook' ? 'Facebook' : 'Google'}. Volvé a intentarlo.`);
+      setIsSigningIn(false);
+    }
+  }
+
+  async function handleEmailSubmit(event) {
+    event.preventDefault();
+    setSignInError('');
+    setIsSigningIn(true);
+
+    try {
+      if (emailMode === 'register') {
+        await registerWithEmail({ name, email, password });
+      } else {
+        await signInWithEmail({ email, password });
+      }
+    } catch (error) {
+      setSignInError(error?.message || 'No pudimos completar el ingreso con correo.');
       setIsSigningIn(false);
     }
   }
@@ -230,7 +266,7 @@ export default function GamesSection({ showHeading = true }) {
         </>
       );
     }
-  } else if (isStaticPreview || !googleAvailable) {
+  } else if (isStaticPreview || !anyAuthAvailable) {
     content = (
       <>
         <div className="games-section__grid">
@@ -238,7 +274,7 @@ export default function GamesSection({ showHeading = true }) {
         </div>
         <div className="games-section__cta">
           <p className="games-section__note">
-            Los juegos son gratuitos para clientes registrados con Google. Muy pronto habilitaremos el ingreso con Google para desbloquear esta sección.
+            Los juegos son gratuitos para clientes registrados. Muy pronto habilitaremos el ingreso para desbloquear esta sección.
           </p>
         </div>
       </>
@@ -250,11 +286,101 @@ export default function GamesSection({ showHeading = true }) {
           {gamesPreview.map((game) => <GameCard key={game.id || game.slug} game={game} locked />)}
         </div>
         <div className="games-section__cta">
-          <p>Iniciá sesión con tu cuenta de Google para desbloquear los juegos gratis.</p>
-          <button className="button button--dark" type="button" onClick={handleGoogleSignIn} disabled={isSigningIn}>
-            {isSigningIn ? 'Conectando con Google…' : 'Iniciar sesión con Google para entrar'}
-          </button>
-          {signInError && <p className="games-section__error" role="alert">{signInError}</p>}
+          <div className="games-auth-panel">
+            <p>Iniciá sesión con tu cuenta o creá una gratis con tu correo para desbloquear los juegos.</p>
+            {(googleAvailable || facebookAvailable) && (
+              <div className="games-auth-panel__providers">
+                {googleAvailable && (
+                  <button className="button button--dark" type="button" onClick={() => handleProviderSignIn('google')} disabled={isSigningIn}>
+                    {isSigningIn ? 'Conectando…' : 'Continuar con Google'}
+                  </button>
+                )}
+                {facebookAvailable && (
+                  <button className="button button--ghost" type="button" onClick={() => handleProviderSignIn('facebook')} disabled={isSigningIn}>
+                    Continuar con Facebook
+                  </button>
+                )}
+              </div>
+            )}
+            {emailAvailable && (
+              <div className="games-auth-email">
+                <div className="games-auth-tabs" role="tablist" aria-label="Acceso con correo para juegos">
+                  <button
+                    className={`games-auth-tab${emailMode === 'login' ? ' is-active' : ''}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={emailMode === 'login'}
+                    onClick={() => {
+                      setEmailMode('login');
+                      setSignInError('');
+                    }}
+                    disabled={isSigningIn}
+                  >
+                    Ingresar con correo
+                  </button>
+                  <button
+                    className={`games-auth-tab${emailMode === 'register' ? ' is-active' : ''}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={emailMode === 'register'}
+                    onClick={() => {
+                      setEmailMode('register');
+                      setSignInError('');
+                    }}
+                    disabled={isSigningIn}
+                  >
+                    Crear cuenta gratis
+                  </button>
+                </div>
+                <form className="games-auth-form" onSubmit={handleEmailSubmit}>
+                  {emailMode === 'register' && (
+                    <input
+                      type="text"
+                      name="name"
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                      placeholder="Tu nombre"
+                      aria-label="Tu nombre"
+                      autoComplete="name"
+                      minLength={2}
+                      maxLength={80}
+                      required
+                      disabled={isSigningIn}
+                    />
+                  )}
+                  <input
+                    type="email"
+                    name="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="tu@correo.com"
+                    aria-label="Correo electrónico"
+                    autoComplete="email"
+                    maxLength={160}
+                    required
+                    disabled={isSigningIn}
+                  />
+                  <input
+                    type="password"
+                    name="password"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder={emailMode === 'register' ? 'Contraseña (mín. 8 caracteres)' : 'Tu contraseña'}
+                    aria-label="Contraseña"
+                    autoComplete={emailMode === 'register' ? 'new-password' : 'current-password'}
+                    minLength={emailMode === 'register' ? 8 : 1}
+                    maxLength={200}
+                    required
+                    disabled={isSigningIn}
+                  />
+                  <button className="button button--primary" type="submit" disabled={isSigningIn}>
+                    {emailMode === 'register' ? 'Crear cuenta y entrar' : 'Entrar a jugar'}
+                  </button>
+                </form>
+              </div>
+            )}
+            {signInError && <p className="games-section__error" role="alert">{signInError}</p>}
+          </div>
         </div>
       </>
     );
@@ -269,7 +395,7 @@ export default function GamesSection({ showHeading = true }) {
               <p className="eyebrow"><span className="eyebrow__line" /> Zona de juegos gratis</p>
               <h2 id="games-title">Jugá mientras <em>tus plantas crecen.</em></h2>
             </div>
-            <p className="section-heading__aside">Un regalo para quienes inician sesión con Google: juegos gratuitos creados por nosotros.</p>
+            <p className="section-heading__aside">Un regalo para quienes inician sesión con su cuenta: juegos gratuitos creados por nosotros.</p>
           </div>
         ) : (
           <h2 className="visually-hidden">Juegos disponibles</h2>

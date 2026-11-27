@@ -78,6 +78,18 @@ export function isGoogleOAuthConfigured(envConfig = {}) {
   );
 }
 
+export function isFacebookOAuthConfigured(envConfig = {}) {
+  return Boolean(
+    String(envConfig?.FACEBOOK_CLIENT_ID ?? '').trim()
+    && String(envConfig?.FACEBOOK_CLIENT_SECRET ?? '').trim()
+    && getSessionSigningSecret(envConfig),
+  );
+}
+
+export function isEmailAuthConfigured(envConfig = {}) {
+  return Boolean(getSessionSigningSecret(envConfig));
+}
+
 export function sanitizeReturnTo(value, fallback = '/') {
   const text = String(value ?? '').trim();
   if (!text || text.length > 200 || !text.startsWith('/') || text.startsWith('//') || text.startsWith('/\\')) {

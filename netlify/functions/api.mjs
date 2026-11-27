@@ -25,6 +25,8 @@ import {
   isAdminConfigured,
   isAdminGoogleEmail,
   isAdminTokenVersionValid,
+  isEmailAuthConfigured,
+  isFacebookOAuthConfigured,
   isGoogleOAuthConfigured,
   parseAdminEmails,
   parseCookies,
@@ -33,11 +35,14 @@ import {
   verifyAdminToken,
   verifyBootstrapCredentials,
   verifyOAuthStateToken,
+  verifyPasswordHash,
   verifyUserToken,
 } from '../../server/src/auth/admin-session.js';
 import {
   adminAccountUpdateSchema,
   adminLoginSchema,
+  customerLoginSchema,
+  customerRegisterSchema,
   galleryItemPayloadSchema,
   gamePayloadSchema,
   mediaUploadSchema,
@@ -91,6 +96,7 @@ const KEYS = {
   games: 'games',
   orders: 'orders',
   users: 'registered-users',
+  userCredentials: 'user-credentials',
   adminAccount: 'admin-account',
   loginThrottle: 'admin-login-throttle',
   assistantQuota: 'assistant-daily-quota',
@@ -116,6 +122,8 @@ function getAdminEnvConfig(readEnv = readRuntimeEnv) {
     ADMIN_SESSION_SECRET: readEnv('ADMIN_SESSION_SECRET') || '',
     GOOGLE_CLIENT_ID: readEnv('GOOGLE_CLIENT_ID') || '',
     GOOGLE_CLIENT_SECRET: readEnv('GOOGLE_CLIENT_SECRET') || '',
+    FACEBOOK_CLIENT_ID: readEnv('FACEBOOK_CLIENT_ID') || '',
+    FACEBOOK_CLIENT_SECRET: readEnv('FACEBOOK_CLIENT_SECRET') || '',
     USER_SESSION_SECRET: readEnv('USER_SESSION_SECRET') || '',
     BETTER_AUTH_SECRET: readEnv('BETTER_AUTH_SECRET') || '',
     GEMINI_API_KEY: readEnv('GEMINI_API_KEY') || '',
@@ -332,6 +340,7 @@ function resolveNetlifyAdminUser(request, envConfig, accountOverride = null) {
   const googleUser = authenticateUserCookie(request, envConfig);
   if (
     googleUser
+    && googleUser.provider === 'google'
     && googleUser.emailVerified !== false
     && isAdminGoogleEmail(googleUser.email, envConfig, accountOverride)
   ) {
@@ -354,6 +363,8 @@ async function loadRegisteredUsers(store) {
 async function upsertRegisteredUser(store, profile) {
   const normalizedEmail = profile.email.trim().toLowerCase();
   const userId = String(profile.sub || normalizedEmail);
+  const provider = String(profile.provider || 'google');
+  const emailVerified = profile.emailVerified !== false;
   const nowIso = new Date().toISOString();
   let record = null;
 
@@ -362,12 +373,14 @@ async function upsertRegisteredUser(store, profile) {
     const existing = existingIndex >= 0 ? users[existingIndex] : null;
 
     record = {
-      id: userId,
+      id: existing?.id || userId,
       email: normalizedEmail,
       name: String(profile.name || profile.given_name || normalizedEmail.split('@')[0] || 'Cliente').trim(),
-      image: typeof profile.picture === 'string' ? profile.picture : (existing?.image || ''),
-      provider: 'google',
-      emailVerified: true,
+      image: typeof profile.picture === 'string'
+        ? profile.picture
+        : (typeof profile.image === 'string' ? profile.image : (existing?.image || '')),
+      provider,
+      emailVerified,
       registeredAt: existing?.registeredAt || nowIso,
       lastLoginAt: nowIso,
       loginsCount: (existing?.loginsCount || 0) + 1,
@@ -501,6 +514,10 @@ export function createApiHandler({
     windowMs: rateLimits.scoresWindowMs ?? 5 * 60_000,
     max: rateLimits.scoresMax ?? 30,
   });
+  const checkCustomerAuthLimit = createMemoryLimiter({
+    windowMs: rateLimits.customerAuthWindowMs ?? 15 * 60_000,
+    max: rateLimits.customerAuthMax ?? 12,
+  });
   const loginMax = rateLimits.loginMax ?? 10;
   const loginWindowMs = rateLimits.loginWindowMs ?? 15 * 60_000;
 
@@ -551,10 +568,18 @@ export function createApiHandler({
 
       if (path === '/api/auth/status' && method === 'GET') {
         const googleEnabled = isGoogleOAuthConfigured(envConfig);
-        const sessionUser = googleEnabled ? authenticateUserCookie(request, envConfig) : null;
+        const facebookEnabled = isFacebookOAuthConfigured(envConfig);
+        const emailEnabled = isEmailAuthConfigured(envConfig);
+        const providers = [
+          ...(googleEnabled ? ['google'] : []),
+          ...(facebookEnabled ? ['facebook'] : []),
+          ...(emailEnabled ? ['email'] : []),
+        ];
+        const enabled = providers.length > 0;
+        const sessionUser = enabled ? authenticateUserCookie(request, envConfig) : null;
         return jsonResponse({
-          enabled: googleEnabled,
-          providers: googleEnabled ? ['google'] : [],
+          enabled,
+          providers,
           authFlow: 'redirect',
           session: sessionUser
             ? {
@@ -707,6 +732,256 @@ export function createApiHandler({
         return redirectResponse(returnTo, responseCookies);
       }
 
+      if (path === '/api/auth/register' && method === 'POST') {
+        if (!isSameOriginRequest(request, url)) {
+          return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
+        }
+        if (!isEmailAuthConfigured(envConfig)) {
+          return errorResponse(503, 'AUTH_NOT_CONFIGURED', 'El registro con correo todavía no está habilitado en el servidor.');
+        }
+
+        const retryAfter = checkCustomerAuthLimit(getClientIp(request));
+        if (retryAfter > 0) {
+          return jsonResponse(
+            {
+              error: {
+                code: 'RATE_LIMIT_EXCEEDED',
+                message: 'Demasiados intentos en poco tiempo. Esperá unos minutos y volvé a probar.',
+              },
+            },
+            429,
+            { 'Retry-After': String(retryAfter) },
+          );
+        }
+
+        const body = customerRegisterSchema.parse(await parseJsonBody(request));
+        const signingSecret = getSessionSigningSecret(envConfig);
+        const nowIso = new Date().toISOString();
+        const userId = 'USR-' + randomUUID();
+        const passwordHash = hashPasswordPbkdf2(body.password);
+
+        const credentialOutcome = await updateJsonBlob(store, KEYS.userCredentials, {}, (current) => {
+          if (current[body.email]) {
+            return {
+              value: current,
+              response: errorResponse(409, 'EMAIL_EXISTS', 'Ya existe una cuenta registrada con ese correo. Probá iniciar sesión.'),
+            };
+          }
+          return {
+            value: {
+              ...current,
+              [body.email]: {
+                id: userId,
+                email: body.email,
+                name: body.name,
+                passwordHash,
+                createdAt: nowIso,
+                updatedAt: nowIso,
+              },
+            },
+          };
+        });
+
+        if (credentialOutcome.response) {
+          return credentialOutcome.response;
+        }
+
+        const savedUser = await upsertRegisteredUser(store, {
+          sub: userId,
+          email: body.email,
+          name: body.name,
+          provider: 'email',
+          emailVerified: false,
+        });
+        const userToken = createUserToken(savedUser, signingSecret);
+
+        return jsonResponse(
+          {
+            user: {
+              id: savedUser.id,
+              email: savedUser.email,
+              name: savedUser.name,
+              image: savedUser.image,
+              provider: savedUser.provider,
+              emailVerified: savedUser.emailVerified,
+            },
+            session: {
+              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            },
+          },
+          201,
+          {},
+          [buildUserCookie(userToken, { secure: https })],
+        );
+      }
+
+      if (path === '/api/auth/login' && method === 'POST') {
+        if (!isSameOriginRequest(request, url)) {
+          return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
+        }
+        if (!isEmailAuthConfigured(envConfig)) {
+          return errorResponse(503, 'AUTH_NOT_CONFIGURED', 'El ingreso con correo todavía no está habilitado en el servidor.');
+        }
+
+        const retryAfter = checkCustomerAuthLimit(getClientIp(request));
+        if (retryAfter > 0) {
+          return jsonResponse(
+            {
+              error: {
+                code: 'RATE_LIMIT_EXCEEDED',
+                message: 'Demasiados intentos en poco tiempo. Esperá unos minutos y volvé a probar.',
+              },
+            },
+            429,
+            { 'Retry-After': String(retryAfter) },
+          );
+        }
+
+        const body = customerLoginSchema.parse(await parseJsonBody(request));
+        const credentials = await readJsonBlob(store, KEYS.userCredentials, {});
+        const record = credentials && typeof credentials === 'object' ? credentials[body.email] : null;
+        const validPassword = Boolean(record?.passwordHash) && verifyPasswordHash(body.password, record.passwordHash);
+
+        if (!record || !validPassword) {
+          return errorResponse(401, 'INVALID_CREDENTIALS', 'Correo o contraseña incorrectos.');
+        }
+
+        const savedUser = await upsertRegisteredUser(store, {
+          sub: record.id,
+          email: record.email,
+          name: record.name,
+          provider: 'email',
+          emailVerified: false,
+        });
+        const signingSecret = getSessionSigningSecret(envConfig);
+        const userToken = createUserToken(savedUser, signingSecret);
+
+        return jsonResponse(
+          {
+            user: {
+              id: savedUser.id,
+              email: savedUser.email,
+              name: savedUser.name,
+              image: savedUser.image,
+              provider: savedUser.provider,
+              emailVerified: savedUser.emailVerified,
+            },
+            session: {
+              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            },
+          },
+          200,
+          {},
+          [buildUserCookie(userToken, { secure: https })],
+        );
+      }
+
+      if (path === '/api/auth/facebook/start' && method === 'GET') {
+        if (!isFacebookOAuthConfigured(envConfig)) {
+          return errorResponse(503, 'AUTH_NOT_CONFIGURED', 'El inicio de sesión con Facebook todavía no está configurado en Netlify.');
+        }
+
+        const signingSecret = getSessionSigningSecret(envConfig);
+        const returnTo = sanitizeReturnTo(url.searchParams.get('returnTo'), '/');
+        const { state, codeVerifier } = generatePkcePair();
+        const stateToken = createOAuthStateToken({ state, codeVerifier, returnTo }, signingSecret);
+
+        const facebookUrl = new URL('https://www.facebook.com/v20.0/dialog/oauth');
+        facebookUrl.searchParams.set('client_id', envConfig.FACEBOOK_CLIENT_ID.trim());
+        facebookUrl.searchParams.set('redirect_uri', `${url.origin}/api/auth/callback/facebook`);
+        facebookUrl.searchParams.set('response_type', 'code');
+        facebookUrl.searchParams.set('scope', 'email,public_profile');
+        facebookUrl.searchParams.set('state', state);
+
+        return redirectResponse(facebookUrl.toString(), [
+          buildOAuthStateCookie(stateToken, { secure: https }),
+        ]);
+      }
+
+      if (path === '/api/auth/callback/facebook' && method === 'GET') {
+        const clearOAuthCookie = buildClearOAuthStateCookie({ secure: https });
+        const cookies = parseCookies(request.headers.get('cookie') || '');
+        const signingSecret = getSessionSigningSecret(envConfig);
+        const statePayload = signingSecret
+          ? verifyOAuthStateToken(cookies.ct_oauth_state, signingSecret)
+          : null;
+        const returnTo = statePayload?.returnTo || '/';
+
+        const oauthError = url.searchParams.get('error');
+        const code = url.searchParams.get('code');
+        const returnedState = url.searchParams.get('state');
+
+        if (
+          !isFacebookOAuthConfigured(envConfig)
+          || oauthError
+          || !code
+          || !returnedState
+          || !statePayload
+          || !safeEqualStrings(returnedState, statePayload.state)
+        ) {
+          return redirectResponse(
+            appendQueryParam(returnTo, 'auth_error', oauthError === 'access_denied' ? 'facebook_cancelled' : 'facebook_failed'),
+            [clearOAuthCookie],
+          );
+        }
+
+        const tokenUrl = new URL('https://graph.facebook.com/v20.0/oauth/access_token');
+        tokenUrl.searchParams.set('client_id', envConfig.FACEBOOK_CLIENT_ID.trim());
+        tokenUrl.searchParams.set('client_secret', envConfig.FACEBOOK_CLIENT_SECRET.trim());
+        tokenUrl.searchParams.set('redirect_uri', `${url.origin}/api/auth/callback/facebook`);
+        tokenUrl.searchParams.set('code', code);
+
+        const tokenResponse = await fetchImpl(tokenUrl.toString(), {
+          signal: AbortSignal.timeout(10_000),
+        });
+
+        if (!tokenResponse.ok) {
+          return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'facebook_token_failed'), [clearOAuthCookie]);
+        }
+
+        const tokenJson = await tokenResponse.json().catch(() => null);
+        if (!tokenJson?.access_token) {
+          return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'facebook_token_failed'), [clearOAuthCookie]);
+        }
+
+        const profileResponse = await fetchImpl(
+          'https://graph.facebook.com/me?fields=id,name,email,picture.type(large)',
+          {
+            headers: { Authorization: `Bearer ${tokenJson.access_token}` },
+            signal: AbortSignal.timeout(10_000),
+          },
+        );
+
+        if (!profileResponse.ok) {
+          return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'facebook_profile_failed'), [clearOAuthCookie]);
+        }
+
+        const profile = await profileResponse.json().catch(() => null);
+        if (!profile?.id || !profile?.email) {
+          return redirectResponse(appendQueryParam(returnTo, 'auth_error', 'facebook_no_email'), [clearOAuthCookie]);
+        }
+
+        const savedUser = await upsertRegisteredUser(store, {
+          sub: `fb:${profile.id}`,
+          email: profile.email,
+          name: profile.name,
+          picture: profile.picture?.data?.url || '',
+          provider: 'facebook',
+          emailVerified: true,
+        });
+        const userToken = createUserToken(savedUser, signingSecret);
+        const responseCookies = [
+          clearOAuthCookie,
+          buildUserCookie(userToken, { secure: https }),
+        ];
+
+        if (returnTo.startsWith('/admin.html')) {
+          return redirectResponse('/admin.html?auth_error=not_admin', responseCookies);
+        }
+
+        return redirectResponse(returnTo, responseCookies);
+      }
+
       if (path === '/api/auth/sign-out' && method === 'POST') {
         if (!isSameOriginRequest(request, url)) {
           return errorResponse(403, 'FORBIDDEN_ORIGIN', 'Origen no autorizado.');
@@ -822,7 +1097,9 @@ export function createApiHandler({
         }
 
         const sessionUser = authenticateUserCookie(request, envConfig);
-        const googleRegistered = Boolean(sessionUser);
+        const authProvider = sessionUser?.provider || input.authProvider || '';
+        const googleRegistered = Boolean(sessionUser && sessionUser.provider === 'google');
+        const accountRegistered = Boolean(sessionUser);
         const customerEmail = sessionUser?.email || '';
         const order = {
           id: 'PED-' + Date.now().toString(36).toUpperCase() + '-' + randomBytes(2).toString('hex').toUpperCase(),
@@ -830,6 +1107,8 @@ export function createApiHandler({
           customerName: input.customerName || sessionUser?.name || '',
           customerEmail,
           googleRegistered,
+          accountRegistered,
+          authProvider,
           notes: input.notes,
           items: priced.items,
           totalARS: priced.totalARS,
@@ -976,11 +1255,14 @@ export function createApiHandler({
             : null;
 
         if (!viewer) {
-          const anyAuthConfigured = isGoogleOAuthConfigured(envConfig) || isAdminConfigured(envConfig, accountOverride);
+          const anyAuthConfigured = isGoogleOAuthConfigured(envConfig)
+            || isFacebookOAuthConfigured(envConfig)
+            || isEmailAuthConfigured(envConfig)
+            || isAdminConfigured(envConfig, accountOverride);
           if (!anyAuthConfigured) {
-            return errorResponse(503, 'AUTH_NOT_CONFIGURED', 'El acceso estará disponible cuando se configure Google OAuth.');
+            return errorResponse(503, 'AUTH_NOT_CONFIGURED', 'El acceso estará disponible cuando se configure un método de ingreso.');
           }
-          return errorResponse(401, 'AUTH_REQUIRED', 'Iniciá sesión con Google para entrar a esta sección.');
+          return errorResponse(401, 'AUTH_REQUIRED', 'Iniciá sesión para entrar a esta sección.');
         }
 
         const gamesList = await loadGames(store);
