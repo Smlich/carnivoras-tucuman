@@ -160,7 +160,23 @@
 }
 
 .animate-title-stage-reveal {
-  animation: titleStageReveal 560ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both;
+  animation: titleStageReveal 580ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
+  will-change: transform, opacity;
+}
+
+@keyframes introVideoFadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.72;
+    transform: scale(1.03);
+  }
+}
+
+.animate-intro-video-exit {
+  animation: introVideoFadeOut 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: transform, opacity;
 }
 
